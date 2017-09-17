@@ -35,4 +35,8 @@ function Page_Unloaded() {
 
 	//echo "Page Unloaded";
 }
+
+function ewr_CurrentHost() {
+	return ewr_ServerVar("HTTP_HOST");
+}
 ?>

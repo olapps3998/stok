@@ -108,6 +108,36 @@
       <Properties><![CDATA[[{"Id":"PdfBackend","Type":"String","Value":"CPDF"},{"Id":"PdfFont","Type":"String","Value":"Helvetica"},{"Id":"MemoryLimit","Type":"String","Value":"128M"},{"Id":"TimeLimit","Type":"Integer","Value":120}]]]></Properties>
     </ExtProject>
   </Extension>
+  <CustomScript ScriptType="Server" ScriptCodeType="Global" ScriptName="Database_Connecting" ScriptCtrlID="" ScriptL1Key="" ScriptL2Key=""><![CDATA[// Database Connecting event
+function Database_Connecting(&$info) {
+	// Example:
+	//var_dump($info);
+	// Assume the scripts are generated with connection info for local PC
+	// if (ewr_CurrentUserIP() <> "127.0.0.1") { // not connecting to local PC
+	// // connect to the production database
+	// $info["host"] = "localhost";
+	// $info["user"] = "xxx";
+	// $info["pass"] = "yyy";
+	// $info["db"] = "production_db";
+	// }
+
+	if (ewr_CurrentUserIP () == "127.0.0.1"  || ewr_CurrentUserIP () == "::1"  || ewr_CurrentHost () == "localhost" ) { // testing on local PC
+		$info["host"] = "localhost";
+		$info["user"] = "root"; // sesuaikan dengan username database di komputer localhost
+		$info["pass"] = "admin"; // sesuaikan dengan password database di komputer localhost
+		$info["db"] = "db_stok"; // sesuaikan dengan nama database di komputer localhost
+	} else { // setting koneksi database untuk komputer server
+		$info["host"] = "mysql.idhostinger.com";  // sesuaikan dengan ip address atau hostname komputer server
+		$info["user"] = "u197022578_stok"; // sesuaikan dengan username database di komputer server
+		$info["pass"] = "M457r1P 81"; // sesuaikan deengan password database di komputer server
+		$info["db"] = "u197022578_stok"; // sesuaikan dengan nama database di komputer server
+	}
+}
+]]></CustomScript>
+  <CustomScript ScriptType="Server" ScriptCodeType="Global" ScriptName="Global Code" ScriptCtrlID="" ScriptL1Key="" ScriptL2Key=""><![CDATA[function ewr_CurrentHost() {
+	return ewr_ServerVar("HTTP_HOST");
+}
+]]></CustomScript>
   <Menu MenuID="7" MenuText="v 01beli laporan" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="v_01beli_laporan" MenuType="Table" MenuCustomUrl="0" MenuLevel="0" MenuShow="0" MenuDisplayOrder="100" />
   <Menu MenuID="8" MenuText="Pembelian" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="r_beli" MenuType="Table" MenuCustomUrl="0" MenuLevel="0" MenuShow="1" MenuDisplayOrder="200" />
   <Menu MenuID="1" MenuText="t 00audit trail" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="t_00audit_trail" MenuType="Table" MenuCustomUrl="0" MenuLevel="0" MenuShow="0" MenuDisplayOrder="300" />
