@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t_03satuaninfo.php" ?>
+<?php include_once "t_05customerinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -13,9 +13,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t_03satuan_addopt = NULL; // Initialize page object first
+$t_05customer_addopt = NULL; // Initialize page object first
 
-class ct_03satuan_addopt extends ct_03satuan {
+class ct_05customer_addopt extends ct_05customer {
 
 	// Page ID
 	var $PageID = 'addopt';
@@ -24,10 +24,10 @@ class ct_03satuan_addopt extends ct_03satuan {
 	var $ProjectID = "{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}";
 
 	// Table name
-	var $TableName = 't_03satuan';
+	var $TableName = 't_05customer';
 
 	// Page object name
-	var $PageObjName = 't_03satuan_addopt';
+	var $PageObjName = 't_05customer_addopt';
 
 	// Page name
 	function PageName() {
@@ -224,10 +224,10 @@ class ct_03satuan_addopt extends ct_03satuan {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t_03satuan)
-		if (!isset($GLOBALS["t_03satuan"]) || get_class($GLOBALS["t_03satuan"]) == "ct_03satuan") {
-			$GLOBALS["t_03satuan"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t_03satuan"];
+		// Table object (t_05customer)
+		if (!isset($GLOBALS["t_05customer"]) || get_class($GLOBALS["t_05customer"]) == "ct_05customer") {
+			$GLOBALS["t_05customer"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t_05customer"];
 		}
 
 		// Page ID
@@ -236,7 +236,7 @@ class ct_03satuan_addopt extends ct_03satuan {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't_03satuan', TRUE);
+			define("EW_TABLE_NAME", 't_05customer', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -254,7 +254,7 @@ class ct_03satuan_addopt extends ct_03satuan {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->satuan_nama->SetVisibility();
+		$this->customer_nama->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -300,13 +300,13 @@ class ct_03satuan_addopt extends ct_03satuan {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t_03satuan;
+		global $EW_EXPORT, $t_05customer;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t_03satuan);
+				$doc = new $class($t_05customer);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -363,8 +363,8 @@ class ct_03satuan_addopt extends ct_03satuan {
 				$this->SendEmail = TRUE; // Send email on add success
 				if ($this->AddRow()) { // Add successful
 					$row = array();
-					$row["x_satuan_id"] = $this->satuan_id->DbValue;
-					$row["x_satuan_nama"] = $this->satuan_nama->DbValue;
+					$row["x_customer_id"] = $this->customer_id->DbValue;
+					$row["x_customer_nama"] = $this->customer_nama->DbValue;
 					if (!EW_DEBUG_ENABLED && ob_get_length())
 						ob_end_clean();
 					echo ew_ArrayToJson(array($row));
@@ -390,8 +390,8 @@ class ct_03satuan_addopt extends ct_03satuan {
 
 	// Load default values
 	function LoadDefaultValues() {
-		$this->satuan_nama->CurrentValue = NULL;
-		$this->satuan_nama->OldValue = $this->satuan_nama->CurrentValue;
+		$this->customer_nama->CurrentValue = NULL;
+		$this->customer_nama->OldValue = $this->customer_nama->CurrentValue;
 	}
 
 	// Load form values
@@ -399,15 +399,15 @@ class ct_03satuan_addopt extends ct_03satuan {
 
 		// Load from form
 		global $objForm;
-		if (!$this->satuan_nama->FldIsDetailKey) {
-			$this->satuan_nama->setFormValue(ew_ConvertFromUtf8($objForm->GetValue("x_satuan_nama")));
+		if (!$this->customer_nama->FldIsDetailKey) {
+			$this->customer_nama->setFormValue(ew_ConvertFromUtf8($objForm->GetValue("x_customer_nama")));
 		}
 	}
 
 	// Restore form values
 	function RestoreFormValues() {
 		global $objForm;
-		$this->satuan_nama->CurrentValue = ew_ConvertToUtf8($this->satuan_nama->FormValue);
+		$this->customer_nama->CurrentValue = ew_ConvertToUtf8($this->customer_nama->FormValue);
 	}
 
 	// Load row based on key values
@@ -439,16 +439,16 @@ class ct_03satuan_addopt extends ct_03satuan {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->satuan_id->setDbValue($rs->fields('satuan_id'));
-		$this->satuan_nama->setDbValue($rs->fields('satuan_nama'));
+		$this->customer_id->setDbValue($rs->fields('customer_id'));
+		$this->customer_nama->setDbValue($rs->fields('customer_nama'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->satuan_id->DbValue = $row['satuan_id'];
-		$this->satuan_nama->DbValue = $row['satuan_nama'];
+		$this->customer_id->DbValue = $row['customer_id'];
+		$this->customer_nama->DbValue = $row['customer_nama'];
 	}
 
 	// Render row values based on field settings
@@ -461,36 +461,36 @@ class ct_03satuan_addopt extends ct_03satuan {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// satuan_id
-		// satuan_nama
+		// customer_id
+		// customer_nama
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// satuan_id
-		$this->satuan_id->ViewValue = $this->satuan_id->CurrentValue;
-		$this->satuan_id->ViewCustomAttributes = "";
+		// customer_id
+		$this->customer_id->ViewValue = $this->customer_id->CurrentValue;
+		$this->customer_id->ViewCustomAttributes = "";
 
-		// satuan_nama
-		$this->satuan_nama->ViewValue = $this->satuan_nama->CurrentValue;
-		$this->satuan_nama->ViewCustomAttributes = "";
+		// customer_nama
+		$this->customer_nama->ViewValue = $this->customer_nama->CurrentValue;
+		$this->customer_nama->ViewCustomAttributes = "";
 
-			// satuan_nama
-			$this->satuan_nama->LinkCustomAttributes = "";
-			$this->satuan_nama->HrefValue = "";
-			$this->satuan_nama->TooltipValue = "";
+			// customer_nama
+			$this->customer_nama->LinkCustomAttributes = "";
+			$this->customer_nama->HrefValue = "";
+			$this->customer_nama->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
-			// satuan_nama
-			$this->satuan_nama->EditAttrs["class"] = "form-control";
-			$this->satuan_nama->EditCustomAttributes = "";
-			$this->satuan_nama->EditValue = ew_HtmlEncode($this->satuan_nama->CurrentValue);
-			$this->satuan_nama->PlaceHolder = ew_RemoveHtml($this->satuan_nama->FldCaption());
+			// customer_nama
+			$this->customer_nama->EditAttrs["class"] = "form-control";
+			$this->customer_nama->EditCustomAttributes = "";
+			$this->customer_nama->EditValue = ew_HtmlEncode($this->customer_nama->CurrentValue);
+			$this->customer_nama->PlaceHolder = ew_RemoveHtml($this->customer_nama->FldCaption());
 
 			// Add refer script
-			// satuan_nama
+			// customer_nama
 
-			$this->satuan_nama->LinkCustomAttributes = "";
-			$this->satuan_nama->HrefValue = "";
+			$this->customer_nama->LinkCustomAttributes = "";
+			$this->customer_nama->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -513,8 +513,8 @@ class ct_03satuan_addopt extends ct_03satuan {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->satuan_nama->FldIsDetailKey && !is_null($this->satuan_nama->FormValue) && $this->satuan_nama->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->satuan_nama->FldCaption(), $this->satuan_nama->ReqErrMsg));
+		if (!$this->customer_nama->FldIsDetailKey && !is_null($this->customer_nama->FormValue) && $this->customer_nama->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->customer_nama->FldCaption(), $this->customer_nama->ReqErrMsg));
 		}
 
 		// Return validate result
@@ -532,12 +532,12 @@ class ct_03satuan_addopt extends ct_03satuan {
 	// Add record
 	function AddRow($rsold = NULL) {
 		global $Language, $Security;
-		if ($this->satuan_nama->CurrentValue <> "") { // Check field with unique index
-			$sFilter = "(satuan_nama = '" . ew_AdjustSql($this->satuan_nama->CurrentValue, $this->DBID) . "')";
+		if ($this->customer_nama->CurrentValue <> "") { // Check field with unique index
+			$sFilter = "(customer_nama = '" . ew_AdjustSql($this->customer_nama->CurrentValue, $this->DBID) . "')";
 			$rsChk = $this->LoadRs($sFilter);
 			if ($rsChk && !$rsChk->EOF) {
-				$sIdxErrMsg = str_replace("%f", $this->satuan_nama->FldCaption(), $Language->Phrase("DupIndex"));
-				$sIdxErrMsg = str_replace("%v", $this->satuan_nama->CurrentValue, $sIdxErrMsg);
+				$sIdxErrMsg = str_replace("%f", $this->customer_nama->FldCaption(), $Language->Phrase("DupIndex"));
+				$sIdxErrMsg = str_replace("%v", $this->customer_nama->CurrentValue, $sIdxErrMsg);
 				$this->setFailureMessage($sIdxErrMsg);
 				$rsChk->Close();
 				return FALSE;
@@ -551,8 +551,8 @@ class ct_03satuan_addopt extends ct_03satuan {
 		}
 		$rsnew = array();
 
-		// satuan_nama
-		$this->satuan_nama->SetDbValueDef($rsnew, $this->satuan_nama->CurrentValue, "", FALSE);
+		// customer_nama
+		$this->customer_nama->SetDbValueDef($rsnew, $this->customer_nama->CurrentValue, "", FALSE);
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -589,7 +589,7 @@ class ct_03satuan_addopt extends ct_03satuan {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_03satuanlist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_05customerlist.php"), "", $this->TableVar, TRUE);
 		$PageId = "addopt";
 		$Breadcrumb->Add("addopt", $PageId, $url);
 	}
@@ -683,28 +683,28 @@ class ct_03satuan_addopt extends ct_03satuan {
 <?php
 
 // Create page object
-if (!isset($t_03satuan_addopt)) $t_03satuan_addopt = new ct_03satuan_addopt();
+if (!isset($t_05customer_addopt)) $t_05customer_addopt = new ct_05customer_addopt();
 
 // Page init
-$t_03satuan_addopt->Page_Init();
+$t_05customer_addopt->Page_Init();
 
 // Page main
-$t_03satuan_addopt->Page_Main();
+$t_05customer_addopt->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t_03satuan_addopt->Page_Render();
+$t_05customer_addopt->Page_Render();
 ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "addopt";
-var CurrentForm = ft_03satuanaddopt = new ew_Form("ft_03satuanaddopt", "addopt");
+var CurrentForm = ft_05customeraddopt = new ew_Form("ft_05customeraddopt", "addopt");
 
 // Validate form
-ft_03satuanaddopt.Validate = function() {
+ft_05customeraddopt.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -718,9 +718,9 @@ ft_03satuanaddopt.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_satuan_nama");
+			elm = this.GetElements("x" + infix + "_customer_nama");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_03satuan->satuan_nama->FldCaption(), $t_03satuan->satuan_nama->ReqErrMsg)) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_05customer->customer_nama->FldCaption(), $t_05customer->customer_nama->ReqErrMsg)) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -730,7 +730,7 @@ ft_03satuanaddopt.Validate = function() {
 }
 
 // Form_CustomValidate event
-ft_03satuanaddopt.Form_CustomValidate = 
+ft_05customeraddopt.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -739,9 +739,9 @@ ft_03satuanaddopt.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft_03satuanaddopt.ValidateRequired = true;
+ft_05customeraddopt.ValidateRequired = true;
 <?php } else { ?>
-ft_03satuanaddopt.ValidateRequired = false; 
+ft_05customeraddopt.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
@@ -753,25 +753,25 @@ ft_03satuanaddopt.ValidateRequired = false;
 // Write your client script here, no need to add script tags.
 </script>
 <?php
-$t_03satuan_addopt->ShowMessage();
+$t_05customer_addopt->ShowMessage();
 ?>
-<form name="ft_03satuanaddopt" id="ft_03satuanaddopt" class="ewForm form-horizontal" action="t_03satuanaddopt.php" method="post">
-<?php if ($t_03satuan_addopt->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_03satuan_addopt->Token ?>">
+<form name="ft_05customeraddopt" id="ft_05customeraddopt" class="ewForm form-horizontal" action="t_05customeraddopt.php" method="post">
+<?php if ($t_05customer_addopt->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_05customer_addopt->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t_03satuan">
+<input type="hidden" name="t" value="t_05customer">
 <input type="hidden" name="a_addopt" id="a_addopt" value="A">
-<?php if ($t_03satuan->satuan_nama->Visible) { // satuan_nama ?>
+<?php if ($t_05customer->customer_nama->Visible) { // customer_nama ?>
 	<div class="form-group">
-		<label class="col-sm-3 control-label ewLabel" for="x_satuan_nama"><?php echo $t_03satuan->satuan_nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<label class="col-sm-3 control-label ewLabel" for="x_customer_nama"><?php echo $t_05customer->customer_nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="col-sm-9">
-<input type="text" data-table="t_03satuan" data-field="x_satuan_nama" name="x_satuan_nama" id="x_satuan_nama" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t_03satuan->satuan_nama->getPlaceHolder()) ?>" value="<?php echo $t_03satuan->satuan_nama->EditValue ?>"<?php echo $t_03satuan->satuan_nama->EditAttributes() ?>>
+<input type="text" data-table="t_05customer" data-field="x_customer_nama" name="x_customer_nama" id="x_customer_nama" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t_05customer->customer_nama->getPlaceHolder()) ?>" value="<?php echo $t_05customer->customer_nama->EditValue ?>"<?php echo $t_05customer->customer_nama->EditAttributes() ?>>
 </div>
 	</div>
 <?php } ?>	
 </form>
 <script type="text/javascript">
-ft_03satuanaddopt.Init();
+ft_05customeraddopt.Init();
 </script>
 <script type="text/javascript">
 
@@ -780,5 +780,5 @@ ft_03satuanaddopt.Init();
 
 </script>
 <?php
-$t_03satuan_addopt->Page_Terminate();
+$t_05customer_addopt->Page_Terminate();
 ?>

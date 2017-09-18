@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/9/17" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/9/18" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -601,11 +601,20 @@
     <menu id="4">
       <phrase id="menutext" value="Satuan" />
     </menu>
+    <menu id="10018">
+      <phrase id="menutext" value="Customer" />
+    </menu>
+    <menu id="10020">
+      <phrase id="menutext" value="Detail Penjualan" />
+    </menu>
     <menu id="10016">
       <phrase id="menutext" value="Transaksi" />
     </menu>
     <menu id="5">
       <phrase id="menutext" value="Pembelian" />
+    </menu>
+    <menu id="10019">
+      <phrase id="menutext" value="Penjualan" />
     </menu>
     <menu id="9">
       <phrase id="menutext" value="Laporan" />
@@ -779,6 +788,60 @@
       </field>
       <field id="jml_lunas">
         <phrase id="fldcaption" value="jml lunas" />
+      </field>
+    </table>
+    <table id="t_05customer">
+      <phrase id="tblcaption" value="Customer" />
+      <field id="customer_id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="customer_nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+    </table>
+    <table id="t_06jual">
+      <phrase id="tblcaption" value="Penjualan" />
+      <field id="jual_id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="no_po">
+        <phrase id="fldcaption" value="No. PO" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="Tgl." />
+      </field>
+      <field id="customer_id">
+        <phrase id="fldcaption" value="Customer" />
+      </field>
+      <field id="total">
+        <phrase id="fldcaption" value="Total" />
+      </field>
+    </table>
+    <table id="t_07jual_detail">
+      <phrase id="tblcaption" value="Detail Penjualan" />
+      <field id="jual_detail_id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="jual_id">
+        <phrase id="fldcaption" value="Jual ID" />
+      </field>
+      <field id="tgl_kirim">
+        <phrase id="fldcaption" value="Tgl. Kirim" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="Item" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty." />
+      </field>
+      <field id="satuan_id">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="Harga" />
+      </field>
+      <field id="sub_total">
+        <phrase id="fldcaption" value="Sub Total" />
       </field>
     </table>
   </project>

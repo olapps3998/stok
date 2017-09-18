@@ -5,7 +5,8 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t_01vendorinfo.php" ?>
+<?php include_once "t_06jualinfo.php" ?>
+<?php include_once "t_07jual_detailgridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -13,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t_01vendor_edit = NULL; // Initialize page object first
+$t_06jual_edit = NULL; // Initialize page object first
 
-class ct_01vendor_edit extends ct_01vendor {
+class ct_06jual_edit extends ct_06jual {
 
 	// Page ID
 	var $PageID = 'edit';
@@ -24,10 +25,10 @@ class ct_01vendor_edit extends ct_01vendor {
 	var $ProjectID = "{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}";
 
 	// Table name
-	var $TableName = 't_01vendor';
+	var $TableName = 't_06jual';
 
 	// Page object name
-	var $PageObjName = 't_01vendor_edit';
+	var $PageObjName = 't_06jual_edit';
 
 	// Page name
 	function PageName() {
@@ -224,10 +225,10 @@ class ct_01vendor_edit extends ct_01vendor {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t_01vendor)
-		if (!isset($GLOBALS["t_01vendor"]) || get_class($GLOBALS["t_01vendor"]) == "ct_01vendor") {
-			$GLOBALS["t_01vendor"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t_01vendor"];
+		// Table object (t_06jual)
+		if (!isset($GLOBALS["t_06jual"]) || get_class($GLOBALS["t_06jual"]) == "ct_06jual") {
+			$GLOBALS["t_06jual"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t_06jual"];
 		}
 
 		// Page ID
@@ -236,7 +237,7 @@ class ct_01vendor_edit extends ct_01vendor {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't_01vendor', TRUE);
+			define("EW_TABLE_NAME", 't_06jual', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -254,9 +255,10 @@ class ct_01vendor_edit extends ct_01vendor {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->vendor_id->SetVisibility();
-		$this->vendor_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
-		$this->vendor_nama->SetVisibility();
+		$this->no_po->SetVisibility();
+		$this->tgl->SetVisibility();
+		$this->customer_id->SetVisibility();
+		$this->total->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -273,6 +275,14 @@ class ct_01vendor_edit extends ct_01vendor {
 
 		// Process auto fill
 		if (@$_POST["ajax"] == "autofill") {
+
+			// Process auto fill for detail table 't_07jual_detail'
+			if (@$_POST["grid"] == "ft_07jual_detailgrid") {
+				if (!isset($GLOBALS["t_07jual_detail_grid"])) $GLOBALS["t_07jual_detail_grid"] = new ct_07jual_detail_grid;
+				$GLOBALS["t_07jual_detail_grid"]->Page_Init();
+				$this->Page_Terminate();
+				exit();
+			}
 			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
 			if ($results) {
 
@@ -302,13 +312,13 @@ class ct_01vendor_edit extends ct_01vendor {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t_01vendor;
+		global $EW_EXPORT, $t_06jual;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t_01vendor);
+				$doc = new $class($t_06jual);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -371,9 +381,9 @@ class ct_01vendor_edit extends ct_01vendor {
 		$bMatchRecord = FALSE;
 
 		// Load key from QueryString
-		if (@$_GET["vendor_id"] <> "") {
-			$this->vendor_id->setQueryStringValue($_GET["vendor_id"]);
-			$this->RecKey["vendor_id"] = $this->vendor_id->QueryStringValue;
+		if (@$_GET["jual_id"] <> "") {
+			$this->jual_id->setQueryStringValue($_GET["jual_id"]);
+			$this->RecKey["jual_id"] = $this->jual_id->QueryStringValue;
 		} else {
 			$bLoadCurrentRecord = TRUE;
 		}
@@ -385,7 +395,7 @@ class ct_01vendor_edit extends ct_01vendor {
 		if ($this->TotalRecs <= 0) { // No record found
 			if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 				$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-			$this->Page_Terminate("t_01vendorlist.php"); // Return to list page
+			$this->Page_Terminate("t_06juallist.php"); // Return to list page
 		} elseif ($bLoadCurrentRecord) { // Load current record position
 			$this->SetUpStartRec(); // Set up start record position
 
@@ -396,7 +406,7 @@ class ct_01vendor_edit extends ct_01vendor {
 			}
 		} else { // Match key values
 			while (!$this->Recordset->EOF) {
-				if (strval($this->vendor_id->CurrentValue) == strval($this->Recordset->fields('vendor_id'))) {
+				if (strval($this->jual_id->CurrentValue) == strval($this->Recordset->fields('jual_id'))) {
 					$this->setStartRecordNumber($this->StartRec); // Save record position
 					$bMatchRecord = TRUE;
 					break;
@@ -411,6 +421,9 @@ class ct_01vendor_edit extends ct_01vendor {
 		if (@$_POST["a_edit"] <> "") {
 			$this->CurrentAction = $_POST["a_edit"]; // Get action code
 			$this->LoadFormValues(); // Get form values
+
+			// Set up detail parameters
+			$this->SetUpDetailParms();
 		} else {
 			$this->CurrentAction = "I"; // Default action is display
 		}
@@ -429,14 +442,20 @@ class ct_01vendor_edit extends ct_01vendor {
 				if (!$bMatchRecord) {
 					if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 						$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-					$this->Page_Terminate("t_01vendorlist.php"); // Return to list page
+					$this->Page_Terminate("t_06juallist.php"); // Return to list page
 				} else {
 					$this->LoadRowValues($this->Recordset); // Load row values
 				}
+
+				// Set up detail parameters
+				$this->SetUpDetailParms();
 				break;
 			Case "U": // Update
-				$sReturnUrl = $this->getReturnUrl();
-				if (ew_GetPageName($sReturnUrl) == "t_01vendorlist.php")
+				if ($this->getCurrentDetailTable() <> "") // Master/detail edit
+					$sReturnUrl = $this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
+				else
+					$sReturnUrl = $this->getReturnUrl();
+				if (ew_GetPageName($sReturnUrl) == "t_06juallist.php")
 					$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
 				$this->SendEmail = TRUE; // Send email on update success
 				if ($this->EditRow()) { // Update record based on key
@@ -448,6 +467,9 @@ class ct_01vendor_edit extends ct_01vendor {
 				} else {
 					$this->EventCancelled = TRUE; // Event cancelled
 					$this->RestoreFormValues(); // Restore form values if update failed
+
+					// Set up detail parameters
+					$this->SetUpDetailParms();
 				}
 		}
 
@@ -508,19 +530,33 @@ class ct_01vendor_edit extends ct_01vendor {
 
 		// Load from form
 		global $objForm;
-		if (!$this->vendor_id->FldIsDetailKey)
-			$this->vendor_id->setFormValue($objForm->GetValue("x_vendor_id"));
-		if (!$this->vendor_nama->FldIsDetailKey) {
-			$this->vendor_nama->setFormValue($objForm->GetValue("x_vendor_nama"));
+		if (!$this->no_po->FldIsDetailKey) {
+			$this->no_po->setFormValue($objForm->GetValue("x_no_po"));
 		}
+		if (!$this->tgl->FldIsDetailKey) {
+			$this->tgl->setFormValue($objForm->GetValue("x_tgl"));
+			$this->tgl->CurrentValue = ew_UnFormatDateTime($this->tgl->CurrentValue, 7);
+		}
+		if (!$this->customer_id->FldIsDetailKey) {
+			$this->customer_id->setFormValue($objForm->GetValue("x_customer_id"));
+		}
+		if (!$this->total->FldIsDetailKey) {
+			$this->total->setFormValue($objForm->GetValue("x_total"));
+		}
+		if (!$this->jual_id->FldIsDetailKey)
+			$this->jual_id->setFormValue($objForm->GetValue("x_jual_id"));
 	}
 
 	// Restore form values
 	function RestoreFormValues() {
 		global $objForm;
 		$this->LoadRow();
-		$this->vendor_id->CurrentValue = $this->vendor_id->FormValue;
-		$this->vendor_nama->CurrentValue = $this->vendor_nama->FormValue;
+		$this->jual_id->CurrentValue = $this->jual_id->FormValue;
+		$this->no_po->CurrentValue = $this->no_po->FormValue;
+		$this->tgl->CurrentValue = $this->tgl->FormValue;
+		$this->tgl->CurrentValue = ew_UnFormatDateTime($this->tgl->CurrentValue, 7);
+		$this->customer_id->CurrentValue = $this->customer_id->FormValue;
+		$this->total->CurrentValue = $this->total->FormValue;
 	}
 
 	// Load recordset
@@ -535,7 +571,7 @@ class ct_01vendor_edit extends ct_01vendor {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -578,16 +614,27 @@ class ct_01vendor_edit extends ct_01vendor {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->vendor_id->setDbValue($rs->fields('vendor_id'));
-		$this->vendor_nama->setDbValue($rs->fields('vendor_nama'));
+		$this->jual_id->setDbValue($rs->fields('jual_id'));
+		$this->no_po->setDbValue($rs->fields('no_po'));
+		$this->tgl->setDbValue($rs->fields('tgl'));
+		$this->customer_id->setDbValue($rs->fields('customer_id'));
+		if (array_key_exists('EV__customer_id', $rs->fields)) {
+			$this->customer_id->VirtualValue = $rs->fields('EV__customer_id'); // Set up virtual field value
+		} else {
+			$this->customer_id->VirtualValue = ""; // Clear value
+		}
+		$this->total->setDbValue($rs->fields('total'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->vendor_id->DbValue = $row['vendor_id'];
-		$this->vendor_nama->DbValue = $row['vendor_nama'];
+		$this->jual_id->DbValue = $row['jual_id'];
+		$this->no_po->DbValue = $row['no_po'];
+		$this->tgl->DbValue = $row['tgl'];
+		$this->customer_id->DbValue = $row['customer_id'];
+		$this->total->DbValue = $row['total'];
 	}
 
 	// Render row values based on field settings
@@ -595,56 +642,153 @@ class ct_01vendor_edit extends ct_01vendor {
 		global $Security, $Language, $gsLanguage;
 
 		// Initialize URLs
-		// Call Row_Rendering event
+		// Convert decimal values if posted back
 
+		if ($this->total->FormValue == $this->total->CurrentValue && is_numeric(ew_StrToFloat($this->total->CurrentValue)))
+			$this->total->CurrentValue = ew_StrToFloat($this->total->CurrentValue);
+
+		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// vendor_id
-		// vendor_nama
+		// jual_id
+		// no_po
+		// tgl
+		// customer_id
+		// total
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// vendor_id
-		$this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
-		$this->vendor_id->ViewCustomAttributes = "";
+		// jual_id
+		$this->jual_id->ViewValue = $this->jual_id->CurrentValue;
+		$this->jual_id->ViewCustomAttributes = "";
 
-		// vendor_nama
-		$this->vendor_nama->ViewValue = $this->vendor_nama->CurrentValue;
-		$this->vendor_nama->ViewCustomAttributes = "";
+		// no_po
+		$this->no_po->ViewValue = $this->no_po->CurrentValue;
+		$this->no_po->ViewCustomAttributes = "";
 
-			// vendor_id
-			$this->vendor_id->LinkCustomAttributes = "";
-			$this->vendor_id->HrefValue = "";
-			$this->vendor_id->TooltipValue = "";
+		// tgl
+		$this->tgl->ViewValue = $this->tgl->CurrentValue;
+		$this->tgl->ViewValue = ew_FormatDateTime($this->tgl->ViewValue, 7);
+		$this->tgl->ViewCustomAttributes = "";
 
-			// vendor_nama
-			$this->vendor_nama->LinkCustomAttributes = "";
-			$this->vendor_nama->HrefValue = "";
-			$this->vendor_nama->TooltipValue = "";
+		// customer_id
+		if ($this->customer_id->VirtualValue <> "") {
+			$this->customer_id->ViewValue = $this->customer_id->VirtualValue;
+		} else {
+			$this->customer_id->ViewValue = $this->customer_id->CurrentValue;
+		if (strval($this->customer_id->CurrentValue) <> "") {
+			$sFilterWrk = "`customer_id`" . ew_SearchString("=", $this->customer_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `customer_id`, `customer_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_05customer`";
+		$sWhereWrk = "";
+		$this->customer_id->LookupFilters = array("dx1" => '`customer_nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->customer_id->ViewValue = $this->customer_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->customer_id->ViewValue = $this->customer_id->CurrentValue;
+			}
+		} else {
+			$this->customer_id->ViewValue = NULL;
+		}
+		}
+		$this->customer_id->ViewCustomAttributes = "";
+
+		// total
+		$this->total->ViewValue = $this->total->CurrentValue;
+		$this->total->ViewValue = ew_FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
+		$this->total->CellCssStyle .= "text-align: right;";
+		$this->total->ViewCustomAttributes = "";
+
+			// no_po
+			$this->no_po->LinkCustomAttributes = "";
+			$this->no_po->HrefValue = "";
+			$this->no_po->TooltipValue = "";
+
+			// tgl
+			$this->tgl->LinkCustomAttributes = "";
+			$this->tgl->HrefValue = "";
+			$this->tgl->TooltipValue = "";
+
+			// customer_id
+			$this->customer_id->LinkCustomAttributes = "";
+			$this->customer_id->HrefValue = "";
+			$this->customer_id->TooltipValue = "";
+
+			// total
+			$this->total->LinkCustomAttributes = "";
+			$this->total->HrefValue = "";
+			$this->total->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
-			// vendor_id
-			$this->vendor_id->EditAttrs["class"] = "form-control";
-			$this->vendor_id->EditCustomAttributes = "";
-			$this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
-			$this->vendor_id->ViewCustomAttributes = "";
+			// no_po
+			$this->no_po->EditAttrs["class"] = "form-control";
+			$this->no_po->EditCustomAttributes = "";
+			$this->no_po->EditValue = ew_HtmlEncode($this->no_po->CurrentValue);
+			$this->no_po->PlaceHolder = ew_RemoveHtml($this->no_po->FldCaption());
 
-			// vendor_nama
-			$this->vendor_nama->EditAttrs["class"] = "form-control";
-			$this->vendor_nama->EditCustomAttributes = "";
-			$this->vendor_nama->EditValue = ew_HtmlEncode($this->vendor_nama->CurrentValue);
-			$this->vendor_nama->PlaceHolder = ew_RemoveHtml($this->vendor_nama->FldCaption());
+			// tgl
+			$this->tgl->EditAttrs["class"] = "form-control";
+			$this->tgl->EditCustomAttributes = "";
+			$this->tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->tgl->CurrentValue, 7));
+			$this->tgl->PlaceHolder = ew_RemoveHtml($this->tgl->FldCaption());
+
+			// customer_id
+			$this->customer_id->EditAttrs["class"] = "form-control";
+			$this->customer_id->EditCustomAttributes = "";
+			$this->customer_id->EditValue = ew_HtmlEncode($this->customer_id->CurrentValue);
+			if (strval($this->customer_id->CurrentValue) <> "") {
+				$sFilterWrk = "`customer_id`" . ew_SearchString("=", $this->customer_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$sSqlWrk = "SELECT `customer_id`, `customer_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_05customer`";
+			$sWhereWrk = "";
+			$this->customer_id->LookupFilters = array("dx1" => '`customer_nama`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
+					$this->customer_id->EditValue = $this->customer_id->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->customer_id->EditValue = ew_HtmlEncode($this->customer_id->CurrentValue);
+				}
+			} else {
+				$this->customer_id->EditValue = NULL;
+			}
+			$this->customer_id->PlaceHolder = ew_RemoveHtml($this->customer_id->FldCaption());
+
+			// total
+			$this->total->EditAttrs["class"] = "form-control";
+			$this->total->EditCustomAttributes = "";
+			$this->total->EditValue = ew_HtmlEncode($this->total->CurrentValue);
+			$this->total->PlaceHolder = ew_RemoveHtml($this->total->FldCaption());
+			if (strval($this->total->EditValue) <> "" && is_numeric($this->total->EditValue)) $this->total->EditValue = ew_FormatNumber($this->total->EditValue, -2, -2, -2, -2);
 
 			// Edit refer script
-			// vendor_id
+			// no_po
 
-			$this->vendor_id->LinkCustomAttributes = "";
-			$this->vendor_id->HrefValue = "";
+			$this->no_po->LinkCustomAttributes = "";
+			$this->no_po->HrefValue = "";
 
-			// vendor_nama
-			$this->vendor_nama->LinkCustomAttributes = "";
-			$this->vendor_nama->HrefValue = "";
+			// tgl
+			$this->tgl->LinkCustomAttributes = "";
+			$this->tgl->HrefValue = "";
+
+			// customer_id
+			$this->customer_id->LinkCustomAttributes = "";
+			$this->customer_id->HrefValue = "";
+
+			// total
+			$this->total->LinkCustomAttributes = "";
+			$this->total->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -667,8 +811,18 @@ class ct_01vendor_edit extends ct_01vendor {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->vendor_nama->FldIsDetailKey && !is_null($this->vendor_nama->FormValue) && $this->vendor_nama->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->vendor_nama->FldCaption(), $this->vendor_nama->ReqErrMsg));
+		if (!ew_CheckEuroDate($this->tgl->FormValue)) {
+			ew_AddMessage($gsFormError, $this->tgl->FldErrMsg());
+		}
+		if (!ew_CheckNumber($this->total->FormValue)) {
+			ew_AddMessage($gsFormError, $this->total->FldErrMsg());
+		}
+
+		// Validate detail grid
+		$DetailTblVar = explode(",", $this->getCurrentDetailTable());
+		if (in_array("t_07jual_detail", $DetailTblVar) && $GLOBALS["t_07jual_detail"]->DetailEdit) {
+			if (!isset($GLOBALS["t_07jual_detail_grid"])) $GLOBALS["t_07jual_detail_grid"] = new ct_07jual_detail_grid(); // get detail page object
+			$GLOBALS["t_07jual_detail_grid"]->ValidateGridForm();
 		}
 
 		// Return validate result
@@ -689,8 +843,8 @@ class ct_01vendor_edit extends ct_01vendor {
 		$sFilter = $this->KeyFilter();
 		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$conn = &$this->Connection();
-		if ($this->vendor_nama->CurrentValue <> "") { // Check field with unique index
-			$sFilterChk = "(`vendor_nama` = '" . ew_AdjustSql($this->vendor_nama->CurrentValue, $this->DBID) . "')";
+		if ($this->no_po->CurrentValue <> "") { // Check field with unique index
+			$sFilterChk = "(`no_po` = '" . ew_AdjustSql($this->no_po->CurrentValue, $this->DBID) . "')";
 			$sFilterChk .= " AND NOT (" . $sFilter . ")";
 			$this->CurrentFilter = $sFilterChk;
 			$sSqlChk = $this->SQL();
@@ -700,8 +854,8 @@ class ct_01vendor_edit extends ct_01vendor {
 			if ($rsChk === FALSE) {
 				return FALSE;
 			} elseif (!$rsChk->EOF) {
-				$sIdxErrMsg = str_replace("%f", $this->vendor_nama->FldCaption(), $Language->Phrase("DupIndex"));
-				$sIdxErrMsg = str_replace("%v", $this->vendor_nama->CurrentValue, $sIdxErrMsg);
+				$sIdxErrMsg = str_replace("%f", $this->no_po->FldCaption(), $Language->Phrase("DupIndex"));
+				$sIdxErrMsg = str_replace("%v", $this->no_po->CurrentValue, $sIdxErrMsg);
 				$this->setFailureMessage($sIdxErrMsg);
 				$rsChk->Close();
 				return FALSE;
@@ -720,13 +874,26 @@ class ct_01vendor_edit extends ct_01vendor {
 			$EditRow = FALSE; // Update Failed
 		} else {
 
+			// Begin transaction
+			if ($this->getCurrentDetailTable() <> "")
+				$conn->BeginTrans();
+
 			// Save old values
 			$rsold = &$rs->fields;
 			$this->LoadDbValues($rsold);
 			$rsnew = array();
 
-			// vendor_nama
-			$this->vendor_nama->SetDbValueDef($rsnew, $this->vendor_nama->CurrentValue, "", $this->vendor_nama->ReadOnly);
+			// no_po
+			$this->no_po->SetDbValueDef($rsnew, $this->no_po->CurrentValue, NULL, $this->no_po->ReadOnly);
+
+			// tgl
+			$this->tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl->CurrentValue, 7), NULL, $this->tgl->ReadOnly);
+
+			// customer_id
+			$this->customer_id->SetDbValueDef($rsnew, $this->customer_id->CurrentValue, NULL, $this->customer_id->ReadOnly);
+
+			// total
+			$this->total->SetDbValueDef($rsnew, $this->total->CurrentValue, NULL, $this->total->ReadOnly);
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -738,6 +905,24 @@ class ct_01vendor_edit extends ct_01vendor {
 					$EditRow = TRUE; // No field to update
 				$conn->raiseErrorFn = '';
 				if ($EditRow) {
+				}
+
+				// Update detail records
+				$DetailTblVar = explode(",", $this->getCurrentDetailTable());
+				if ($EditRow) {
+					if (in_array("t_07jual_detail", $DetailTblVar) && $GLOBALS["t_07jual_detail"]->DetailEdit) {
+						if (!isset($GLOBALS["t_07jual_detail_grid"])) $GLOBALS["t_07jual_detail_grid"] = new ct_07jual_detail_grid(); // Get detail page object
+						$EditRow = $GLOBALS["t_07jual_detail_grid"]->GridUpdate();
+					}
+				}
+
+				// Commit/Rollback transaction
+				if ($this->getCurrentDetailTable() <> "") {
+					if ($EditRow) {
+						$conn->CommitTrans(); // Commit transaction
+					} else {
+						$conn->RollbackTrans(); // Rollback transaction
+					}
 				}
 			} else {
 				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
@@ -760,12 +945,42 @@ class ct_01vendor_edit extends ct_01vendor {
 		return $EditRow;
 	}
 
+	// Set up detail parms based on QueryString
+	function SetUpDetailParms() {
+
+		// Get the keys for master table
+		if (isset($_GET[EW_TABLE_SHOW_DETAIL])) {
+			$sDetailTblVar = $_GET[EW_TABLE_SHOW_DETAIL];
+			$this->setCurrentDetailTable($sDetailTblVar);
+		} else {
+			$sDetailTblVar = $this->getCurrentDetailTable();
+		}
+		if ($sDetailTblVar <> "") {
+			$DetailTblVar = explode(",", $sDetailTblVar);
+			if (in_array("t_07jual_detail", $DetailTblVar)) {
+				if (!isset($GLOBALS["t_07jual_detail_grid"]))
+					$GLOBALS["t_07jual_detail_grid"] = new ct_07jual_detail_grid;
+				if ($GLOBALS["t_07jual_detail_grid"]->DetailEdit) {
+					$GLOBALS["t_07jual_detail_grid"]->CurrentMode = "edit";
+					$GLOBALS["t_07jual_detail_grid"]->CurrentAction = "gridedit";
+
+					// Save current master table to detail table
+					$GLOBALS["t_07jual_detail_grid"]->setCurrentMasterTable($this->TableVar);
+					$GLOBALS["t_07jual_detail_grid"]->setStartRecordNumber(1);
+					$GLOBALS["t_07jual_detail_grid"]->jual_id->FldIsDetailKey = TRUE;
+					$GLOBALS["t_07jual_detail_grid"]->jual_id->CurrentValue = $this->jual_id->CurrentValue;
+					$GLOBALS["t_07jual_detail_grid"]->jual_id->setSessionValue($GLOBALS["t_07jual_detail_grid"]->jual_id->CurrentValue);
+				}
+			}
+		}
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_01vendorlist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_06juallist.php"), "", $this->TableVar, TRUE);
 		$PageId = "edit";
 		$Breadcrumb->Add("edit", $PageId, $url);
 	}
@@ -775,6 +990,18 @@ class ct_01vendor_edit extends ct_01vendor {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_customer_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `customer_id` AS `LinkFld`, `customer_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_05customer`";
+			$sWhereWrk = "{filter}";
+			$this->customer_id->LookupFilters = array("dx1" => '`customer_nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`customer_id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -783,6 +1010,19 @@ class ct_01vendor_edit extends ct_01vendor {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_customer_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `customer_id`, `customer_nama` AS `DispFld` FROM `t_05customer`";
+			$sWhereWrk = "`customer_nama` LIKE '{query_value}%'";
+			$this->customer_id->LookupFilters = array("dx1" => '`customer_nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->customer_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$sSqlWrk .= " LIMIT " . EW_AUTO_SUGGEST_MAX_ENTRIES;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -858,29 +1098,29 @@ class ct_01vendor_edit extends ct_01vendor {
 <?php
 
 // Create page object
-if (!isset($t_01vendor_edit)) $t_01vendor_edit = new ct_01vendor_edit();
+if (!isset($t_06jual_edit)) $t_06jual_edit = new ct_06jual_edit();
 
 // Page init
-$t_01vendor_edit->Page_Init();
+$t_06jual_edit->Page_Init();
 
 // Page main
-$t_01vendor_edit->Page_Main();
+$t_06jual_edit->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t_01vendor_edit->Page_Render();
+$t_06jual_edit->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "edit";
-var CurrentForm = ft_01vendoredit = new ew_Form("ft_01vendoredit", "edit");
+var CurrentForm = ft_06jualedit = new ew_Form("ft_06jualedit", "edit");
 
 // Validate form
-ft_01vendoredit.Validate = function() {
+ft_06jualedit.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -894,9 +1134,12 @@ ft_01vendoredit.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_vendor_nama");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_01vendor->vendor_nama->FldCaption(), $t_01vendor->vendor_nama->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_tgl");
+			if (elm && !ew_CheckEuroDate(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->tgl->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_total");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->total->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -915,7 +1158,7 @@ ft_01vendoredit.Validate = function() {
 }
 
 // Form_CustomValidate event
-ft_01vendoredit.Form_CustomValidate = 
+ft_06jualedit.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -924,163 +1167,212 @@ ft_01vendoredit.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft_01vendoredit.ValidateRequired = true;
+ft_06jualedit.ValidateRequired = true;
 <?php } else { ?>
-ft_01vendoredit.ValidateRequired = false; 
+ft_06jualedit.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+ft_06jualedit.Lists["x_customer_id"] = {"LinkField":"x_customer_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_customer_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_05customer"};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php if (!$t_01vendor_edit->IsModal) { ?>
+<?php if (!$t_06jual_edit->IsModal) { ?>
 <div class="ewToolbar">
 <?php $Breadcrumb->Render(); ?>
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $t_01vendor_edit->ShowPageHeader(); ?>
+<?php $t_06jual_edit->ShowPageHeader(); ?>
 <?php
-$t_01vendor_edit->ShowMessage();
+$t_06jual_edit->ShowMessage();
 ?>
-<?php if (!$t_01vendor_edit->IsModal) { ?>
+<?php if (!$t_06jual_edit->IsModal) { ?>
 <form name="ewPagerForm" class="form-horizontal ewForm ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($t_01vendor_edit->Pager)) $t_01vendor_edit->Pager = new cPrevNextPager($t_01vendor_edit->StartRec, $t_01vendor_edit->DisplayRecs, $t_01vendor_edit->TotalRecs) ?>
-<?php if ($t_01vendor_edit->Pager->RecordCount > 0 && $t_01vendor_edit->Pager->Visible) { ?>
+<?php if (!isset($t_06jual_edit->Pager)) $t_06jual_edit->Pager = new cPrevNextPager($t_06jual_edit->StartRec, $t_06jual_edit->DisplayRecs, $t_06jual_edit->TotalRecs) ?>
+<?php if ($t_06jual_edit->Pager->RecordCount > 0 && $t_06jual_edit->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t_01vendor_edit->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_01vendor_edit->PageUrl() ?>start=<?php echo $t_01vendor_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t_06jual_edit->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_06jual_edit->PageUrl() ?>start=<?php echo $t_06jual_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t_01vendor_edit->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_01vendor_edit->PageUrl() ?>start=<?php echo $t_01vendor_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t_06jual_edit->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_06jual_edit->PageUrl() ?>start=<?php echo $t_06jual_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_01vendor_edit->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_06jual_edit->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t_01vendor_edit->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_01vendor_edit->PageUrl() ?>start=<?php echo $t_01vendor_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t_06jual_edit->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_06jual_edit->PageUrl() ?>start=<?php echo $t_06jual_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t_01vendor_edit->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_01vendor_edit->PageUrl() ?>start=<?php echo $t_01vendor_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t_06jual_edit->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_06jual_edit->PageUrl() ?>start=<?php echo $t_06jual_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_01vendor_edit->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_06jual_edit->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 </form>
 <?php } ?>
-<form name="ft_01vendoredit" id="ft_01vendoredit" class="<?php echo $t_01vendor_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t_01vendor_edit->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_01vendor_edit->Token ?>">
+<form name="ft_06jualedit" id="ft_06jualedit" class="<?php echo $t_06jual_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t_06jual_edit->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_06jual_edit->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t_01vendor">
+<input type="hidden" name="t" value="t_06jual">
 <input type="hidden" name="a_edit" id="a_edit" value="U">
-<?php if ($t_01vendor_edit->IsModal) { ?>
+<?php if ($t_06jual_edit->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <div>
-<?php if ($t_01vendor->vendor_id->Visible) { // vendor_id ?>
-	<div id="r_vendor_id" class="form-group">
-		<label id="elh_t_01vendor_vendor_id" class="col-sm-2 control-label ewLabel"><?php echo $t_01vendor->vendor_id->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $t_01vendor->vendor_id->CellAttributes() ?>>
-<span id="el_t_01vendor_vendor_id">
-<span<?php echo $t_01vendor->vendor_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t_01vendor->vendor_id->EditValue ?></p></span>
+<?php if ($t_06jual->no_po->Visible) { // no_po ?>
+	<div id="r_no_po" class="form-group">
+		<label id="elh_t_06jual_no_po" for="x_no_po" class="col-sm-2 control-label ewLabel"><?php echo $t_06jual->no_po->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_06jual->no_po->CellAttributes() ?>>
+<span id="el_t_06jual_no_po">
+<input type="text" data-table="t_06jual" data-field="x_no_po" name="x_no_po" id="x_no_po" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t_06jual->no_po->getPlaceHolder()) ?>" value="<?php echo $t_06jual->no_po->EditValue ?>"<?php echo $t_06jual->no_po->EditAttributes() ?>>
 </span>
-<input type="hidden" data-table="t_01vendor" data-field="x_vendor_id" name="x_vendor_id" id="x_vendor_id" value="<?php echo ew_HtmlEncode($t_01vendor->vendor_id->CurrentValue) ?>">
-<?php echo $t_01vendor->vendor_id->CustomMsg ?></div></div>
+<?php echo $t_06jual->no_po->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t_01vendor->vendor_nama->Visible) { // vendor_nama ?>
-	<div id="r_vendor_nama" class="form-group">
-		<label id="elh_t_01vendor_vendor_nama" for="x_vendor_nama" class="col-sm-2 control-label ewLabel"><?php echo $t_01vendor->vendor_nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $t_01vendor->vendor_nama->CellAttributes() ?>>
-<span id="el_t_01vendor_vendor_nama">
-<input type="text" data-table="t_01vendor" data-field="x_vendor_nama" name="x_vendor_nama" id="x_vendor_nama" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t_01vendor->vendor_nama->getPlaceHolder()) ?>" value="<?php echo $t_01vendor->vendor_nama->EditValue ?>"<?php echo $t_01vendor->vendor_nama->EditAttributes() ?>>
+<?php if ($t_06jual->tgl->Visible) { // tgl ?>
+	<div id="r_tgl" class="form-group">
+		<label id="elh_t_06jual_tgl" for="x_tgl" class="col-sm-2 control-label ewLabel"><?php echo $t_06jual->tgl->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_06jual->tgl->CellAttributes() ?>>
+<span id="el_t_06jual_tgl">
+<input type="text" data-table="t_06jual" data-field="x_tgl" data-format="7" name="x_tgl" id="x_tgl" placeholder="<?php echo ew_HtmlEncode($t_06jual->tgl->getPlaceHolder()) ?>" value="<?php echo $t_06jual->tgl->EditValue ?>"<?php echo $t_06jual->tgl->EditAttributes() ?>>
+<?php if (!$t_06jual->tgl->ReadOnly && !$t_06jual->tgl->Disabled && !isset($t_06jual->tgl->EditAttrs["readonly"]) && !isset($t_06jual->tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft_06jualedit", "x_tgl", 7);
+</script>
+<?php } ?>
 </span>
-<?php echo $t_01vendor->vendor_nama->CustomMsg ?></div></div>
+<?php echo $t_06jual->tgl->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_06jual->customer_id->Visible) { // customer_id ?>
+	<div id="r_customer_id" class="form-group">
+		<label id="elh_t_06jual_customer_id" class="col-sm-2 control-label ewLabel"><?php echo $t_06jual->customer_id->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_06jual->customer_id->CellAttributes() ?>>
+<span id="el_t_06jual_customer_id">
+<?php
+$wrkonchange = trim(" " . @$t_06jual->customer_id->EditAttrs["onchange"]);
+if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
+$t_06jual->customer_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x_customer_id" style="white-space: nowrap; z-index: 8960">
+	<input type="text" name="sv_x_customer_id" id="sv_x_customer_id" value="<?php echo $t_06jual->customer_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($t_06jual->customer_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_06jual->customer_id->getPlaceHolder()) ?>"<?php echo $t_06jual->customer_id->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_customer_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_06jual->customer_id->DisplayValueSeparatorAttribute() ?>" name="x_customer_id" id="x_customer_id" value="<?php echo ew_HtmlEncode($t_06jual->customer_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<input type="hidden" name="q_x_customer_id" id="q_x_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery(true) ?>">
+<script type="text/javascript">
+ft_06jualedit.CreateAutoSuggest({"id":"x_customer_id","forceSelect":true});
+</script>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_06jual->customer_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_customer_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" name="s_x_customer_id" id="s_x_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery(false) ?>">
+<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_06jual->customer_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x_customer_id',url:'t_05customeraddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x_customer_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_06jual->customer_id->FldCaption() ?></span></button>
+<input type="hidden" name="s_x_customer_id" id="s_x_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery() ?>">
+</span>
+<?php echo $t_06jual->customer_id->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_06jual->total->Visible) { // total ?>
+	<div id="r_total" class="form-group">
+		<label id="elh_t_06jual_total" for="x_total" class="col-sm-2 control-label ewLabel"><?php echo $t_06jual->total->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_06jual->total->CellAttributes() ?>>
+<span id="el_t_06jual_total">
+<input type="text" data-table="t_06jual" data-field="x_total" name="x_total" id="x_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
+</span>
+<?php echo $t_06jual->total->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div>
-<?php if (!$t_01vendor_edit->IsModal) { ?>
+<input type="hidden" data-table="t_06jual" data-field="x_jual_id" name="x_jual_id" id="x_jual_id" value="<?php echo ew_HtmlEncode($t_06jual->jual_id->CurrentValue) ?>">
+<?php
+	if (in_array("t_07jual_detail", explode(",", $t_06jual->getCurrentDetailTable())) && $t_07jual_detail->DetailEdit) {
+?>
+<?php if ($t_06jual->getCurrentDetailTable() <> "") { ?>
+<h4 class="ewDetailCaption"><?php echo $Language->TablePhrase("t_07jual_detail", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "t_07jual_detailgrid.php" ?>
+<?php } ?>
+<?php if (!$t_06jual_edit->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("SaveBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t_01vendor_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t_06jual_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 	</div>
 </div>
-<?php if (!isset($t_01vendor_edit->Pager)) $t_01vendor_edit->Pager = new cPrevNextPager($t_01vendor_edit->StartRec, $t_01vendor_edit->DisplayRecs, $t_01vendor_edit->TotalRecs) ?>
-<?php if ($t_01vendor_edit->Pager->RecordCount > 0 && $t_01vendor_edit->Pager->Visible) { ?>
+<?php if (!isset($t_06jual_edit->Pager)) $t_06jual_edit->Pager = new cPrevNextPager($t_06jual_edit->StartRec, $t_06jual_edit->DisplayRecs, $t_06jual_edit->TotalRecs) ?>
+<?php if ($t_06jual_edit->Pager->RecordCount > 0 && $t_06jual_edit->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t_01vendor_edit->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_01vendor_edit->PageUrl() ?>start=<?php echo $t_01vendor_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t_06jual_edit->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_06jual_edit->PageUrl() ?>start=<?php echo $t_06jual_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t_01vendor_edit->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_01vendor_edit->PageUrl() ?>start=<?php echo $t_01vendor_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t_06jual_edit->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_06jual_edit->PageUrl() ?>start=<?php echo $t_06jual_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_01vendor_edit->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_06jual_edit->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t_01vendor_edit->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_01vendor_edit->PageUrl() ?>start=<?php echo $t_01vendor_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t_06jual_edit->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_06jual_edit->PageUrl() ?>start=<?php echo $t_06jual_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t_01vendor_edit->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_01vendor_edit->PageUrl() ?>start=<?php echo $t_01vendor_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t_06jual_edit->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_06jual_edit->PageUrl() ?>start=<?php echo $t_06jual_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_01vendor_edit->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_06jual_edit->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 <?php } ?>
 </form>
 <script type="text/javascript">
-ft_01vendoredit.Init();
+ft_06jualedit.Init();
 </script>
 <?php
-$t_01vendor_edit->ShowPageFooter();
+$t_06jual_edit->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1092,5 +1384,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t_01vendor_edit->Page_Terminate();
+$t_06jual_edit->Page_Terminate();
 ?>

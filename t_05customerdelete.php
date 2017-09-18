@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t_03satuaninfo.php" ?>
+<?php include_once "t_05customerinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -13,21 +13,21 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t_03satuan_addopt = NULL; // Initialize page object first
+$t_05customer_delete = NULL; // Initialize page object first
 
-class ct_03satuan_addopt extends ct_03satuan {
+class ct_05customer_delete extends ct_05customer {
 
 	// Page ID
-	var $PageID = 'addopt';
+	var $PageID = 'delete';
 
 	// Project ID
 	var $ProjectID = "{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}";
 
 	// Table name
-	var $TableName = 't_03satuan';
+	var $TableName = 't_05customer';
 
 	// Page object name
-	var $PageObjName = 't_03satuan_addopt';
+	var $PageObjName = 't_05customer_delete';
 
 	// Page name
 	function PageName() {
@@ -224,19 +224,19 @@ class ct_03satuan_addopt extends ct_03satuan {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t_03satuan)
-		if (!isset($GLOBALS["t_03satuan"]) || get_class($GLOBALS["t_03satuan"]) == "ct_03satuan") {
-			$GLOBALS["t_03satuan"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t_03satuan"];
+		// Table object (t_05customer)
+		if (!isset($GLOBALS["t_05customer"]) || get_class($GLOBALS["t_05customer"]) == "ct_05customer") {
+			$GLOBALS["t_05customer"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t_05customer"];
 		}
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
-			define("EW_PAGE_ID", 'addopt', TRUE);
+			define("EW_PAGE_ID", 'delete', TRUE);
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't_03satuan', TRUE);
+			define("EW_TABLE_NAME", 't_05customer', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -250,11 +250,8 @@ class ct_03satuan_addopt extends ct_03satuan {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
-
-		// Create form object
-		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->satuan_nama->SetVisibility();
+		$this->customer_nama->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -267,20 +264,6 @@ class ct_03satuan_addopt extends ct_03satuan {
 			echo $Language->Phrase("InvalidPostRequest");
 			$this->Page_Terminate();
 			exit();
-		}
-
-		// Process auto fill
-		if (@$_POST["ajax"] == "autofill") {
-			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
-			if ($results) {
-
-				// Clean output buffer
-				if (!EW_DEBUG_ENABLED && ob_get_length())
-					ob_end_clean();
-				echo $results;
-				$this->Page_Terminate();
-				exit();
-			}
 		}
 
 		// Create Token
@@ -300,13 +283,13 @@ class ct_03satuan_addopt extends ct_03satuan {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t_03satuan;
+		global $EW_EXPORT, $t_05customer;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t_03satuan);
+				$doc = new $class($t_05customer);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -329,85 +312,89 @@ class ct_03satuan_addopt extends ct_03satuan {
 		}
 		exit();
 	}
+	var $DbMasterFilter = "";
+	var $DbDetailFilter = "";
+	var $StartRec;
+	var $TotalRecs = 0;
+	var $RecCnt;
+	var $RecKeys = array();
+	var $Recordset;
+	var $StartRowCnt = 1;
+	var $RowCnt = 0;
 
 	//
 	// Page main
 	//
 	function Page_Main() {
-		global $objForm, $Language, $gsFormError;
-		set_error_handler("ew_ErrorHandler");
+		global $Language;
 
 		// Set up Breadcrumb
-		//$this->SetupBreadcrumb(); // Not used
-		// Process form if post back
+		$this->SetupBreadcrumb();
 
-		if ($objForm->GetValue("a_addopt") <> "") {
-			$this->CurrentAction = $objForm->GetValue("a_addopt"); // Get form action
-			$this->LoadFormValues(); // Load form values
+		// Load key parameters
+		$this->RecKeys = $this->GetRecordKeys(); // Load record keys
+		$sFilter = $this->GetKeyFilter();
+		if ($sFilter == "")
+			$this->Page_Terminate("t_05customerlist.php"); // Prevent SQL injection, return to list
 
-			// Validate form
-			if (!$this->ValidateForm()) {
-				$this->CurrentAction = "I"; // Form error, reset action
-				$this->setFailureMessage($gsFormError);
+		// Set up filter (SQL WHHERE clause) and get return SQL
+		// SQL constructor in t_05customer class, t_05customerinfo.php
+
+		$this->CurrentFilter = $sFilter;
+
+		// Get action
+		if (@$_POST["a_delete"] <> "") {
+			$this->CurrentAction = $_POST["a_delete"];
+		} elseif (@$_GET["a_delete"] == "1") {
+			$this->CurrentAction = "D"; // Delete record directly
+		} else {
+			$this->CurrentAction = "I"; // Display record
+		}
+		if ($this->CurrentAction == "D") {
+			$this->SendEmail = TRUE; // Send email on delete success
+			if ($this->DeleteRows()) { // Delete rows
+				if ($this->getSuccessMessage() == "")
+					$this->setSuccessMessage($Language->Phrase("DeleteSuccess")); // Set up success message
+				$this->Page_Terminate($this->getReturnUrl()); // Return to caller
+			} else { // Delete failed
+				$this->CurrentAction = "I"; // Display record
 			}
-		} else { // Not post back
-			$this->CurrentAction = "I"; // Display blank record
-			$this->LoadDefaultValues(); // Load default values
 		}
-
-		// Perform action based on action code
-		switch ($this->CurrentAction) {
-			case "I": // Blank record, no action required
-				break;
-			case "A": // Add new record
-				$this->SendEmail = TRUE; // Send email on add success
-				if ($this->AddRow()) { // Add successful
-					$row = array();
-					$row["x_satuan_id"] = $this->satuan_id->DbValue;
-					$row["x_satuan_nama"] = $this->satuan_nama->DbValue;
-					if (!EW_DEBUG_ENABLED && ob_get_length())
-						ob_end_clean();
-					echo ew_ArrayToJson(array($row));
-				} else {
-					$this->ShowMessage();
-				}
-				$this->Page_Terminate();
-				exit();
-		}
-
-		// Render row
-		$this->RowType = EW_ROWTYPE_ADD; // Render add type
-		$this->ResetAttrs();
-		$this->RenderRow();
-	}
-
-	// Get upload files
-	function GetUploadFiles() {
-		global $objForm, $Language;
-
-		// Get upload data
-	}
-
-	// Load default values
-	function LoadDefaultValues() {
-		$this->satuan_nama->CurrentValue = NULL;
-		$this->satuan_nama->OldValue = $this->satuan_nama->CurrentValue;
-	}
-
-	// Load form values
-	function LoadFormValues() {
-
-		// Load from form
-		global $objForm;
-		if (!$this->satuan_nama->FldIsDetailKey) {
-			$this->satuan_nama->setFormValue(ew_ConvertFromUtf8($objForm->GetValue("x_satuan_nama")));
+		if ($this->CurrentAction == "I") { // Load records for display
+			if ($this->Recordset = $this->LoadRecordset())
+				$this->TotalRecs = $this->Recordset->RecordCount(); // Get record count
+			if ($this->TotalRecs <= 0) { // No record found, exit
+				if ($this->Recordset)
+					$this->Recordset->Close();
+				$this->Page_Terminate("t_05customerlist.php"); // Return to list
+			}
 		}
 	}
 
-	// Restore form values
-	function RestoreFormValues() {
-		global $objForm;
-		$this->satuan_nama->CurrentValue = ew_ConvertToUtf8($this->satuan_nama->FormValue);
+	// Load recordset
+	function LoadRecordset($offset = -1, $rowcnt = -1) {
+
+		// Load List page SQL
+		$sSql = $this->SelectSQL();
+		$conn = &$this->Connection();
+
+		// Load recordset
+		$dbtype = ew_GetConnectionType($this->DBID);
+		if ($this->UseSelectLimit) {
+			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+			if ($dbtype == "MSSQL") {
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
+			} else {
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
+			}
+			$conn->raiseErrorFn = '';
+		} else {
+			$rs = ew_LoadRecordset($sSql, $conn);
+		}
+
+		// Call Recordset Selected event
+		$this->Recordset_Selected($rs);
+		return $rs;
 	}
 
 	// Load row based on key values
@@ -439,16 +426,16 @@ class ct_03satuan_addopt extends ct_03satuan {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->satuan_id->setDbValue($rs->fields('satuan_id'));
-		$this->satuan_nama->setDbValue($rs->fields('satuan_nama'));
+		$this->customer_id->setDbValue($rs->fields('customer_id'));
+		$this->customer_nama->setDbValue($rs->fields('customer_nama'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->satuan_id->DbValue = $row['satuan_id'];
-		$this->satuan_nama->DbValue = $row['satuan_nama'];
+		$this->customer_id->DbValue = $row['customer_id'];
+		$this->customer_nama->DbValue = $row['customer_nama'];
 	}
 
 	// Render row values based on field settings
@@ -461,41 +448,23 @@ class ct_03satuan_addopt extends ct_03satuan {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// satuan_id
-		// satuan_nama
+		// customer_id
+		// customer_nama
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// satuan_id
-		$this->satuan_id->ViewValue = $this->satuan_id->CurrentValue;
-		$this->satuan_id->ViewCustomAttributes = "";
+		// customer_id
+		$this->customer_id->ViewValue = $this->customer_id->CurrentValue;
+		$this->customer_id->ViewCustomAttributes = "";
 
-		// satuan_nama
-		$this->satuan_nama->ViewValue = $this->satuan_nama->CurrentValue;
-		$this->satuan_nama->ViewCustomAttributes = "";
+		// customer_nama
+		$this->customer_nama->ViewValue = $this->customer_nama->CurrentValue;
+		$this->customer_nama->ViewCustomAttributes = "";
 
-			// satuan_nama
-			$this->satuan_nama->LinkCustomAttributes = "";
-			$this->satuan_nama->HrefValue = "";
-			$this->satuan_nama->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
-
-			// satuan_nama
-			$this->satuan_nama->EditAttrs["class"] = "form-control";
-			$this->satuan_nama->EditCustomAttributes = "";
-			$this->satuan_nama->EditValue = ew_HtmlEncode($this->satuan_nama->CurrentValue);
-			$this->satuan_nama->PlaceHolder = ew_RemoveHtml($this->satuan_nama->FldCaption());
-
-			// Add refer script
-			// satuan_nama
-
-			$this->satuan_nama->LinkCustomAttributes = "";
-			$this->satuan_nama->HrefValue = "";
-		}
-		if ($this->RowType == EW_ROWTYPE_ADD ||
-			$this->RowType == EW_ROWTYPE_EDIT ||
-			$this->RowType == EW_ROWTYPE_SEARCH) { // Add / Edit / Search row
-			$this->SetupFieldTitles();
+			// customer_nama
+			$this->customer_nama->LinkCustomAttributes = "";
+			$this->customer_nama->HrefValue = "";
+			$this->customer_nama->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -503,67 +472,61 @@ class ct_03satuan_addopt extends ct_03satuan {
 			$this->Row_Rendered();
 	}
 
-	// Validate form
-	function ValidateForm() {
-		global $Language, $gsFormError;
-
-		// Initialize form error message
-		$gsFormError = "";
-
-		// Check if validation required
-		if (!EW_SERVER_VALIDATE)
-			return ($gsFormError == "");
-		if (!$this->satuan_nama->FldIsDetailKey && !is_null($this->satuan_nama->FormValue) && $this->satuan_nama->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->satuan_nama->FldCaption(), $this->satuan_nama->ReqErrMsg));
-		}
-
-		// Return validate result
-		$ValidateForm = ($gsFormError == "");
-
-		// Call Form_CustomValidate event
-		$sFormCustomError = "";
-		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
-		if ($sFormCustomError <> "") {
-			ew_AddMessage($gsFormError, $sFormCustomError);
-		}
-		return $ValidateForm;
-	}
-
-	// Add record
-	function AddRow($rsold = NULL) {
+	//
+	// Delete records based on current filter
+	//
+	function DeleteRows() {
 		global $Language, $Security;
-		if ($this->satuan_nama->CurrentValue <> "") { // Check field with unique index
-			$sFilter = "(satuan_nama = '" . ew_AdjustSql($this->satuan_nama->CurrentValue, $this->DBID) . "')";
-			$rsChk = $this->LoadRs($sFilter);
-			if ($rsChk && !$rsChk->EOF) {
-				$sIdxErrMsg = str_replace("%f", $this->satuan_nama->FldCaption(), $Language->Phrase("DupIndex"));
-				$sIdxErrMsg = str_replace("%v", $this->satuan_nama->CurrentValue, $sIdxErrMsg);
-				$this->setFailureMessage($sIdxErrMsg);
-				$rsChk->Close();
-				return FALSE;
+		$DeleteRows = TRUE;
+		$sSql = $this->SQL();
+		$conn = &$this->Connection();
+		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+		$rs = $conn->Execute($sSql);
+		$conn->raiseErrorFn = '';
+		if ($rs === FALSE) {
+			return FALSE;
+		} elseif ($rs->EOF) {
+			$this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
+			$rs->Close();
+			return FALSE;
+
+		//} else {
+		//	$this->LoadRowValues($rs); // Load row values
+
+		}
+		$rows = ($rs) ? $rs->GetRows() : array();
+		$conn->BeginTrans();
+		if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteBegin")); // Batch delete begin
+
+		// Clone old rows
+		$rsold = $rows;
+		if ($rs)
+			$rs->Close();
+
+		// Call row deleting event
+		if ($DeleteRows) {
+			foreach ($rsold as $row) {
+				$DeleteRows = $this->Row_Deleting($row);
+				if (!$DeleteRows) break;
 			}
 		}
-		$conn = &$this->Connection();
-
-		// Load db values from rsold
-		if ($rsold) {
-			$this->LoadDbValues($rsold);
-		}
-		$rsnew = array();
-
-		// satuan_nama
-		$this->satuan_nama->SetDbValueDef($rsnew, $this->satuan_nama->CurrentValue, "", FALSE);
-
-		// Call Row Inserting event
-		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
-		$bInsertRow = $this->Row_Inserting($rs, $rsnew);
-		if ($bInsertRow) {
-			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-			$AddRow = $this->Insert($rsnew);
-			$conn->raiseErrorFn = '';
-			if ($AddRow) {
+		if ($DeleteRows) {
+			$sKey = "";
+			foreach ($rsold as $row) {
+				$sThisKey = "";
+				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
+				$sThisKey .= $row['customer_id'];
+				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+				$DeleteRows = $this->Delete($row); // Delete
+				$conn->raiseErrorFn = '';
+				if ($DeleteRows === FALSE)
+					break;
+				if ($sKey <> "") $sKey .= ", ";
+				$sKey .= $sThisKey;
 			}
 		} else {
+
+			// Set up error message
 			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
 
 				// Use the message, do nothing
@@ -571,17 +534,24 @@ class ct_03satuan_addopt extends ct_03satuan {
 				$this->setFailureMessage($this->CancelMessage);
 				$this->CancelMessage = "";
 			} else {
-				$this->setFailureMessage($Language->Phrase("InsertCancelled"));
+				$this->setFailureMessage($Language->Phrase("DeleteCancelled"));
 			}
-			$AddRow = FALSE;
 		}
-		if ($AddRow) {
+		if ($DeleteRows) {
+			$conn->CommitTrans(); // Commit the changes
+			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteSuccess")); // Batch delete success
+		} else {
+			$conn->RollbackTrans(); // Rollback changes
+			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteRollback")); // Batch delete rollback
+		}
 
-			// Call Row Inserted event
-			$rs = ($rsold == NULL) ? NULL : $rsold->fields;
-			$this->Row_Inserted($rs, $rsnew);
+		// Call Row Deleted event
+		if ($DeleteRows) {
+			foreach ($rsold as $row) {
+				$this->Row_Deleted($row);
+			}
 		}
-		return $AddRow;
+		return $DeleteRows;
 	}
 
 	// Set up Breadcrumb
@@ -589,9 +559,9 @@ class ct_03satuan_addopt extends ct_03satuan {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_03satuanlist.php"), "", $this->TableVar, TRUE);
-		$PageId = "addopt";
-		$Breadcrumb->Add("addopt", $PageId, $url);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_05customerlist.php"), "", $this->TableVar, TRUE);
+		$PageId = "delete";
+		$Breadcrumb->Add("delete", $PageId, $url);
 	}
 
 	// Setup lookup filters of a field
@@ -669,68 +639,35 @@ class ct_03satuan_addopt extends ct_03satuan {
 		//$footer = "your footer";
 
 	}
-
-	// Custom validate event
-	// Form Custom Validate event
-	function Form_CustomValidate(&$CustomError) {
-
-		// Return error message in CustomError
-		return TRUE;
-	}
 }
 ?>
 <?php ew_Header(FALSE) ?>
 <?php
 
 // Create page object
-if (!isset($t_03satuan_addopt)) $t_03satuan_addopt = new ct_03satuan_addopt();
+if (!isset($t_05customer_delete)) $t_05customer_delete = new ct_05customer_delete();
 
 // Page init
-$t_03satuan_addopt->Page_Init();
+$t_05customer_delete->Page_Init();
 
 // Page main
-$t_03satuan_addopt->Page_Main();
+$t_05customer_delete->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t_03satuan_addopt->Page_Render();
+$t_05customer_delete->Page_Render();
 ?>
+<?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
-var CurrentPageID = EW_PAGE_ID = "addopt";
-var CurrentForm = ft_03satuanaddopt = new ew_Form("ft_03satuanaddopt", "addopt");
-
-// Validate form
-ft_03satuanaddopt.Validate = function() {
-	if (!this.ValidateRequired)
-		return true; // Ignore validation
-	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
-	if ($fobj.find("#a_confirm").val() == "F")
-		return true;
-	var elm, felm, uelm, addcnt = 0;
-	var $k = $fobj.find("#" + this.FormKeyCountName); // Get key_count
-	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
-	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
-	var gridinsert = $fobj.find("#a_list").val() == "gridinsert";
-	for (var i = startcnt; i <= rowcnt; i++) {
-		var infix = ($k[0]) ? String(i) : "";
-		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_satuan_nama");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_03satuan->satuan_nama->FldCaption(), $t_03satuan->satuan_nama->ReqErrMsg)) ?>");
-
-			// Fire Form_CustomValidate event
-			if (!this.Form_CustomValidate(fobj))
-				return false;
-	}
-	return true;
-}
+var CurrentPageID = EW_PAGE_ID = "delete";
+var CurrentForm = ft_05customerdelete = new ew_Form("ft_05customerdelete", "delete");
 
 // Form_CustomValidate event
-ft_03satuanaddopt.Form_CustomValidate = 
+ft_05customerdelete.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -739,9 +676,9 @@ ft_03satuanaddopt.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft_03satuanaddopt.ValidateRequired = true;
+ft_05customerdelete.ValidateRequired = true;
 <?php } else { ?>
-ft_03satuanaddopt.ValidateRequired = false; 
+ft_05customerdelete.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
@@ -752,33 +689,93 @@ ft_03satuanaddopt.ValidateRequired = false;
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php
-$t_03satuan_addopt->ShowMessage();
-?>
-<form name="ft_03satuanaddopt" id="ft_03satuanaddopt" class="ewForm form-horizontal" action="t_03satuanaddopt.php" method="post">
-<?php if ($t_03satuan_addopt->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_03satuan_addopt->Token ?>">
-<?php } ?>
-<input type="hidden" name="t" value="t_03satuan">
-<input type="hidden" name="a_addopt" id="a_addopt" value="A">
-<?php if ($t_03satuan->satuan_nama->Visible) { // satuan_nama ?>
-	<div class="form-group">
-		<label class="col-sm-3 control-label ewLabel" for="x_satuan_nama"><?php echo $t_03satuan->satuan_nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-9">
-<input type="text" data-table="t_03satuan" data-field="x_satuan_nama" name="x_satuan_nama" id="x_satuan_nama" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t_03satuan->satuan_nama->getPlaceHolder()) ?>" value="<?php echo $t_03satuan->satuan_nama->EditValue ?>"<?php echo $t_03satuan->satuan_nama->EditAttributes() ?>>
+<div class="ewToolbar">
+<?php $Breadcrumb->Render(); ?>
+<?php echo $Language->SelectionForm(); ?>
+<div class="clearfix"></div>
 </div>
-	</div>
-<?php } ?>	
+<?php $t_05customer_delete->ShowPageHeader(); ?>
+<?php
+$t_05customer_delete->ShowMessage();
+?>
+<form name="ft_05customerdelete" id="ft_05customerdelete" class="form-inline ewForm ewDeleteForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t_05customer_delete->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_05customer_delete->Token ?>">
+<?php } ?>
+<input type="hidden" name="t" value="t_05customer">
+<input type="hidden" name="a_delete" id="a_delete" value="D">
+<?php foreach ($t_05customer_delete->RecKeys as $key) { ?>
+<?php $keyvalue = is_array($key) ? implode($EW_COMPOSITE_KEY_SEPARATOR, $key) : $key; ?>
+<input type="hidden" name="key_m[]" value="<?php echo ew_HtmlEncode($keyvalue) ?>">
+<?php } ?>
+<div class="ewGrid">
+<div class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
+<table class="table ewTable">
+<?php echo $t_05customer->TableCustomInnerHtml ?>
+	<thead>
+	<tr class="ewTableHeader">
+<?php if ($t_05customer->customer_nama->Visible) { // customer_nama ?>
+		<th><span id="elh_t_05customer_customer_nama" class="t_05customer_customer_nama"><?php echo $t_05customer->customer_nama->FldCaption() ?></span></th>
+<?php } ?>
+	</tr>
+	</thead>
+	<tbody>
+<?php
+$t_05customer_delete->RecCnt = 0;
+$i = 0;
+while (!$t_05customer_delete->Recordset->EOF) {
+	$t_05customer_delete->RecCnt++;
+	$t_05customer_delete->RowCnt++;
+
+	// Set row properties
+	$t_05customer->ResetAttrs();
+	$t_05customer->RowType = EW_ROWTYPE_VIEW; // View
+
+	// Get the field contents
+	$t_05customer_delete->LoadRowValues($t_05customer_delete->Recordset);
+
+	// Render row
+	$t_05customer_delete->RenderRow();
+?>
+	<tr<?php echo $t_05customer->RowAttributes() ?>>
+<?php if ($t_05customer->customer_nama->Visible) { // customer_nama ?>
+		<td<?php echo $t_05customer->customer_nama->CellAttributes() ?>>
+<span id="el<?php echo $t_05customer_delete->RowCnt ?>_t_05customer_customer_nama" class="t_05customer_customer_nama">
+<span<?php echo $t_05customer->customer_nama->ViewAttributes() ?>>
+<?php echo $t_05customer->customer_nama->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+	</tr>
+<?php
+	$t_05customer_delete->Recordset->MoveNext();
+}
+$t_05customer_delete->Recordset->Close();
+?>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("DeleteBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t_05customer_delete->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+</div>
 </form>
 <script type="text/javascript">
-ft_03satuanaddopt.Init();
+ft_05customerdelete.Init();
 </script>
+<?php
+$t_05customer_delete->ShowPageFooter();
+if (EW_DEBUG_ENABLED)
+	echo ew_DebugMsg();
+?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
 // document.write("page loaded");
 
 </script>
+<?php include_once "footer.php" ?>
 <?php
-$t_03satuan_addopt->Page_Terminate();
+$t_05customer_delete->Page_Terminate();
 ?>
