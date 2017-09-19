@@ -42,7 +42,7 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js");
 
 // Write your global startup script here
 // document.write("page loaded");
-	// Table 'orderdetails' Field 'UnitPrice'
+	// Table 't_04beli' Field 'qty'
 
 	$('[data-table=t_04beli][data-field=x_qty]').on(
 		{ // keys = event types, values = handler functions
@@ -59,7 +59,7 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js");
 		}
 	);
 
-	// Table 'orderdetails' Field 'UnitPrice'
+	// Table 't_04beli' Field 'harga'
 	$('[data-table=t_04beli][data-field=x_harga]').on(
 		{ // keys = event types, values = handler functions
 			"change keyup": function(e) {
@@ -71,6 +71,40 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js");
 				//alert(st);
 				$row["sub_total"].val(st);
 				$row["jml_lunas"].val(st);
+			}
+		}
+	);
+
+	// Table 't_07jual_detail' Field 'qty'
+	$('[data-table=t_07jual_detail][data-field=x_qty]').on(
+		{ // keys = event types, values = handler functions
+			"change keyup": function(e) {
+				var $row = $(this).fields();
+				var qty = parseInt($row["qty"].val());
+				var harga = parseInt($row["harga"].val());
+				var st = qty * harga;
+
+				//alert(st);
+				$row["sub_total"].val(st);
+
+				//$row["jml_lunas"].val(st);
+			}
+		}
+	);
+
+	// Table 't_07jual_detail' Field 'harga'
+	$('[data-table=t_07jual_detail][data-field=x_harga]').on(
+		{ // keys = event types, values = handler functions
+			"change keyup": function(e) {
+				var $row = $(this).fields();
+				var qty = parseInt($row["qty"].val());
+				var harga = parseInt($row["harga"].val());
+				var st = qty * harga;
+
+				//alert(st);
+				$row["sub_total"].val(st);
+
+				//$row["jml_lunas"].val(st);
 			}
 		}
 	);

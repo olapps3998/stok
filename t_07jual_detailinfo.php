@@ -1180,6 +1180,8 @@ class ct_07jual_detail extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
+		$tot_det = ew_ExecuteScalar("select sum(sub_total) from t_07jual_detail where jual_id = ".$rsnew["jual_id"]."");
+		ew_Execute("update t_06jual set total = ".$tot_det." where jual_id = ".$rsnew["jual_id"]."");
 	}
 
 	// Row Updating event
@@ -1195,6 +1197,8 @@ class ct_07jual_detail extends cTable {
 	function Row_Updated($rsold, &$rsnew) {
 
 		//echo "Row Updated";
+		$tot_det = ew_ExecuteScalar("select sum(sub_total) from t_07jual_detail where jual_id = ".$rsold["jual_id"]."");
+		ew_Execute("update t_06jual set total = ".$tot_det." where jual_id = ".$rsold["jual_id"]."");
 	}
 
 	// Row Update Conflict event
