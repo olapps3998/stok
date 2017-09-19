@@ -445,13 +445,13 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 		<td data-name="qty"<?php echo $t_07jual_detail->qty->CellAttributes() ?>>
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_ADD) { // Add record ?>
 <span id="el<?php echo $t_07jual_detail_grid->RowCnt ?>_t_07jual_detail_qty" class="form-group t_07jual_detail_qty">
-<input type="text" data-table="t_07jual_detail" data-field="x_qty" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->qty->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->qty->EditValue ?>"<?php echo $t_07jual_detail->qty->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_qty" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->qty->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->qty->EditValue ?>"<?php echo $t_07jual_detail->qty->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_07jual_detail" data-field="x_qty" name="o<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" id="o<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" value="<?php echo ew_HtmlEncode($t_07jual_detail->qty->OldValue) ?>">
 <?php } ?>
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_07jual_detail_grid->RowCnt ?>_t_07jual_detail_qty" class="form-group t_07jual_detail_qty">
-<input type="text" data-table="t_07jual_detail" data-field="x_qty" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->qty->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->qty->EditValue ?>"<?php echo $t_07jual_detail->qty->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_qty" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->qty->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->qty->EditValue ?>"<?php echo $t_07jual_detail->qty->EditAttributes() ?>>
 </span>
 <?php } ?>
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_VIEW) { // View record ?>
@@ -529,13 +529,13 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 		<td data-name="harga"<?php echo $t_07jual_detail->harga->CellAttributes() ?>>
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_ADD) { // Add record ?>
 <span id="el<?php echo $t_07jual_detail_grid->RowCnt ?>_t_07jual_detail_harga" class="form-group t_07jual_detail_harga">
-<input type="text" data-table="t_07jual_detail" data-field="x_harga" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->harga->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->harga->EditValue ?>"<?php echo $t_07jual_detail->harga->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_harga" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->harga->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->harga->EditValue ?>"<?php echo $t_07jual_detail->harga->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_07jual_detail" data-field="x_harga" name="o<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" id="o<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" value="<?php echo ew_HtmlEncode($t_07jual_detail->harga->OldValue) ?>">
 <?php } ?>
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_07jual_detail_grid->RowCnt ?>_t_07jual_detail_harga" class="form-group t_07jual_detail_harga">
-<input type="text" data-table="t_07jual_detail" data-field="x_harga" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->harga->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->harga->EditValue ?>"<?php echo $t_07jual_detail->harga->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_harga" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->harga->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->harga->EditValue ?>"<?php echo $t_07jual_detail->harga->EditAttributes() ?>>
 </span>
 <?php } ?>
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_VIEW) { // View record ?>
@@ -557,13 +557,13 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 		<td data-name="sub_total"<?php echo $t_07jual_detail->sub_total->CellAttributes() ?>>
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_ADD) { // Add record ?>
 <span id="el<?php echo $t_07jual_detail_grid->RowCnt ?>_t_07jual_detail_sub_total" class="form-group t_07jual_detail_sub_total">
-<input type="text" data-table="t_07jual_detail" data-field="x_sub_total" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->sub_total->EditValue ?>"<?php echo $t_07jual_detail->sub_total->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_sub_total" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->sub_total->EditValue ?>"<?php echo $t_07jual_detail->sub_total->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_07jual_detail" data-field="x_sub_total" name="o<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" id="o<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" value="<?php echo ew_HtmlEncode($t_07jual_detail->sub_total->OldValue) ?>">
 <?php } ?>
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_07jual_detail_grid->RowCnt ?>_t_07jual_detail_sub_total" class="form-group t_07jual_detail_sub_total">
-<input type="text" data-table="t_07jual_detail" data-field="x_sub_total" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->sub_total->EditValue ?>"<?php echo $t_07jual_detail->sub_total->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_sub_total" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->sub_total->EditValue ?>"<?php echo $t_07jual_detail->sub_total->EditAttributes() ?>>
 </span>
 <?php } ?>
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_VIEW) { // View record ?>
@@ -678,7 +678,7 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 		<td data-name="qty">
 <?php if ($t_07jual_detail->CurrentAction <> "F") { ?>
 <span id="el$rowindex$_t_07jual_detail_qty" class="form-group t_07jual_detail_qty">
-<input type="text" data-table="t_07jual_detail" data-field="x_qty" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->qty->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->qty->EditValue ?>"<?php echo $t_07jual_detail->qty->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_qty" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_qty" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->qty->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->qty->EditValue ?>"<?php echo $t_07jual_detail->qty->EditAttributes() ?>>
 </span>
 <?php } else { ?>
 <span id="el$rowindex$_t_07jual_detail_qty" class="form-group t_07jual_detail_qty">
@@ -724,7 +724,7 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 		<td data-name="harga">
 <?php if ($t_07jual_detail->CurrentAction <> "F") { ?>
 <span id="el$rowindex$_t_07jual_detail_harga" class="form-group t_07jual_detail_harga">
-<input type="text" data-table="t_07jual_detail" data-field="x_harga" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->harga->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->harga->EditValue ?>"<?php echo $t_07jual_detail->harga->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_harga" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->harga->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->harga->EditValue ?>"<?php echo $t_07jual_detail->harga->EditAttributes() ?>>
 </span>
 <?php } else { ?>
 <span id="el$rowindex$_t_07jual_detail_harga" class="form-group t_07jual_detail_harga">
@@ -740,7 +740,7 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 		<td data-name="sub_total">
 <?php if ($t_07jual_detail->CurrentAction <> "F") { ?>
 <span id="el$rowindex$_t_07jual_detail_sub_total" class="form-group t_07jual_detail_sub_total">
-<input type="text" data-table="t_07jual_detail" data-field="x_sub_total" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->sub_total->EditValue ?>"<?php echo $t_07jual_detail->sub_total->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_sub_total" name="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" id="x<?php echo $t_07jual_detail_grid->RowIndex ?>_sub_total" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->sub_total->EditValue ?>"<?php echo $t_07jual_detail->sub_total->EditAttributes() ?>>
 </span>
 <?php } else { ?>
 <span id="el$rowindex$_t_07jual_detail_sub_total" class="form-group t_07jual_detail_sub_total">

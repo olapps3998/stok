@@ -1303,7 +1303,7 @@ ft_06jualedit.CreateAutoSuggest({"id":"x_customer_id","forceSelect":true});
 		<label id="elh_t_06jual_total" for="x_total" class="col-sm-2 control-label ewLabel"><?php echo $t_06jual->total->FldCaption() ?></label>
 		<div class="col-sm-10"><div<?php echo $t_06jual->total->CellAttributes() ?>>
 <span id="el_t_06jual_total">
-<input type="text" data-table="t_06jual" data-field="x_total" name="x_total" id="x_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
+<input type="text" data-table="t_06jual" data-field="x_total" name="x_total" id="x_total" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
 </span>
 <?php echo $t_06jual->total->CustomMsg ?></div></div>
 	</div>

@@ -3649,7 +3649,7 @@ ft_06juallist.CreateAutoSuggest({"id":"x<?php echo $t_06jual_list->RowIndex ?>_c
 	<?php if ($t_06jual->total->Visible) { // total ?>
 		<td data-name="total">
 <span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_total" class="form-group t_06jual_total">
-<input type="text" data-table="t_06jual" data-field="x_total" name="x<?php echo $t_06jual_list->RowIndex ?>_total" id="x<?php echo $t_06jual_list->RowIndex ?>_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
+<input type="text" data-table="t_06jual" data-field="x_total" name="x<?php echo $t_06jual_list->RowIndex ?>_total" id="x<?php echo $t_06jual_list->RowIndex ?>_total" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_06jual" data-field="x_total" name="o<?php echo $t_06jual_list->RowIndex ?>_total" id="o<?php echo $t_06jual_list->RowIndex ?>_total" value="<?php echo ew_HtmlEncode($t_06jual->total->OldValue) ?>">
 </td>
@@ -3895,13 +3895,13 @@ ft_06juallist.CreateAutoSuggest({"id":"x<?php echo $t_06jual_list->RowIndex ?>_c
 		<td data-name="total"<?php echo $t_06jual->total->CellAttributes() ?>>
 <?php if ($t_06jual->RowType == EW_ROWTYPE_ADD) { // Add record ?>
 <span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_total" class="form-group t_06jual_total">
-<input type="text" data-table="t_06jual" data-field="x_total" name="x<?php echo $t_06jual_list->RowIndex ?>_total" id="x<?php echo $t_06jual_list->RowIndex ?>_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
+<input type="text" data-table="t_06jual" data-field="x_total" name="x<?php echo $t_06jual_list->RowIndex ?>_total" id="x<?php echo $t_06jual_list->RowIndex ?>_total" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_06jual" data-field="x_total" name="o<?php echo $t_06jual_list->RowIndex ?>_total" id="o<?php echo $t_06jual_list->RowIndex ?>_total" value="<?php echo ew_HtmlEncode($t_06jual->total->OldValue) ?>">
 <?php } ?>
 <?php if ($t_06jual->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_total" class="form-group t_06jual_total">
-<input type="text" data-table="t_06jual" data-field="x_total" name="x<?php echo $t_06jual_list->RowIndex ?>_total" id="x<?php echo $t_06jual_list->RowIndex ?>_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
+<input type="text" data-table="t_06jual" data-field="x_total" name="x<?php echo $t_06jual_list->RowIndex ?>_total" id="x<?php echo $t_06jual_list->RowIndex ?>_total" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
 </span>
 <?php } ?>
 <?php if ($t_06jual->RowType == EW_ROWTYPE_VIEW) { // View record ?>
@@ -4002,7 +4002,7 @@ ft_06juallist.CreateAutoSuggest({"id":"x<?php echo $t_06jual_list->RowIndex ?>_c
 	<?php if ($t_06jual->total->Visible) { // total ?>
 		<td data-name="total">
 <span id="el$rowindex$_t_06jual_total" class="form-group t_06jual_total">
-<input type="text" data-table="t_06jual" data-field="x_total" name="x<?php echo $t_06jual_list->RowIndex ?>_total" id="x<?php echo $t_06jual_list->RowIndex ?>_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
+<input type="text" data-table="t_06jual" data-field="x_total" name="x<?php echo $t_06jual_list->RowIndex ?>_total" id="x<?php echo $t_06jual_list->RowIndex ?>_total" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_06jual" data-field="x_total" name="o<?php echo $t_06jual_list->RowIndex ?>_total" id="o<?php echo $t_06jual_list->RowIndex ?>_total" value="<?php echo ew_HtmlEncode($t_06jual->total->OldValue) ?>">
 </td>

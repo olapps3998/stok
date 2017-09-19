@@ -1426,7 +1426,7 @@ ft_07jual_detailedit.CreateAutoSuggest({"id":"x_item_id","forceSelect":true});
 		<label id="elh_t_07jual_detail_qty" for="x_qty" class="col-sm-2 control-label ewLabel"><?php echo $t_07jual_detail->qty->FldCaption() ?></label>
 		<div class="col-sm-10"><div<?php echo $t_07jual_detail->qty->CellAttributes() ?>>
 <span id="el_t_07jual_detail_qty">
-<input type="text" data-table="t_07jual_detail" data-field="x_qty" name="x_qty" id="x_qty" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->qty->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->qty->EditValue ?>"<?php echo $t_07jual_detail->qty->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_qty" name="x_qty" id="x_qty" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->qty->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->qty->EditValue ?>"<?php echo $t_07jual_detail->qty->EditAttributes() ?>>
 </span>
 <?php echo $t_07jual_detail->qty->CustomMsg ?></div></div>
 	</div>
@@ -1460,7 +1460,7 @@ ft_07jual_detailedit.CreateAutoSuggest({"id":"x_satuan_id","forceSelect":true});
 		<label id="elh_t_07jual_detail_harga" for="x_harga" class="col-sm-2 control-label ewLabel"><?php echo $t_07jual_detail->harga->FldCaption() ?></label>
 		<div class="col-sm-10"><div<?php echo $t_07jual_detail->harga->CellAttributes() ?>>
 <span id="el_t_07jual_detail_harga">
-<input type="text" data-table="t_07jual_detail" data-field="x_harga" name="x_harga" id="x_harga" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->harga->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->harga->EditValue ?>"<?php echo $t_07jual_detail->harga->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_harga" name="x_harga" id="x_harga" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->harga->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->harga->EditValue ?>"<?php echo $t_07jual_detail->harga->EditAttributes() ?>>
 </span>
 <?php echo $t_07jual_detail->harga->CustomMsg ?></div></div>
 	</div>
@@ -1470,7 +1470,7 @@ ft_07jual_detailedit.CreateAutoSuggest({"id":"x_satuan_id","forceSelect":true});
 		<label id="elh_t_07jual_detail_sub_total" for="x_sub_total" class="col-sm-2 control-label ewLabel"><?php echo $t_07jual_detail->sub_total->FldCaption() ?></label>
 		<div class="col-sm-10"><div<?php echo $t_07jual_detail->sub_total->CellAttributes() ?>>
 <span id="el_t_07jual_detail_sub_total">
-<input type="text" data-table="t_07jual_detail" data-field="x_sub_total" name="x_sub_total" id="x_sub_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->sub_total->EditValue ?>"<?php echo $t_07jual_detail->sub_total->EditAttributes() ?>>
+<input type="text" data-table="t_07jual_detail" data-field="x_sub_total" name="x_sub_total" id="x_sub_total" placeholder="<?php echo ew_HtmlEncode($t_07jual_detail->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_07jual_detail->sub_total->EditValue ?>"<?php echo $t_07jual_detail->sub_total->EditAttributes() ?>>
 </span>
 <?php echo $t_07jual_detail->sub_total->CustomMsg ?></div></div>
 	</div>
