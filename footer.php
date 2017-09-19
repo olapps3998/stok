@@ -49,7 +49,11 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js");
 			"change keyup": function(e) {
 				var $row = $(this).fields();
 				var qty = parseInt($row["qty"].val());
-				var harga = parseInt($row["harga"].val());
+
+				//var harga = parseInt($row["harga"].val());
+				var harga_asli = $row["harga"].val();
+				var harga_clean = harga_asli.replace(/,/g, '');
+				var harga = parseInt(harga_clean);
 				var st = qty * harga;
 
 				//alert(st);
@@ -65,7 +69,11 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js");
 			"change keyup": function(e) {
 				var $row = $(this).fields();
 				var qty = parseInt($row["qty"].val());
-				var harga = parseInt($row["harga"].val());
+
+				//var harga = parseInt($row["harga"].val());
+				var harga_asli = $row["harga"].val();
+				var harga_clean = harga_asli.replace(/,/g, '');
+				var harga = parseInt(harga_clean);
 				var st = qty * harga;
 
 				//alert(st);
@@ -81,7 +89,9 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js");
 			"change keyup": function(e) {
 				var $row = $(this).fields();
 				var qty = parseInt($row["qty"].val());
-				var harga = parseInt($row["harga"].val());
+				var harga_asli = $row["harga"].val();
+				var harga_clean = harga_asli.replace(/,/g, '');
+				var harga = parseInt(harga_clean);
 				var st = qty * harga;
 
 				//alert(st);
@@ -98,7 +108,11 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js");
 			"change keyup": function(e) {
 				var $row = $(this).fields();
 				var qty = parseInt($row["qty"].val());
-				var harga = parseInt($row["harga"].val());
+
+				//var harga = parseInt($row["harga"].val());
+				var harga_asli = $row["harga"].val();
+				var harga_clean = harga_asli.replace(/,/g, '');
+				var harga = parseInt(harga_clean);
 				var st = qty * harga;
 
 				//alert(st);
