@@ -625,6 +625,21 @@
     <menu id="1">
       <phrase id="menutext" value="t 00audit trail" />
     </menu>
+    <menu id="10013">
+      <phrase id="menutext" value="Penjualan" />
+    </menu>
+    <menu id="10009">
+      <phrase id="menutext" value="t 05customer" />
+    </menu>
+    <menu id="10010">
+      <phrase id="menutext" value="t 06jual" />
+    </menu>
+    <menu id="10011">
+      <phrase id="menutext" value="t 07jual detail" />
+    </menu>
+    <menu id="10012">
+      <phrase id="menutext" value="v 02jual laporan" />
+    </menu>
     <menu id="10007">
       <phrase id="menutext" value="v 01beli laporan" />
     </menu>

@@ -15,6 +15,7 @@ $RootMenu->AddMenuItem(5, "mi_t_04beli", $Language->MenuPhrase("5", "MenuText"),
 $RootMenu->AddMenuItem(10019, "mi_t_06jual", $Language->MenuPhrase("10019", "MenuText"), "t_06juallist.php", 10016, "", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(9, "mci_Laporan", $Language->MenuPhrase("9", "MenuText"), "", -1, "", TRUE, FALSE, TRUE);
 $RootMenu->AddMenuItem(10008, "mri_r5fbeli", $Language->MenuPhrase("10008", "MenuText"), "r_belismry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", TRUE, FALSE, FALSE);
+$RootMenu->AddMenuItem(10013, "mri_r5fjual", $Language->MenuPhrase("10013", "MenuText"), "r_jualsmry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", TRUE, FALSE, FALSE);
 $RootMenu->Render();
 ?>
 <!-- End Main Menu -->
