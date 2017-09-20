@@ -395,7 +395,7 @@ class ct_07jual_detail_delete extends ct_07jual_detail {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -442,8 +442,18 @@ class ct_07jual_detail_delete extends ct_07jual_detail {
 		$this->jual_id->setDbValue($rs->fields('jual_id'));
 		$this->tgl_kirim->setDbValue($rs->fields('tgl_kirim'));
 		$this->item_id->setDbValue($rs->fields('item_id'));
+		if (array_key_exists('EV__item_id', $rs->fields)) {
+			$this->item_id->VirtualValue = $rs->fields('EV__item_id'); // Set up virtual field value
+		} else {
+			$this->item_id->VirtualValue = ""; // Clear value
+		}
 		$this->qty->setDbValue($rs->fields('qty'));
 		$this->satuan_id->setDbValue($rs->fields('satuan_id'));
+		if (array_key_exists('EV__satuan_id', $rs->fields)) {
+			$this->satuan_id->VirtualValue = $rs->fields('EV__satuan_id'); // Set up virtual field value
+		} else {
+			$this->satuan_id->VirtualValue = ""; // Clear value
+		}
 		$this->harga->setDbValue($rs->fields('harga'));
 		$this->sub_total->setDbValue($rs->fields('sub_total'));
 	}
@@ -509,7 +519,10 @@ class ct_07jual_detail_delete extends ct_07jual_detail {
 		$this->tgl_kirim->ViewCustomAttributes = "";
 
 		// item_id
-		$this->item_id->ViewValue = $this->item_id->CurrentValue;
+		if ($this->item_id->VirtualValue <> "") {
+			$this->item_id->ViewValue = $this->item_id->VirtualValue;
+		} else {
+			$this->item_id->ViewValue = $this->item_id->CurrentValue;
 		if (strval($this->item_id->CurrentValue) <> "") {
 			$sFilterWrk = "`item_id`" . ew_SearchString("=", $this->item_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `item_id`, `item_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_02item`";
@@ -530,6 +543,7 @@ class ct_07jual_detail_delete extends ct_07jual_detail {
 		} else {
 			$this->item_id->ViewValue = NULL;
 		}
+		}
 		$this->item_id->ViewCustomAttributes = "";
 
 		// qty
@@ -539,7 +553,10 @@ class ct_07jual_detail_delete extends ct_07jual_detail {
 		$this->qty->ViewCustomAttributes = "";
 
 		// satuan_id
-		$this->satuan_id->ViewValue = $this->satuan_id->CurrentValue;
+		if ($this->satuan_id->VirtualValue <> "") {
+			$this->satuan_id->ViewValue = $this->satuan_id->VirtualValue;
+		} else {
+			$this->satuan_id->ViewValue = $this->satuan_id->CurrentValue;
 		if (strval($this->satuan_id->CurrentValue) <> "") {
 			$sFilterWrk = "`satuan_id`" . ew_SearchString("=", $this->satuan_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `satuan_id`, `satuan_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_03satuan`";
@@ -559,6 +576,7 @@ class ct_07jual_detail_delete extends ct_07jual_detail {
 			}
 		} else {
 			$this->satuan_id->ViewValue = NULL;
+		}
 		}
 		$this->satuan_id->ViewCustomAttributes = "";
 

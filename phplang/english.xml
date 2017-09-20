@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/9/19" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/9/20" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -583,6 +583,9 @@
   <project>
     <phrase id="bodytitle" value="STOK" />
     <phrase id="footertext" value="&amp;copy;2016 e.World Technology Ltd. All rights reserved." />
+    <menu id="10021">
+      <phrase id="menutext" value="v 02jual laporan" />
+    </menu>
     <menu id="10017">
       <phrase id="menutext" value="v 01beli laporan" />
     </menu>
@@ -627,6 +630,12 @@
     </menu>
     <menu id="10013">
       <phrase id="menutext" value="Penjualan" />
+    </menu>
+    <menu id="10015">
+      <phrase id="menutext" value="Transaksi" />
+    </menu>
+    <menu id="10014">
+      <phrase id="menutext" value="Transaksi" />
     </menu>
     <menu id="10009">
       <phrase id="menutext" value="t 05customer" />
@@ -857,6 +866,39 @@
       </field>
       <field id="sub_total">
         <phrase id="fldcaption" value="Sub Total" />
+      </field>
+    </table>
+    <table id="v_02jual_laporan">
+      <phrase id="tblcaption" value="v 02jual laporan" />
+      <field id="no_po">
+        <phrase id="fldcaption" value="no po" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
+      </field>
+      <field id="customer_nama">
+        <phrase id="fldcaption" value="customer nama" />
+      </field>
+      <field id="total">
+        <phrase id="fldcaption" value="total" />
+      </field>
+      <field id="tgl_kirim">
+        <phrase id="fldcaption" value="tgl kirim" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="qty" />
+      </field>
+      <field id="satuan_nama">
+        <phrase id="fldcaption" value="satuan nama" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="harga" />
+      </field>
+      <field id="sub_total">
+        <phrase id="fldcaption" value="sub total" />
       </field>
     </table>
   </project>
