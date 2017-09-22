@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/9/20" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/9/22" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -583,14 +583,11 @@
   <project>
     <phrase id="bodytitle" value="STOK" />
     <phrase id="footertext" value="&amp;copy;2016 e.World Technology Ltd. All rights reserved." />
-    <menu id="10021">
-      <phrase id="menutext" value="v 02jual laporan" />
-    </menu>
-    <menu id="10017">
-      <phrase id="menutext" value="v 01beli laporan" />
-    </menu>
     <menu id="6">
       <phrase id="menutext" value="Home" />
+    </menu>
+    <menu id="10022">
+      <phrase id="menutext" value="v 03transaksi" />
     </menu>
     <menu id="7">
       <phrase id="menutext" value="Master" />
@@ -607,8 +604,8 @@
     <menu id="10018">
       <phrase id="menutext" value="Customer" />
     </menu>
-    <menu id="10020">
-      <phrase id="menutext" value="Detail Penjualan" />
+    <menu id="10021">
+      <phrase id="menutext" value="v 02jual laporan" />
     </menu>
     <menu id="10016">
       <phrase id="menutext" value="Transaksi" />
@@ -632,7 +629,19 @@
       <phrase id="menutext" value="Penjualan" />
     </menu>
     <menu id="10015">
-      <phrase id="menutext" value="Transaksi" />
+      <phrase id="menutext" value="Stok" />
+    </menu>
+    <menu id="10023">
+      <phrase id="menutext" value="v 04stok" />
+    </menu>
+    <menu id="10017">
+      <phrase id="menutext" value="Mutasi" />
+    </menu>
+    <menu id="10020">
+      <phrase id="menutext" value="Detail Penjualan" />
+    </menu>
+    <menu id="10024">
+      <phrase id="menutext" value="v 04stok" />
     </menu>
     <menu id="10014">
       <phrase id="menutext" value="Transaksi" />
@@ -899,6 +908,57 @@
       </field>
       <field id="sub_total">
         <phrase id="fldcaption" value="sub total" />
+      </field>
+    </table>
+    <table id="v_03transaksi">
+      <phrase id="tblcaption" value="v 03transaksi" />
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
+      </field>
+      <field id="vendor_customer">
+        <phrase id="fldcaption" value="vendor customer" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="qty" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="jenis" />
+      </field>
+      <field id="satuan_nama">
+        <phrase id="fldcaption" value="satuan nama" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="harga" />
+      </field>
+      <field id="sub_total">
+        <phrase id="fldcaption" value="sub total" />
+      </field>
+    </table>
+    <table id="v_04stok">
+      <phrase id="tblcaption" value="v 04stok" />
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
+      </field>
+      <field id="masuk">
+        <phrase id="fldcaption" value="masuk" />
+      </field>
+      <field id="keluar">
+        <phrase id="fldcaption" value="keluar" />
+      </field>
+      <field id="saldo">
+        <phrase id="fldcaption" value="saldo" />
       </field>
     </table>
   </project>
