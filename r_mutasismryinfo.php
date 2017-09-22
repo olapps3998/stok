@@ -163,7 +163,7 @@ class crr_mutasi extends crTableBase {
 	var $_SqlFrom = "";
 
 	function getSqlFrom() {
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`v_04stok`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`v_07mutasi`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -378,7 +378,7 @@ class crr_mutasi extends crTableBase {
 		switch ($fld->FldVar) {
 		case "x_item_nama":
 			$sSqlWrk = "";
-		$sSqlWrk = "SELECT DISTINCT `item_nama`, `item_nama` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v_04stok`";
+		$sSqlWrk = "SELECT DISTINCT `item_nama`, `item_nama` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v_07mutasi`";
 		$sWhereWrk = "";
 		$this->item_nama->LookupFilters = array();
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "DB", "f0" => '`item_nama` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter));

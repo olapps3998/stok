@@ -1136,8 +1136,9 @@ class crr_jual_summary extends crr_jual {
 
 			// total
 			$this->total->GroupViewValue = $this->total->GroupOldValue();
-			$this->total->GroupViewValue = ewr_FormatNumber($this->total->GroupViewValue, $this->total->DefaultDecimalPrecision, -1, 0, 0);
+			$this->total->GroupViewValue = ewr_FormatNumber($this->total->GroupViewValue, 2, -2, -2, -2);
 			$this->total->CellAttrs["class"] = ($this->RowGroupLevel == 4) ? "ewRptGrpSummary4" : "ewRptGrpField4";
+			$this->total->CellAttrs["style"] = "text-align:right;";
 			$this->total->GroupViewValue = ewr_DisplayGroupValue($this->total, $this->total->GroupViewValue);
 			$this->total->GroupSummaryOldValue = $this->total->GroupSummaryValue;
 			$this->total->GroupSummaryValue = $this->total->GroupViewValue;
@@ -1215,8 +1216,9 @@ class crr_jual_summary extends crr_jual {
 
 			// total
 			$this->total->GroupViewValue = $this->total->GroupValue();
-			$this->total->GroupViewValue = ewr_FormatNumber($this->total->GroupViewValue, $this->total->DefaultDecimalPrecision, -1, 0, 0);
+			$this->total->GroupViewValue = ewr_FormatNumber($this->total->GroupViewValue, 2, -2, -2, -2);
 			$this->total->CellAttrs["class"] = "ewRptGrpField4";
+			$this->total->CellAttrs["style"] = "text-align:right;";
 			$this->total->GroupViewValue = ewr_DisplayGroupValue($this->total, $this->total->GroupViewValue);
 			if ($this->total->GroupValue() == $this->total->GroupOldValue() && !$this->ChkLvlBreak(4))
 				$this->total->GroupViewValue = "&nbsp;";
@@ -2775,15 +2777,15 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<td data-field="total">&nbsp;</td>
 	<?php } else { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="total"><div class="r_jual_total"><span class="ewTableHeaderCaption"><?php echo $Page->total->FldCaption() ?></span></div></td>
+	<td data-field="total"><div class="r_jual_total" style="text-align: right;"><span class="ewTableHeaderCaption"><?php echo $Page->total->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="total">
 <?php if ($Page->SortUrl($Page->total) == "") { ?>
-		<div class="ewTableHeaderBtn r_jual_total">
+		<div class="ewTableHeaderBtn r_jual_total" style="text-align: right;">
 			<span class="ewTableHeaderCaption"><?php echo $Page->total->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer r_jual_total" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->total) ?>',2);">
+		<div class="ewTableHeaderBtn ewPointer r_jual_total" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->total) ?>',2);" style="text-align: right;">
 			<span class="ewTableHeaderCaption"><?php echo $Page->total->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->total->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->total->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>

@@ -11,13 +11,9 @@ class crr_stok extends crTableBase {
 	var $ShowCompactSummaryFooter = TRUE;
 	var $item_id;
 	var $item_nama;
-	var $tgl;
-	var $jenis;
-	var $vendor_customer;
-	var $qty;
-	var $satuan_nama;
-	var $harga;
-	var $sub_total;
+	var $masuk;
+	var $keluar;
+	var $saldo;
 
 	//
 	// Table class constructor
@@ -34,91 +30,46 @@ class crr_stok extends crTableBase {
 		// item_id
 		$this->item_id = new crField('r_stok', 'r_stok', 'x_item_id', 'item_id', '`item_id`', 3, EWR_DATATYPE_NUMBER, -1);
 		$this->item_id->Sortable = TRUE; // Allow sort
-		$this->item_id->GroupingFieldId = 1;
-		$this->item_id->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
-		$this->item_id->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
 		$this->item_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->fields['item_id'] = &$this->item_id;
 		$this->item_id->DateFilter = "";
 		$this->item_id->SqlSelect = "";
 		$this->item_id->SqlOrderBy = "";
-		$this->item_id->FldGroupByType = "";
-		$this->item_id->FldGroupInt = "0";
-		$this->item_id->FldGroupSql = "";
 
 		// item_nama
 		$this->item_nama = new crField('r_stok', 'r_stok', 'x_item_nama', 'item_nama', '`item_nama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->item_nama->Sortable = TRUE; // Allow sort
-		$this->item_nama->GroupingFieldId = 2;
-		$this->item_nama->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
-		$this->item_nama->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
 		$this->fields['item_nama'] = &$this->item_nama;
 		$this->item_nama->DateFilter = "";
 		$this->item_nama->SqlSelect = "";
 		$this->item_nama->SqlOrderBy = "";
-		$this->item_nama->FldGroupByType = "";
-		$this->item_nama->FldGroupInt = "0";
-		$this->item_nama->FldGroupSql = "";
 
-		// tgl
-		$this->tgl = new crField('r_stok', 'r_stok', 'x_tgl', 'tgl', '`tgl`', 133, EWR_DATATYPE_DATE, 7);
-		$this->tgl->Sortable = TRUE; // Allow sort
-		$this->tgl->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectField");
-		$this->fields['tgl'] = &$this->tgl;
-		$this->tgl->DateFilter = "";
-		$this->tgl->SqlSelect = "";
-		$this->tgl->SqlOrderBy = "";
+		// masuk
+		$this->masuk = new crField('r_stok', 'r_stok', 'x_masuk', 'masuk', '`masuk`', 5, EWR_DATATYPE_NUMBER, -1);
+		$this->masuk->Sortable = TRUE; // Allow sort
+		$this->masuk->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->fields['masuk'] = &$this->masuk;
+		$this->masuk->DateFilter = "";
+		$this->masuk->SqlSelect = "";
+		$this->masuk->SqlOrderBy = "";
 
-		// jenis
-		$this->jenis = new crField('r_stok', 'r_stok', 'x_jenis', 'jenis', '`jenis`', 200, EWR_DATATYPE_STRING, -1);
-		$this->jenis->Sortable = TRUE; // Allow sort
-		$this->fields['jenis'] = &$this->jenis;
-		$this->jenis->DateFilter = "";
-		$this->jenis->SqlSelect = "";
-		$this->jenis->SqlOrderBy = "";
+		// keluar
+		$this->keluar = new crField('r_stok', 'r_stok', 'x_keluar', 'keluar', '`keluar`', 5, EWR_DATATYPE_NUMBER, -1);
+		$this->keluar->Sortable = TRUE; // Allow sort
+		$this->keluar->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->fields['keluar'] = &$this->keluar;
+		$this->keluar->DateFilter = "";
+		$this->keluar->SqlSelect = "";
+		$this->keluar->SqlOrderBy = "";
 
-		// vendor_customer
-		$this->vendor_customer = new crField('r_stok', 'r_stok', 'x_vendor_customer', 'vendor_customer', '`vendor_customer`', 200, EWR_DATATYPE_STRING, -1);
-		$this->vendor_customer->Sortable = TRUE; // Allow sort
-		$this->fields['vendor_customer'] = &$this->vendor_customer;
-		$this->vendor_customer->DateFilter = "";
-		$this->vendor_customer->SqlSelect = "";
-		$this->vendor_customer->SqlOrderBy = "";
-
-		// qty
-		$this->qty = new crField('r_stok', 'r_stok', 'x_qty', 'qty', '`qty`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->qty->Sortable = TRUE; // Allow sort
-		$this->qty->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
-		$this->fields['qty'] = &$this->qty;
-		$this->qty->DateFilter = "";
-		$this->qty->SqlSelect = "";
-		$this->qty->SqlOrderBy = "";
-
-		// satuan_nama
-		$this->satuan_nama = new crField('r_stok', 'r_stok', 'x_satuan_nama', 'satuan_nama', '`satuan_nama`', 200, EWR_DATATYPE_STRING, -1);
-		$this->satuan_nama->Sortable = TRUE; // Allow sort
-		$this->fields['satuan_nama'] = &$this->satuan_nama;
-		$this->satuan_nama->DateFilter = "";
-		$this->satuan_nama->SqlSelect = "";
-		$this->satuan_nama->SqlOrderBy = "";
-
-		// harga
-		$this->harga = new crField('r_stok', 'r_stok', 'x_harga', 'harga', '`harga`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->harga->Sortable = TRUE; // Allow sort
-		$this->harga->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
-		$this->fields['harga'] = &$this->harga;
-		$this->harga->DateFilter = "";
-		$this->harga->SqlSelect = "";
-		$this->harga->SqlOrderBy = "";
-
-		// sub_total
-		$this->sub_total = new crField('r_stok', 'r_stok', 'x_sub_total', 'sub_total', '`sub_total`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->sub_total->Sortable = TRUE; // Allow sort
-		$this->sub_total->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
-		$this->fields['sub_total'] = &$this->sub_total;
-		$this->sub_total->DateFilter = "";
-		$this->sub_total->SqlSelect = "";
-		$this->sub_total->SqlOrderBy = "";
+		// saldo
+		$this->saldo = new crField('r_stok', 'r_stok', 'x_saldo', 'saldo', '`saldo`', 5, EWR_DATATYPE_NUMBER, -1);
+		$this->saldo->Sortable = TRUE; // Allow sort
+		$this->saldo->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->fields['saldo'] = &$this->saldo;
+		$this->saldo->DateFilter = "";
+		$this->saldo->SqlSelect = "";
+		$this->saldo->SqlOrderBy = "";
 	}
 
 	// Set Field Visibility
@@ -190,7 +141,7 @@ class crr_stok extends crTableBase {
 	var $_SqlFrom = "";
 
 	function getSqlFrom() {
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`v_03transaksi`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`v_05stok`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -266,7 +217,7 @@ class crr_stok extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`item_id` ASC, `item_nama` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -283,7 +234,7 @@ class crr_stok extends crTableBase {
 	var $_SqlFirstGroupField = "";
 
 	function getSqlFirstGroupField() {
-		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`item_id`";
+		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "";
 	}
 
 	function SqlFirstGroupField() { // For backward compatibility
@@ -313,7 +264,7 @@ class crr_stok extends crTableBase {
 	var $_SqlOrderByGroup = "";
 
 	function getSqlOrderByGroup() {
-		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`item_id` ASC";
+		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "";
 	}
 
 	function SqlOrderByGroup() { // For backward compatibility
@@ -403,6 +354,19 @@ class crr_stok extends crTableBase {
 	function SetupLookupFilters($fld) {
 		global $gsLanguage;
 		switch ($fld->FldVar) {
+		case "x_item_nama":
+			$sSqlWrk = "";
+		$sSqlWrk = "SELECT DISTINCT `item_nama`, `item_nama` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v_05stok`";
+		$sWhereWrk = "";
+		$this->item_nama->LookupFilters = array();
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "DB", "f0" => '`item_nama` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter));
+			$sSqlWrk = "";
+		$this->Lookup_Selecting($this->item_nama, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+		$sSqlWrk .= " ORDER BY `item_nama` ASC";
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
