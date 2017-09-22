@@ -34,33 +34,68 @@ FROM (((t_06jual
   JOIN t_02item ON t_07jual_detail.item_id = t_02item.item_id)
   JOIN t_03satuan ON t_07jual_detail.satuan_id = t_03satuan.satuan_id;
   
-create view v_03transaksi as
-SELECT a.item_id AS item_id,
-  a.item_nama AS item_nama,
-  b.tgl_beli AS tgl,
-  y.vendor_nama AS vendor_customer,
-  b.qty AS qty,
-  'M' AS jenis,
-  z.satuan_nama AS satuan_nama,
-  b.harga AS harga,
-  b.sub_total AS sub_total
-FROM ((t_02item a
-  LEFT JOIN t_04beli b ON a.item_id = b.item_id)
-  LEFT JOIN t_01vendor y ON b.vendor_id = y.vendor_id)
-  LEFT JOIN t_03satuan z ON b.satuan_id = z.satuan_id
-UNION ALL
-SELECT a.item_id AS item_id,
-  a.item_nama AS item_nama,
-  b.tgl_kirim AS tgl_kirim,
-  y.customer_nama AS customer_nama,
-  (b.qty * -(1)) AS qty,
-  'K' AS K,
-  z.satuan_nama AS satuan_nama,
-  b.harga AS harga,
-  ((b.qty * -(1)) * b.harga) AS `(``b``.``qty`` * -(1)) * ``b``.``harga```
-FROM (((t_02item a
-  LEFT JOIN t_07jual_detail b ON a.item_id = b.item_id)
-  LEFT JOIN t_06jual c ON b.jual_id = c.jual_id)
-  LEFT JOIN t_05customer y ON c.customer_id = y.customer_id)
-  LEFT JOIN t_03satuan z ON b.satuan_id = z.satuan_id
-ORDER BY item_id;
+create view v_03masuk as
+Select t_04beli.item_id As item_id,
+  Sum(t_04beli.qty) As masuk
+From t_04beli
+Group By t_04beli.item_id;
+
+create view v_04keluar as
+Select t_07jual_detail.item_id As item_id,
+  Sum(t_07jual_detail.qty) As keluar
+From t_07jual_detail
+Group By t_07jual_detail.item_id;
+
+create view v_05stok as
+Select a.item_id As item_id,
+  a.item_nama As item_nama,
+  (Case When isnull(b.masuk) Then 0 Else b.masuk End) As masuk,
+  (Case When isnull(c.keluar) Then 0 Else c.keluar End) As keluar,
+  ((Case When isnull(b.masuk) Then 0 Else b.masuk End) - (Case
+    When isnull(c.keluar) Then 0 Else c.keluar End)) As saldo
+From (t_02item a
+  Left Join v_03masuk b On a.item_id = b.item_id)
+  Left Join v_04keluar c On a.item_id = c.item_id
+Order By item_id;
+
+create view v_06transaksi as
+Select a.item_id As item_id,
+  a.item_nama As item_nama,
+  b.tgl_beli As tgl,
+  y.vendor_nama As vendor_customer,
+  b.qty As qty,
+  'M' As jenis,
+  z.satuan_nama As satuan_nama,
+  b.harga As harga,
+  b.sub_total As sub_total
+From ((t_02item a
+  Left Join t_04beli b On a.item_id = b.item_id)
+  Left Join t_01vendor y On b.vendor_id = y.vendor_id)
+  Left Join t_03satuan z On b.satuan_id = z.satuan_id
+union All
+Select a.item_id As item_id,
+  a.item_nama As item_nama,
+  b.tgl_kirim As tgl_kirim,
+  y.customer_nama As customer_nama,
+  b.qty As qty,
+  'K' As K,
+  z.satuan_nama As satuan_nama,
+  b.harga As harga,
+  b.sub_total As sub_total
+From (((t_02item a
+  Left Join t_07jual_detail b On a.item_id = b.item_id)
+  Left Join t_06jual c On b.jual_id = c.jual_id)
+  Left Join t_05customer y On c.customer_id = y.customer_id)
+  Left Join t_03satuan z On b.satuan_id = z.satuan_id
+Order By item_id;
+
+create view v_07mutasi as
+Select v_06transaksi.item_id As item_id,
+  v_06transaksi.item_nama As item_nama,
+  v_06transaksi.tgl As tgl,
+  (Case v_06transaksi.jenis When 'M' Then v_06transaksi.qty Else 0
+  End) As masuk,
+  (Case v_06transaksi.jenis When 'K' Then v_06transaksi.qty Else 0
+  End) As keluar,
+  v_06transaksi.qty As saldo
+From v_06transaksi;
