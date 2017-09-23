@@ -99,3 +99,18 @@ Select v_06transaksi.item_id As item_id,
   End) As keluar,
   v_06transaksi.qty As saldo
 From v_06transaksi;
+
+select
+	b.vendor_nama
+    , c.item_nama
+    , d.satuan_nama
+    , a.harga
+	, a.*
+from
+	t_04beli a
+	left join t_01vendor b on a.vendor_id = b.vendor_id
+    left join t_02item c on a.item_id = c.item_id
+    left join t_03satuan d on a.satuan_id = d.satuan_id
+order by
+	a.item_id
+    , a.tgl_beli
