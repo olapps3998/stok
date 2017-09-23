@@ -52,7 +52,7 @@ class crr_jual extends crTableBase {
 		$this->tgl->GroupingFieldId = 2;
 		$this->tgl->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
 		$this->tgl->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
-		$this->tgl->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectField");
+		$this->tgl->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_SEPARATOR"], $ReportLanguage->Phrase("IncorrectDateDMY"));
 		$this->fields['tgl'] = &$this->tgl;
 		$this->tgl->DateFilter = "";
 		$this->tgl->SqlSelect = "";

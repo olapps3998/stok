@@ -267,8 +267,6 @@ class crr_beli_summary extends crr_beli {
 
 		// Setup placeholder
 		$this->tgl_beli->PlaceHolder = $this->tgl_beli->FldCaption();
-		$this->vendor_nama->PlaceHolder = $this->vendor_nama->FldCaption();
-		$this->item_nama->PlaceHolder = $this->item_nama->FldCaption();
 
 		// Setup export options
 		$this->SetupExportOptions();
@@ -1370,8 +1368,8 @@ class crr_beli_summary extends crr_beli {
 
 			// Load default values
 			$this->SetSessionFilterValues($this->tgl_beli->SearchValue, $this->tgl_beli->SearchOperator, $this->tgl_beli->SearchCondition, $this->tgl_beli->SearchValue2, $this->tgl_beli->SearchOperator2, 'tgl_beli'); // Field tgl_beli
-			$this->SetSessionFilterValues($this->vendor_nama->SearchValue, $this->vendor_nama->SearchOperator, $this->vendor_nama->SearchCondition, $this->vendor_nama->SearchValue2, $this->vendor_nama->SearchOperator2, 'vendor_nama'); // Field vendor_nama
-			$this->SetSessionFilterValues($this->item_nama->SearchValue, $this->item_nama->SearchOperator, $this->item_nama->SearchCondition, $this->item_nama->SearchValue2, $this->item_nama->SearchOperator2, 'item_nama'); // Field item_nama
+			$this->SetSessionDropDownValue($this->vendor_nama->DropDownValue, $this->vendor_nama->SearchOperator, 'vendor_nama'); // Field vendor_nama
+			$this->SetSessionDropDownValue($this->item_nama->DropDownValue, $this->item_nama->SearchOperator, 'item_nama'); // Field item_nama
 
 			//$bSetupFilter = TRUE; // No need to set up, just use default
 		} else {
@@ -1383,12 +1381,16 @@ class crr_beli_summary extends crr_beli {
 			}
 
 			// Field vendor_nama
-			if ($this->GetFilterValues($this->vendor_nama)) {
+			if ($this->GetDropDownValue($this->vendor_nama)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->vendor_nama->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_r_beli_vendor_nama'])) {
 				$bSetupFilter = TRUE;
 			}
 
 			// Field item_nama
-			if ($this->GetFilterValues($this->item_nama)) {
+			if ($this->GetDropDownValue($this->item_nama)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->item_nama->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_r_beli_item_nama'])) {
 				$bSetupFilter = TRUE;
 			}
 			if (!$this->ValidateForm()) {
@@ -1400,8 +1402,8 @@ class crr_beli_summary extends crr_beli {
 		// Restore session
 		if ($bRestoreSession) {
 			$this->GetSessionFilterValues($this->tgl_beli); // Field tgl_beli
-			$this->GetSessionFilterValues($this->vendor_nama); // Field vendor_nama
-			$this->GetSessionFilterValues($this->item_nama); // Field item_nama
+			$this->GetSessionDropDownValue($this->vendor_nama); // Field vendor_nama
+			$this->GetSessionDropDownValue($this->item_nama); // Field item_nama
 		}
 
 		// Call page filter validated event
@@ -1409,17 +1411,23 @@ class crr_beli_summary extends crr_beli {
 
 		// Build SQL
 		$this->BuildExtendedFilter($this->tgl_beli, $sFilter, FALSE, TRUE); // Field tgl_beli
-		$this->BuildExtendedFilter($this->vendor_nama, $sFilter, FALSE, TRUE); // Field vendor_nama
-		$this->BuildExtendedFilter($this->item_nama, $sFilter, FALSE, TRUE); // Field item_nama
+		$this->BuildDropDownFilter($this->vendor_nama, $sFilter, $this->vendor_nama->SearchOperator, FALSE, TRUE); // Field vendor_nama
+		$this->BuildDropDownFilter($this->item_nama, $sFilter, $this->item_nama->SearchOperator, FALSE, TRUE); // Field item_nama
 
 		// Save parms to session
 		$this->SetSessionFilterValues($this->tgl_beli->SearchValue, $this->tgl_beli->SearchOperator, $this->tgl_beli->SearchCondition, $this->tgl_beli->SearchValue2, $this->tgl_beli->SearchOperator2, 'tgl_beli'); // Field tgl_beli
-		$this->SetSessionFilterValues($this->vendor_nama->SearchValue, $this->vendor_nama->SearchOperator, $this->vendor_nama->SearchCondition, $this->vendor_nama->SearchValue2, $this->vendor_nama->SearchOperator2, 'vendor_nama'); // Field vendor_nama
-		$this->SetSessionFilterValues($this->item_nama->SearchValue, $this->item_nama->SearchOperator, $this->item_nama->SearchCondition, $this->item_nama->SearchValue2, $this->item_nama->SearchOperator2, 'item_nama'); // Field item_nama
+		$this->SetSessionDropDownValue($this->vendor_nama->DropDownValue, $this->vendor_nama->SearchOperator, 'vendor_nama'); // Field vendor_nama
+		$this->SetSessionDropDownValue($this->item_nama->DropDownValue, $this->item_nama->SearchOperator, 'item_nama'); // Field item_nama
 
 		// Setup filter
 		if ($bSetupFilter) {
 		}
+
+		// Field vendor_nama
+		ewr_LoadDropDownList($this->vendor_nama->DropDownList, $this->vendor_nama->DropDownValue);
+
+		// Field item_nama
+		ewr_LoadDropDownList($this->item_nama->DropDownList, $this->item_nama->DropDownValue);
 		return $sFilter;
 	}
 
@@ -1727,6 +1735,14 @@ class crr_beli_summary extends crr_beli {
 		/**
 		* Set up default values for non Text filters
 		*/
+
+		// Field vendor_nama
+		$this->vendor_nama->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->vendor_nama->DropDownValue = $this->vendor_nama->DefaultDropDownValue;
+
+		// Field item_nama
+		$this->item_nama->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->item_nama->DropDownValue = $this->item_nama->DefaultDropDownValue;
 		/**
 		* Set up default values for extended filters
 		* function SetDefaultExtFilter(&$fld, $so1, $sv1, $sc, $so2, $sv2)
@@ -1742,14 +1758,6 @@ class crr_beli_summary extends crr_beli {
 		// Field tgl_beli
 		$this->SetDefaultExtFilter($this->tgl_beli, "BETWEEN", NULL, 'AND', "=", NULL);
 		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->tgl_beli);
-
-		// Field vendor_nama
-		$this->SetDefaultExtFilter($this->vendor_nama, "LIKE", NULL, 'AND', "=", NULL);
-		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->vendor_nama);
-
-		// Field item_nama
-		$this->SetDefaultExtFilter($this->item_nama, "LIKE", NULL, 'AND', "=", NULL);
-		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->item_nama);
 		/**
 		* Set up default values for popup filters
 		*/
@@ -1762,12 +1770,12 @@ class crr_beli_summary extends crr_beli {
 		if ($this->TextFilterApplied($this->tgl_beli))
 			return TRUE;
 
-		// Check vendor_nama text filter
-		if ($this->TextFilterApplied($this->vendor_nama))
+		// Check vendor_nama extended filter
+		if ($this->NonTextFilterApplied($this->vendor_nama))
 			return TRUE;
 
-		// Check item_nama text filter
-		if ($this->TextFilterApplied($this->item_nama))
+		// Check item_nama extended filter
+		if ($this->NonTextFilterApplied($this->item_nama))
 			return TRUE;
 		return FALSE;
 	}
@@ -1794,7 +1802,7 @@ class crr_beli_summary extends crr_beli {
 		// Field vendor_nama
 		$sExtWrk = "";
 		$sWrk = "";
-		$this->BuildExtendedFilter($this->vendor_nama, $sExtWrk);
+		$this->BuildDropDownFilter($this->vendor_nama, $sExtWrk, $this->vendor_nama->SearchOperator);
 		$sFilter = "";
 		if ($sExtWrk <> "")
 			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
@@ -1806,7 +1814,7 @@ class crr_beli_summary extends crr_beli {
 		// Field item_nama
 		$sExtWrk = "";
 		$sWrk = "";
-		$this->BuildExtendedFilter($this->item_nama, $sExtWrk);
+		$this->BuildDropDownFilter($this->item_nama, $sExtWrk, $this->item_nama->SearchOperator);
 		$sFilter = "";
 		if ($sExtWrk <> "")
 			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
@@ -1852,13 +1860,11 @@ class crr_beli_summary extends crr_beli {
 
 		// Field vendor_nama
 		$sWrk = "";
-		if ($this->vendor_nama->SearchValue <> "" || $this->vendor_nama->SearchValue2 <> "") {
-			$sWrk = "\"sv_vendor_nama\":\"" . ewr_JsEncode2($this->vendor_nama->SearchValue) . "\"," .
-				"\"so_vendor_nama\":\"" . ewr_JsEncode2($this->vendor_nama->SearchOperator) . "\"," .
-				"\"sc_vendor_nama\":\"" . ewr_JsEncode2($this->vendor_nama->SearchCondition) . "\"," .
-				"\"sv2_vendor_nama\":\"" . ewr_JsEncode2($this->vendor_nama->SearchValue2) . "\"," .
-				"\"so2_vendor_nama\":\"" . ewr_JsEncode2($this->vendor_nama->SearchOperator2) . "\"";
-		}
+		$sWrk = ($this->vendor_nama->DropDownValue <> EWR_INIT_VALUE) ? $this->vendor_nama->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_vendor_nama\":\"" . ewr_JsEncode2($sWrk) . "\"";
 		if ($sWrk <> "") {
 			if ($sFilterList <> "") $sFilterList .= ",";
 			$sFilterList .= $sWrk;
@@ -1866,13 +1872,11 @@ class crr_beli_summary extends crr_beli {
 
 		// Field item_nama
 		$sWrk = "";
-		if ($this->item_nama->SearchValue <> "" || $this->item_nama->SearchValue2 <> "") {
-			$sWrk = "\"sv_item_nama\":\"" . ewr_JsEncode2($this->item_nama->SearchValue) . "\"," .
-				"\"so_item_nama\":\"" . ewr_JsEncode2($this->item_nama->SearchOperator) . "\"," .
-				"\"sc_item_nama\":\"" . ewr_JsEncode2($this->item_nama->SearchCondition) . "\"," .
-				"\"sv2_item_nama\":\"" . ewr_JsEncode2($this->item_nama->SearchValue2) . "\"," .
-				"\"so2_item_nama\":\"" . ewr_JsEncode2($this->item_nama->SearchOperator2) . "\"";
-		}
+		$sWrk = ($this->item_nama->DropDownValue <> EWR_INIT_VALUE) ? $this->item_nama->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_item_nama\":\"" . ewr_JsEncode2($sWrk) . "\"";
 		if ($sWrk <> "") {
 			if ($sFilterList <> "") $sFilterList .= ",";
 			$sFilterList .= $sWrk;
@@ -1914,26 +1918,28 @@ class crr_beli_summary extends crr_beli {
 
 		// Field vendor_nama
 		$bRestoreFilter = FALSE;
-		if (array_key_exists("sv_vendor_nama", $filter) || array_key_exists("so_vendor_nama", $filter) ||
-			array_key_exists("sc_vendor_nama", $filter) ||
-			array_key_exists("sv2_vendor_nama", $filter) || array_key_exists("so2_vendor_nama", $filter)) {
-			$this->SetSessionFilterValues(@$filter["sv_vendor_nama"], @$filter["so_vendor_nama"], @$filter["sc_vendor_nama"], @$filter["sv2_vendor_nama"], @$filter["so2_vendor_nama"], "vendor_nama");
+		if (array_key_exists("sv_vendor_nama", $filter)) {
+			$sWrk = $filter["sv_vendor_nama"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_vendor_nama"], "vendor_nama");
 			$bRestoreFilter = TRUE;
 		}
 		if (!$bRestoreFilter) { // Clear filter
-			$this->SetSessionFilterValues("", "=", "AND", "", "=", "vendor_nama");
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "vendor_nama");
 		}
 
 		// Field item_nama
 		$bRestoreFilter = FALSE;
-		if (array_key_exists("sv_item_nama", $filter) || array_key_exists("so_item_nama", $filter) ||
-			array_key_exists("sc_item_nama", $filter) ||
-			array_key_exists("sv2_item_nama", $filter) || array_key_exists("so2_item_nama", $filter)) {
-			$this->SetSessionFilterValues(@$filter["sv_item_nama"], @$filter["so_item_nama"], @$filter["sc_item_nama"], @$filter["sv2_item_nama"], @$filter["so2_item_nama"], "item_nama");
+		if (array_key_exists("sv_item_nama", $filter)) {
+			$sWrk = $filter["sv_item_nama"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_item_nama"], "item_nama");
 			$bRestoreFilter = TRUE;
 		}
 		if (!$bRestoreFilter) { // Clear filter
-			$this->SetSessionFilterValues("", "=", "AND", "", "=", "item_nama");
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "item_nama");
 		}
 		return TRUE;
 	}
@@ -2352,6 +2358,8 @@ fr_belisummary.ValidateRequired = false; // No JavaScript validation
 <?php } ?>
 
 // Use Ajax
+fr_belisummary.Lists["sv_vendor_nama"] = {"LinkField":"sv_vendor_nama","Ajax":true,"DisplayFields":["sv_vendor_nama","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
+fr_belisummary.Lists["sv_item_nama"] = {"LinkField":"sv_item_nama","Ajax":true,"DisplayFields":["sv_item_nama","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
 </script>
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
@@ -2432,21 +2440,71 @@ if (!$Page->DrillDownInPanel) {
 <div id="r_2" class="ewRow">
 <div id="c_vendor_nama" class="ewCell form-group">
 	<label for="sv_vendor_nama" class="ewSearchCaption ewLabel"><?php echo $Page->vendor_nama->FldCaption() ?></label>
-	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_vendor_nama" id="so_vendor_nama" value="LIKE"></span>
-	<span class="control-group ewSearchField">
-<?php ewr_PrependClass($Page->vendor_nama->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="r_beli" data-field="x_vendor_nama" id="sv_vendor_nama" name="sv_vendor_nama" size="30" maxlength="100" placeholder="<?php echo $Page->vendor_nama->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->vendor_nama->SearchValue) ?>"<?php echo $Page->vendor_nama->EditAttributes() ?>>
-</span>
+	<span class="ewSearchField">
+<?php ewr_PrependClass($Page->vendor_nama->EditAttrs["class"], "form-control"); ?>
+<select data-table="r_beli" data-field="x_vendor_nama" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->vendor_nama->DisplayValueSeparator) ? json_encode($Page->vendor_nama->DisplayValueSeparator) : $Page->vendor_nama->DisplayValueSeparator) ?>" id="sv_vendor_nama" name="sv_vendor_nama"<?php echo $Page->vendor_nama->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->vendor_nama->AdvancedFilters) ? count($Page->vendor_nama->AdvancedFilters) : 0;
+	$cntd = is_array($Page->vendor_nama->DropDownList) ? count($Page->vendor_nama->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->vendor_nama->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->vendor_nama->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->vendor_nama->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->vendor_nama->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_vendor_nama" id="s_sv_vendor_nama" value="<?php echo $Page->vendor_nama->LookupFilterQuery() ?>"></span>
 </div>
 </div>
 <div id="r_3" class="ewRow">
 <div id="c_item_nama" class="ewCell form-group">
 	<label for="sv_item_nama" class="ewSearchCaption ewLabel"><?php echo $Page->item_nama->FldCaption() ?></label>
-	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_item_nama" id="so_item_nama" value="LIKE"></span>
-	<span class="control-group ewSearchField">
-<?php ewr_PrependClass($Page->item_nama->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="r_beli" data-field="x_item_nama" id="sv_item_nama" name="sv_item_nama" size="30" maxlength="100" placeholder="<?php echo $Page->item_nama->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->item_nama->SearchValue) ?>"<?php echo $Page->item_nama->EditAttributes() ?>>
-</span>
+	<span class="ewSearchField">
+<?php ewr_PrependClass($Page->item_nama->EditAttrs["class"], "form-control"); ?>
+<select data-table="r_beli" data-field="x_item_nama" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->item_nama->DisplayValueSeparator) ? json_encode($Page->item_nama->DisplayValueSeparator) : $Page->item_nama->DisplayValueSeparator) ?>" id="sv_item_nama" name="sv_item_nama"<?php echo $Page->item_nama->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->item_nama->AdvancedFilters) ? count($Page->item_nama->AdvancedFilters) : 0;
+	$cntd = is_array($Page->item_nama->DropDownList) ? count($Page->item_nama->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->item_nama->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->item_nama->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->item_nama->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->item_nama->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_item_nama" id="s_sv_item_nama" value="<?php echo $Page->item_nama->LookupFilterQuery() ?>"></span>
 </div>
 </div>
 <div class="ewRow"><input type="submit" name="btnsubmit" id="btnsubmit" class="btn btn-primary" value="<?php echo $ReportLanguage->Phrase("Search") ?>">

@@ -1812,11 +1812,11 @@ class crr_jual_summary extends crr_jual {
 		// Check if validation required
 		if (!EWR_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!EURODATE($this->tgl->SearchValue)) {
+		if (!ewr_CheckEuroDate($this->tgl->SearchValue)) {
 			if ($gsFormError <> "") $gsFormError .= "<br>";
 			$gsFormError .= $this->tgl->FldErrMsg();
 		}
-		if (!EURODATE($this->tgl->SearchValue2)) {
+		if (!ewr_CheckEuroDate($this->tgl->SearchValue2)) {
 			if ($gsFormError <> "") $gsFormError .= "<br>";
 			$gsFormError .= $this->tgl->FldErrMsg();
 		}
@@ -2443,12 +2443,12 @@ fr_jualsummary.Validate = function() {
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
 	var elm = fobj.sv_tgl;
-	if (elm && typeof(EURODATE) == "function" && !EURODATE(elm.value)) {
+	if (elm && !ewr_CheckEuroDate(elm.value)) {
 		if (!this.OnError(elm, "<?php echo ewr_JsEncode2($Page->tgl->FldErrMsg()) ?>"))
 			return false;
 	}
 	var elm = fobj.sv2_tgl;
-	if (elm && typeof(EURODATE) == "function" && !EURODATE(elm.value)) {
+	if (elm && !ewr_CheckEuroDate(elm.value)) {
 		if (!this.OnError(elm, "<?php echo ewr_JsEncode2($Page->tgl->FldErrMsg()) ?>"))
 			return false;
 	}
@@ -2543,12 +2543,12 @@ if (!$Page->DrillDownInPanel) {
 	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("BETWEEN"); ?><input type="hidden" name="so_tgl" id="so_tgl" value="BETWEEN"></span>
 	<span class="control-group ewSearchField">
 <?php ewr_PrependClass($Page->tgl->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="r_jual" data-field="x_tgl" id="sv_tgl" name="sv_tgl" placeholder="<?php echo $Page->tgl->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->tgl->SearchValue) ?>"<?php echo $Page->tgl->EditAttributes() ?>>
+<input type="text" data-table="r_jual" data-field="x_tgl" id="sv_tgl" name="sv_tgl" placeholder="<?php echo $Page->tgl->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->tgl->SearchValue) ?>" data-calendar="true" data-formatid="7"<?php echo $Page->tgl->EditAttributes() ?>>
 </span>
 	<span class="ewSearchCond btw1_tgl"><?php echo $ReportLanguage->Phrase("AND") ?></span>
 	<span class="ewSearchField btw1_tgl">
 <?php ewr_PrependClass($Page->tgl->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="r_jual" data-field="x_tgl" id="sv2_tgl" name="sv2_tgl" placeholder="<?php echo $Page->tgl->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->tgl->SearchValue2) ?>"<?php echo $Page->tgl->EditAttributes() ?>>
+<input type="text" data-table="r_jual" data-field="x_tgl" id="sv2_tgl" name="sv2_tgl" placeholder="<?php echo $Page->tgl->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->tgl->SearchValue2) ?>" data-calendar="true" data-formatid="7"<?php echo $Page->tgl->EditAttributes() ?>>
 </span>
 </div>
 </div>

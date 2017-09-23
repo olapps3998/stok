@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/9/22" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/9/23" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -582,7 +582,13 @@
   </global>
   <project>
     <phrase id="bodytitle" value="STOK" />
-    <phrase id="footertext" value="&amp;copy;2016 e.World Technology Ltd. All rights reserved." />
+    <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="10035">
+      <phrase id="menutext" value="v 06transaksi" />
+    </menu>
+    <menu id="10036">
+      <phrase id="menutext" value="v 07mutasi" />
+    </menu>
     <menu id="10029">
       <phrase id="menutext" value="v 01beli laporan" />
     </menu>
@@ -959,6 +965,57 @@
       </field>
       <field id="item_nama">
         <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="masuk">
+        <phrase id="fldcaption" value="masuk" />
+      </field>
+      <field id="keluar">
+        <phrase id="fldcaption" value="keluar" />
+      </field>
+      <field id="saldo">
+        <phrase id="fldcaption" value="saldo" />
+      </field>
+    </table>
+    <table id="v_06transaksi">
+      <phrase id="tblcaption" value="v 06transaksi" />
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
+      </field>
+      <field id="vendor_customer">
+        <phrase id="fldcaption" value="vendor customer" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="qty" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="jenis" />
+      </field>
+      <field id="satuan_nama">
+        <phrase id="fldcaption" value="satuan nama" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="harga" />
+      </field>
+      <field id="sub_total">
+        <phrase id="fldcaption" value="sub total" />
+      </field>
+    </table>
+    <table id="v_07mutasi">
+      <phrase id="tblcaption" value="v 07mutasi" />
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
       </field>
       <field id="masuk">
         <phrase id="fldcaption" value="masuk" />
