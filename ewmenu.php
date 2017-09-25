@@ -19,6 +19,7 @@ $RootMenu->AddMenuItem(10013, "mri_r5fjual", $Language->MenuPhrase("10013", "Men
 $RootMenu->AddMenuItem(10015, "mri_r5fstok", $Language->MenuPhrase("10015", "MenuText"), "r_stoksmry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(10017, "mri_r5fmutasi", $Language->MenuPhrase("10017", "MenuText"), "r_mutasismry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(10027, "mri_r5fmargin", $Language->MenuPhrase("10027", "MenuText"), "r_marginsmry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", TRUE, FALSE, FALSE);
+$RootMenu->AddMenuItem(10029, "mri_r5fhutang", $Language->MenuPhrase("10029", "MenuText"), "r_hutangsmry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", TRUE, FALSE, FALSE);
 $RootMenu->Render();
 ?>
 <!-- End Main Menu -->

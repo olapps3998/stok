@@ -583,6 +583,18 @@
   <project>
     <phrase id="bodytitle" value="STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="10039">
+      <phrase id="menutext" value="v 01beli laporan" />
+    </menu>
+    <menu id="10040">
+      <phrase id="menutext" value="v 03masuk" />
+    </menu>
+    <menu id="10041">
+      <phrase id="menutext" value="v 05stok" />
+    </menu>
+    <menu id="10042">
+      <phrase id="menutext" value="v 10hutang" />
+    </menu>
     <menu id="10035">
       <phrase id="menutext" value="v 06transaksi" />
     </menu>
@@ -594,9 +606,6 @@
     </menu>
     <menu id="10038">
       <phrase id="menutext" value="v 09margin" />
-    </menu>
-    <menu id="10030">
-      <phrase id="menutext" value="Detail Penjualan" />
     </menu>
     <menu id="10034">
       <phrase id="menutext" value="v 04keluar" />
@@ -649,6 +658,9 @@
     <menu id="10027">
       <phrase id="menutext" value="Margin" />
     </menu>
+    <menu id="10029">
+      <phrase id="menutext" value="Hutang" />
+    </menu>
     <menu id="10021">
       <phrase id="menutext" value="v 03masuk" />
     </menu>
@@ -658,17 +670,17 @@
     <menu id="10014">
       <phrase id="menutext" value="Transaksi" />
     </menu>
-    <menu id="10031">
-      <phrase id="menutext" value="v 02jual laporan" />
-    </menu>
     <menu id="10032">
       <phrase id="menutext" value="v 04keluar" />
     </menu>
-    <menu id="10028">
-      <phrase id="menutext" value="v 05stok" />
+    <menu id="10030">
+      <phrase id="menutext" value="Detail Penjualan" />
     </menu>
-    <menu id="10029">
-      <phrase id="menutext" value="v 01beli laporan" />
+    <menu id="10031">
+      <phrase id="menutext" value="v 02jual laporan" />
+    </menu>
+    <menu id="10028">
+      <phrase id="menutext" value="v 10hutang" />
     </menu>
     <menu id="10025">
       <phrase id="menutext" value="v 08harga jual terakhir" />
@@ -1070,6 +1082,21 @@
       </field>
       <field id="margin_prosen">
         <phrase id="fldcaption" value="margin prosen" />
+      </field>
+    </table>
+    <table id="v_10hutang">
+      <phrase id="tblcaption" value="v 10hutang" />
+      <field id="vendor_nama">
+        <phrase id="fldcaption" value="vendor nama" />
+      </field>
+      <field id="tot_hutang">
+        <phrase id="fldcaption" value="tot hutang" />
+      </field>
+      <field id="tot_dp">
+        <phrase id="fldcaption" value="tot dp" />
+      </field>
+      <field id="tot_lunas">
+        <phrase id="fldcaption" value="tot lunas" />
       </field>
     </table>
   </project>

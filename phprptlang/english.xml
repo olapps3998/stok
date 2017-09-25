@@ -350,6 +350,12 @@
   <project>
     <phrase id="bodytitle" value="STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="28">
+      <phrase id="menutext" value="v 10hutang" />
+    </menu>
+    <menu id="29">
+      <phrase id="menutext" value="Hutang" />
+    </menu>
     <menu id="25">
       <phrase id="menutext" value="v 08harga jual terakhir" />
     </menu>
@@ -906,6 +912,36 @@
       </field>
       <field id="margin_prosen">
         <phrase id="fldcaption" value="%" />
+      </field>
+    </table>
+    <table id="v_10hutang">
+      <phrase id="tblcaption" value="v 10hutang" />
+      <field id="vendor_nama">
+        <phrase id="fldcaption" value="vendor nama" />
+      </field>
+      <field id="tot_hutang">
+        <phrase id="fldcaption" value="tot hutang" />
+      </field>
+      <field id="tot_dp">
+        <phrase id="fldcaption" value="tot dp" />
+      </field>
+      <field id="tot_lunas">
+        <phrase id="fldcaption" value="tot lunas" />
+      </field>
+    </table>
+    <table id="r_hutang">
+      <phrase id="tblcaption" value="Hutang" />
+      <field id="vendor_nama">
+        <phrase id="fldcaption" value="Sub Vendor" />
+      </field>
+      <field id="tot_hutang">
+        <phrase id="fldcaption" value="Jumlah Hutang" />
+      </field>
+      <field id="tot_dp">
+        <phrase id="fldcaption" value="Jumlah DP" />
+      </field>
+      <field id="tot_lunas">
+        <phrase id="fldcaption" value="Jumlah Pelunasan" />
       </field>
     </table>
   </project>

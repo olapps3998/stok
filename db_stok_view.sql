@@ -124,3 +124,14 @@ Group By a.harga,
   a.item_id
 Order By a.item_id,
   a.tgl_beli;
+
+create view v_10hutang as  
+Select b.vendor_nama As vendor_nama,
+  Sum(a.sub_total) As tot_hutang,
+  Sum(a.jml_dp) As tot_dp,
+  Sum(a.jml_lunas) As tot_lunas
+From t_04beli a
+  Left Join t_01vendor b On a.vendor_id = b.vendor_id
+Where ((Case When isnull(a.jml_dp) Then 0 Else a.jml_dp End) + (Case
+    When isnull(a.jml_lunas) Then 0 Else a.jml_lunas End)) < a.sub_total
+Group By a.vendor_id;
