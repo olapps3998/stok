@@ -27,4 +27,7 @@ hapus view transaksi
 9:33 PM 9/22/2017
 sudah selesai sampai dengan laporan stok dan laporan mutasi
 
+3:13 PM 9/25/2017
+laporan hutang
+- nilai hutang = sub total - (jumlah DP + jumlah pelunasan)
 
