@@ -255,6 +255,11 @@ class ct_06jual_delete extends ct_06jual {
 		$this->tgl->SetVisibility();
 		$this->customer_id->SetVisibility();
 		$this->total->SetVisibility();
+		$this->inv_no->SetVisibility();
+		$this->inv_tgl->SetVisibility();
+		$this->inv_jml->SetVisibility();
+		$this->bayar_tgl->SetVisibility();
+		$this->bayar_jml->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -439,6 +444,11 @@ class ct_06jual_delete extends ct_06jual {
 			$this->customer_id->VirtualValue = ""; // Clear value
 		}
 		$this->total->setDbValue($rs->fields('total'));
+		$this->inv_no->setDbValue($rs->fields('inv_no'));
+		$this->inv_tgl->setDbValue($rs->fields('inv_tgl'));
+		$this->inv_jml->setDbValue($rs->fields('inv_jml'));
+		$this->bayar_tgl->setDbValue($rs->fields('bayar_tgl'));
+		$this->bayar_jml->setDbValue($rs->fields('bayar_jml'));
 	}
 
 	// Load DbValue from recordset
@@ -450,6 +460,11 @@ class ct_06jual_delete extends ct_06jual {
 		$this->tgl->DbValue = $row['tgl'];
 		$this->customer_id->DbValue = $row['customer_id'];
 		$this->total->DbValue = $row['total'];
+		$this->inv_no->DbValue = $row['inv_no'];
+		$this->inv_tgl->DbValue = $row['inv_tgl'];
+		$this->inv_jml->DbValue = $row['inv_jml'];
+		$this->bayar_tgl->DbValue = $row['bayar_tgl'];
+		$this->bayar_jml->DbValue = $row['bayar_jml'];
 	}
 
 	// Render row values based on field settings
@@ -462,6 +477,14 @@ class ct_06jual_delete extends ct_06jual {
 		if ($this->total->FormValue == $this->total->CurrentValue && is_numeric(ew_StrToFloat($this->total->CurrentValue)))
 			$this->total->CurrentValue = ew_StrToFloat($this->total->CurrentValue);
 
+		// Convert decimal values if posted back
+		if ($this->inv_jml->FormValue == $this->inv_jml->CurrentValue && is_numeric(ew_StrToFloat($this->inv_jml->CurrentValue)))
+			$this->inv_jml->CurrentValue = ew_StrToFloat($this->inv_jml->CurrentValue);
+
+		// Convert decimal values if posted back
+		if ($this->bayar_jml->FormValue == $this->bayar_jml->CurrentValue && is_numeric(ew_StrToFloat($this->bayar_jml->CurrentValue)))
+			$this->bayar_jml->CurrentValue = ew_StrToFloat($this->bayar_jml->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
@@ -471,6 +494,11 @@ class ct_06jual_delete extends ct_06jual {
 		// tgl
 		// customer_id
 		// total
+		// inv_no
+		// inv_tgl
+		// inv_jml
+		// bayar_tgl
+		// bayar_jml
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -521,6 +549,32 @@ class ct_06jual_delete extends ct_06jual {
 		$this->total->CellCssStyle .= "text-align: right;";
 		$this->total->ViewCustomAttributes = "";
 
+		// inv_no
+		$this->inv_no->ViewValue = $this->inv_no->CurrentValue;
+		$this->inv_no->ViewCustomAttributes = "";
+
+		// inv_tgl
+		$this->inv_tgl->ViewValue = $this->inv_tgl->CurrentValue;
+		$this->inv_tgl->ViewValue = ew_FormatDateTime($this->inv_tgl->ViewValue, 7);
+		$this->inv_tgl->ViewCustomAttributes = "";
+
+		// inv_jml
+		$this->inv_jml->ViewValue = $this->inv_jml->CurrentValue;
+		$this->inv_jml->ViewValue = ew_FormatNumber($this->inv_jml->ViewValue, 0, -2, -2, -2);
+		$this->inv_jml->CellCssStyle .= "text-align: right;";
+		$this->inv_jml->ViewCustomAttributes = "";
+
+		// bayar_tgl
+		$this->bayar_tgl->ViewValue = $this->bayar_tgl->CurrentValue;
+		$this->bayar_tgl->ViewValue = ew_FormatDateTime($this->bayar_tgl->ViewValue, 7);
+		$this->bayar_tgl->ViewCustomAttributes = "";
+
+		// bayar_jml
+		$this->bayar_jml->ViewValue = $this->bayar_jml->CurrentValue;
+		$this->bayar_jml->ViewValue = ew_FormatNumber($this->bayar_jml->ViewValue, 0, -2, -2, -2);
+		$this->bayar_jml->CellCssStyle .= "text-align: right;";
+		$this->bayar_jml->ViewCustomAttributes = "";
+
 			// no_po
 			$this->no_po->LinkCustomAttributes = "";
 			$this->no_po->HrefValue = "";
@@ -540,6 +594,31 @@ class ct_06jual_delete extends ct_06jual {
 			$this->total->LinkCustomAttributes = "";
 			$this->total->HrefValue = "";
 			$this->total->TooltipValue = "";
+
+			// inv_no
+			$this->inv_no->LinkCustomAttributes = "";
+			$this->inv_no->HrefValue = "";
+			$this->inv_no->TooltipValue = "";
+
+			// inv_tgl
+			$this->inv_tgl->LinkCustomAttributes = "";
+			$this->inv_tgl->HrefValue = "";
+			$this->inv_tgl->TooltipValue = "";
+
+			// inv_jml
+			$this->inv_jml->LinkCustomAttributes = "";
+			$this->inv_jml->HrefValue = "";
+			$this->inv_jml->TooltipValue = "";
+
+			// bayar_tgl
+			$this->bayar_tgl->LinkCustomAttributes = "";
+			$this->bayar_tgl->HrefValue = "";
+			$this->bayar_tgl->TooltipValue = "";
+
+			// bayar_jml
+			$this->bayar_jml->LinkCustomAttributes = "";
+			$this->bayar_jml->HrefValue = "";
+			$this->bayar_jml->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -802,6 +881,21 @@ $t_06jual_delete->ShowMessage();
 <?php if ($t_06jual->total->Visible) { // total ?>
 		<th><span id="elh_t_06jual_total" class="t_06jual_total"><?php echo $t_06jual->total->FldCaption() ?></span></th>
 <?php } ?>
+<?php if ($t_06jual->inv_no->Visible) { // inv_no ?>
+		<th><span id="elh_t_06jual_inv_no" class="t_06jual_inv_no"><?php echo $t_06jual->inv_no->FldCaption() ?></span></th>
+<?php } ?>
+<?php if ($t_06jual->inv_tgl->Visible) { // inv_tgl ?>
+		<th><span id="elh_t_06jual_inv_tgl" class="t_06jual_inv_tgl"><?php echo $t_06jual->inv_tgl->FldCaption() ?></span></th>
+<?php } ?>
+<?php if ($t_06jual->inv_jml->Visible) { // inv_jml ?>
+		<th><span id="elh_t_06jual_inv_jml" class="t_06jual_inv_jml"><?php echo $t_06jual->inv_jml->FldCaption() ?></span></th>
+<?php } ?>
+<?php if ($t_06jual->bayar_tgl->Visible) { // bayar_tgl ?>
+		<th><span id="elh_t_06jual_bayar_tgl" class="t_06jual_bayar_tgl"><?php echo $t_06jual->bayar_tgl->FldCaption() ?></span></th>
+<?php } ?>
+<?php if ($t_06jual->bayar_jml->Visible) { // bayar_jml ?>
+		<th><span id="elh_t_06jual_bayar_jml" class="t_06jual_bayar_jml"><?php echo $t_06jual->bayar_jml->FldCaption() ?></span></th>
+<?php } ?>
 	</tr>
 	</thead>
 	<tbody>
@@ -852,6 +946,46 @@ while (!$t_06jual_delete->Recordset->EOF) {
 <span id="el<?php echo $t_06jual_delete->RowCnt ?>_t_06jual_total" class="t_06jual_total">
 <span<?php echo $t_06jual->total->ViewAttributes() ?>>
 <?php echo $t_06jual->total->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($t_06jual->inv_no->Visible) { // inv_no ?>
+		<td<?php echo $t_06jual->inv_no->CellAttributes() ?>>
+<span id="el<?php echo $t_06jual_delete->RowCnt ?>_t_06jual_inv_no" class="t_06jual_inv_no">
+<span<?php echo $t_06jual->inv_no->ViewAttributes() ?>>
+<?php echo $t_06jual->inv_no->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($t_06jual->inv_tgl->Visible) { // inv_tgl ?>
+		<td<?php echo $t_06jual->inv_tgl->CellAttributes() ?>>
+<span id="el<?php echo $t_06jual_delete->RowCnt ?>_t_06jual_inv_tgl" class="t_06jual_inv_tgl">
+<span<?php echo $t_06jual->inv_tgl->ViewAttributes() ?>>
+<?php echo $t_06jual->inv_tgl->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($t_06jual->inv_jml->Visible) { // inv_jml ?>
+		<td<?php echo $t_06jual->inv_jml->CellAttributes() ?>>
+<span id="el<?php echo $t_06jual_delete->RowCnt ?>_t_06jual_inv_jml" class="t_06jual_inv_jml">
+<span<?php echo $t_06jual->inv_jml->ViewAttributes() ?>>
+<?php echo $t_06jual->inv_jml->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($t_06jual->bayar_tgl->Visible) { // bayar_tgl ?>
+		<td<?php echo $t_06jual->bayar_tgl->CellAttributes() ?>>
+<span id="el<?php echo $t_06jual_delete->RowCnt ?>_t_06jual_bayar_tgl" class="t_06jual_bayar_tgl">
+<span<?php echo $t_06jual->bayar_tgl->ViewAttributes() ?>>
+<?php echo $t_06jual->bayar_tgl->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($t_06jual->bayar_jml->Visible) { // bayar_jml ?>
+		<td<?php echo $t_06jual->bayar_jml->CellAttributes() ?>>
+<span id="el<?php echo $t_06jual_delete->RowCnt ?>_t_06jual_bayar_jml" class="t_06jual_bayar_jml">
+<span<?php echo $t_06jual->bayar_jml->ViewAttributes() ?>>
+<?php echo $t_06jual->bayar_jml->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

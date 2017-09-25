@@ -4,6 +4,11 @@
 // tgl
 // customer_id
 // total
+// inv_no
+// inv_tgl
+// inv_jml
+// bayar_tgl
+// bayar_jml
 
 ?>
 <?php if ($t_06jual->Visible) { ?>
@@ -51,6 +56,61 @@
 <span id="el_t_06jual_total">
 <span<?php echo $t_06jual->total->ViewAttributes() ?>>
 <?php echo $t_06jual->total->ListViewValue() ?></span>
+</span>
+</td>
+		</tr>
+<?php } ?>
+<?php if ($t_06jual->inv_no->Visible) { // inv_no ?>
+		<tr id="r_inv_no">
+			<td><?php echo $t_06jual->inv_no->FldCaption() ?></td>
+			<td<?php echo $t_06jual->inv_no->CellAttributes() ?>>
+<span id="el_t_06jual_inv_no">
+<span<?php echo $t_06jual->inv_no->ViewAttributes() ?>>
+<?php echo $t_06jual->inv_no->ListViewValue() ?></span>
+</span>
+</td>
+		</tr>
+<?php } ?>
+<?php if ($t_06jual->inv_tgl->Visible) { // inv_tgl ?>
+		<tr id="r_inv_tgl">
+			<td><?php echo $t_06jual->inv_tgl->FldCaption() ?></td>
+			<td<?php echo $t_06jual->inv_tgl->CellAttributes() ?>>
+<span id="el_t_06jual_inv_tgl">
+<span<?php echo $t_06jual->inv_tgl->ViewAttributes() ?>>
+<?php echo $t_06jual->inv_tgl->ListViewValue() ?></span>
+</span>
+</td>
+		</tr>
+<?php } ?>
+<?php if ($t_06jual->inv_jml->Visible) { // inv_jml ?>
+		<tr id="r_inv_jml">
+			<td><?php echo $t_06jual->inv_jml->FldCaption() ?></td>
+			<td<?php echo $t_06jual->inv_jml->CellAttributes() ?>>
+<span id="el_t_06jual_inv_jml">
+<span<?php echo $t_06jual->inv_jml->ViewAttributes() ?>>
+<?php echo $t_06jual->inv_jml->ListViewValue() ?></span>
+</span>
+</td>
+		</tr>
+<?php } ?>
+<?php if ($t_06jual->bayar_tgl->Visible) { // bayar_tgl ?>
+		<tr id="r_bayar_tgl">
+			<td><?php echo $t_06jual->bayar_tgl->FldCaption() ?></td>
+			<td<?php echo $t_06jual->bayar_tgl->CellAttributes() ?>>
+<span id="el_t_06jual_bayar_tgl">
+<span<?php echo $t_06jual->bayar_tgl->ViewAttributes() ?>>
+<?php echo $t_06jual->bayar_tgl->ListViewValue() ?></span>
+</span>
+</td>
+		</tr>
+<?php } ?>
+<?php if ($t_06jual->bayar_jml->Visible) { // bayar_jml ?>
+		<tr id="r_bayar_jml">
+			<td><?php echo $t_06jual->bayar_jml->FldCaption() ?></td>
+			<td<?php echo $t_06jual->bayar_jml->CellAttributes() ?>>
+<span id="el_t_06jual_bayar_jml">
+<span<?php echo $t_06jual->bayar_jml->ViewAttributes() ?>>
+<?php echo $t_06jual->bayar_jml->ListViewValue() ?></span>
 </span>
 </td>
 		</tr>

@@ -390,6 +390,11 @@ class ct_06jual_list extends ct_06jual {
 		$this->tgl->SetVisibility();
 		$this->customer_id->SetVisibility();
 		$this->total->SetVisibility();
+		$this->inv_no->SetVisibility();
+		$this->inv_tgl->SetVisibility();
+		$this->inv_jml->SetVisibility();
+		$this->bayar_tgl->SetVisibility();
+		$this->bayar_jml->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -771,6 +776,8 @@ class ct_06jual_list extends ct_06jual {
 	function ClearInlineMode() {
 		$this->setKey("jual_id", ""); // Clear inline edit key
 		$this->total->FormValue = ""; // Clear form value
+		$this->inv_jml->FormValue = ""; // Clear form value
+		$this->bayar_jml->FormValue = ""; // Clear form value
 		$this->LastAction = $this->CurrentAction; // Save last action
 		$this->CurrentAction = ""; // Clear action
 		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
@@ -1135,6 +1142,16 @@ class ct_06jual_list extends ct_06jual {
 			return FALSE;
 		if ($objForm->HasValue("x_total") && $objForm->HasValue("o_total") && $this->total->CurrentValue <> $this->total->OldValue)
 			return FALSE;
+		if ($objForm->HasValue("x_inv_no") && $objForm->HasValue("o_inv_no") && $this->inv_no->CurrentValue <> $this->inv_no->OldValue)
+			return FALSE;
+		if ($objForm->HasValue("x_inv_tgl") && $objForm->HasValue("o_inv_tgl") && $this->inv_tgl->CurrentValue <> $this->inv_tgl->OldValue)
+			return FALSE;
+		if ($objForm->HasValue("x_inv_jml") && $objForm->HasValue("o_inv_jml") && $this->inv_jml->CurrentValue <> $this->inv_jml->OldValue)
+			return FALSE;
+		if ($objForm->HasValue("x_bayar_tgl") && $objForm->HasValue("o_bayar_tgl") && $this->bayar_tgl->CurrentValue <> $this->bayar_tgl->OldValue)
+			return FALSE;
+		if ($objForm->HasValue("x_bayar_jml") && $objForm->HasValue("o_bayar_jml") && $this->bayar_jml->CurrentValue <> $this->bayar_jml->OldValue)
+			return FALSE;
 		return TRUE;
 	}
 
@@ -1224,6 +1241,11 @@ class ct_06jual_list extends ct_06jual {
 		$sFilterList = ew_Concat($sFilterList, $this->tgl->AdvancedSearch->ToJSON(), ","); // Field tgl
 		$sFilterList = ew_Concat($sFilterList, $this->customer_id->AdvancedSearch->ToJSON(), ","); // Field customer_id
 		$sFilterList = ew_Concat($sFilterList, $this->total->AdvancedSearch->ToJSON(), ","); // Field total
+		$sFilterList = ew_Concat($sFilterList, $this->inv_no->AdvancedSearch->ToJSON(), ","); // Field inv_no
+		$sFilterList = ew_Concat($sFilterList, $this->inv_tgl->AdvancedSearch->ToJSON(), ","); // Field inv_tgl
+		$sFilterList = ew_Concat($sFilterList, $this->inv_jml->AdvancedSearch->ToJSON(), ","); // Field inv_jml
+		$sFilterList = ew_Concat($sFilterList, $this->bayar_tgl->AdvancedSearch->ToJSON(), ","); // Field bayar_tgl
+		$sFilterList = ew_Concat($sFilterList, $this->bayar_jml->AdvancedSearch->ToJSON(), ","); // Field bayar_jml
 		if ($this->BasicSearch->Keyword <> "") {
 			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
 			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
@@ -1307,6 +1329,46 @@ class ct_06jual_list extends ct_06jual {
 		$this->total->AdvancedSearch->SearchValue2 = @$filter["y_total"];
 		$this->total->AdvancedSearch->SearchOperator2 = @$filter["w_total"];
 		$this->total->AdvancedSearch->Save();
+
+		// Field inv_no
+		$this->inv_no->AdvancedSearch->SearchValue = @$filter["x_inv_no"];
+		$this->inv_no->AdvancedSearch->SearchOperator = @$filter["z_inv_no"];
+		$this->inv_no->AdvancedSearch->SearchCondition = @$filter["v_inv_no"];
+		$this->inv_no->AdvancedSearch->SearchValue2 = @$filter["y_inv_no"];
+		$this->inv_no->AdvancedSearch->SearchOperator2 = @$filter["w_inv_no"];
+		$this->inv_no->AdvancedSearch->Save();
+
+		// Field inv_tgl
+		$this->inv_tgl->AdvancedSearch->SearchValue = @$filter["x_inv_tgl"];
+		$this->inv_tgl->AdvancedSearch->SearchOperator = @$filter["z_inv_tgl"];
+		$this->inv_tgl->AdvancedSearch->SearchCondition = @$filter["v_inv_tgl"];
+		$this->inv_tgl->AdvancedSearch->SearchValue2 = @$filter["y_inv_tgl"];
+		$this->inv_tgl->AdvancedSearch->SearchOperator2 = @$filter["w_inv_tgl"];
+		$this->inv_tgl->AdvancedSearch->Save();
+
+		// Field inv_jml
+		$this->inv_jml->AdvancedSearch->SearchValue = @$filter["x_inv_jml"];
+		$this->inv_jml->AdvancedSearch->SearchOperator = @$filter["z_inv_jml"];
+		$this->inv_jml->AdvancedSearch->SearchCondition = @$filter["v_inv_jml"];
+		$this->inv_jml->AdvancedSearch->SearchValue2 = @$filter["y_inv_jml"];
+		$this->inv_jml->AdvancedSearch->SearchOperator2 = @$filter["w_inv_jml"];
+		$this->inv_jml->AdvancedSearch->Save();
+
+		// Field bayar_tgl
+		$this->bayar_tgl->AdvancedSearch->SearchValue = @$filter["x_bayar_tgl"];
+		$this->bayar_tgl->AdvancedSearch->SearchOperator = @$filter["z_bayar_tgl"];
+		$this->bayar_tgl->AdvancedSearch->SearchCondition = @$filter["v_bayar_tgl"];
+		$this->bayar_tgl->AdvancedSearch->SearchValue2 = @$filter["y_bayar_tgl"];
+		$this->bayar_tgl->AdvancedSearch->SearchOperator2 = @$filter["w_bayar_tgl"];
+		$this->bayar_tgl->AdvancedSearch->Save();
+
+		// Field bayar_jml
+		$this->bayar_jml->AdvancedSearch->SearchValue = @$filter["x_bayar_jml"];
+		$this->bayar_jml->AdvancedSearch->SearchOperator = @$filter["z_bayar_jml"];
+		$this->bayar_jml->AdvancedSearch->SearchCondition = @$filter["v_bayar_jml"];
+		$this->bayar_jml->AdvancedSearch->SearchValue2 = @$filter["y_bayar_jml"];
+		$this->bayar_jml->AdvancedSearch->SearchOperator2 = @$filter["w_bayar_jml"];
+		$this->bayar_jml->AdvancedSearch->Save();
 		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
 		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
 	}
@@ -1315,6 +1377,7 @@ class ct_06jual_list extends ct_06jual {
 	function BasicSearchSQL($arKeywords, $type) {
 		$sWhere = "";
 		$this->BuildBasicSearchSQL($sWhere, $this->no_po, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->inv_no, $arKeywords, $type);
 		return $sWhere;
 	}
 
@@ -1486,6 +1549,11 @@ class ct_06jual_list extends ct_06jual {
 			$this->UpdateSort($this->tgl, $bCtrl); // tgl
 			$this->UpdateSort($this->customer_id, $bCtrl); // customer_id
 			$this->UpdateSort($this->total, $bCtrl); // total
+			$this->UpdateSort($this->inv_no, $bCtrl); // inv_no
+			$this->UpdateSort($this->inv_tgl, $bCtrl); // inv_tgl
+			$this->UpdateSort($this->inv_jml, $bCtrl); // inv_jml
+			$this->UpdateSort($this->bayar_tgl, $bCtrl); // bayar_tgl
+			$this->UpdateSort($this->bayar_jml, $bCtrl); // bayar_jml
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -1523,6 +1591,11 @@ class ct_06jual_list extends ct_06jual {
 				$this->tgl->setSort("");
 				$this->customer_id->setSort("");
 				$this->total->setSort("");
+				$this->inv_no->setSort("");
+				$this->inv_tgl->setSort("");
+				$this->inv_jml->setSort("");
+				$this->bayar_tgl->setSort("");
+				$this->bayar_jml->setSort("");
 			}
 
 			// Reset start position
@@ -2152,6 +2225,16 @@ class ct_06jual_list extends ct_06jual {
 		$this->customer_id->OldValue = $this->customer_id->CurrentValue;
 		$this->total->CurrentValue = NULL;
 		$this->total->OldValue = $this->total->CurrentValue;
+		$this->inv_no->CurrentValue = NULL;
+		$this->inv_no->OldValue = $this->inv_no->CurrentValue;
+		$this->inv_tgl->CurrentValue = NULL;
+		$this->inv_tgl->OldValue = $this->inv_tgl->CurrentValue;
+		$this->inv_jml->CurrentValue = NULL;
+		$this->inv_jml->OldValue = $this->inv_jml->CurrentValue;
+		$this->bayar_tgl->CurrentValue = NULL;
+		$this->bayar_tgl->OldValue = $this->bayar_tgl->CurrentValue;
+		$this->bayar_jml->CurrentValue = NULL;
+		$this->bayar_jml->OldValue = $this->bayar_jml->CurrentValue;
 	}
 
 	// Load basic search values
@@ -2183,6 +2266,28 @@ class ct_06jual_list extends ct_06jual {
 			$this->total->setFormValue($objForm->GetValue("x_total"));
 		}
 		$this->total->setOldValue($objForm->GetValue("o_total"));
+		if (!$this->inv_no->FldIsDetailKey) {
+			$this->inv_no->setFormValue($objForm->GetValue("x_inv_no"));
+		}
+		$this->inv_no->setOldValue($objForm->GetValue("o_inv_no"));
+		if (!$this->inv_tgl->FldIsDetailKey) {
+			$this->inv_tgl->setFormValue($objForm->GetValue("x_inv_tgl"));
+			$this->inv_tgl->CurrentValue = ew_UnFormatDateTime($this->inv_tgl->CurrentValue, 7);
+		}
+		$this->inv_tgl->setOldValue($objForm->GetValue("o_inv_tgl"));
+		if (!$this->inv_jml->FldIsDetailKey) {
+			$this->inv_jml->setFormValue($objForm->GetValue("x_inv_jml"));
+		}
+		$this->inv_jml->setOldValue($objForm->GetValue("o_inv_jml"));
+		if (!$this->bayar_tgl->FldIsDetailKey) {
+			$this->bayar_tgl->setFormValue($objForm->GetValue("x_bayar_tgl"));
+			$this->bayar_tgl->CurrentValue = ew_UnFormatDateTime($this->bayar_tgl->CurrentValue, 7);
+		}
+		$this->bayar_tgl->setOldValue($objForm->GetValue("o_bayar_tgl"));
+		if (!$this->bayar_jml->FldIsDetailKey) {
+			$this->bayar_jml->setFormValue($objForm->GetValue("x_bayar_jml"));
+		}
+		$this->bayar_jml->setOldValue($objForm->GetValue("o_bayar_jml"));
 		if (!$this->jual_id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
 			$this->jual_id->setFormValue($objForm->GetValue("x_jual_id"));
 	}
@@ -2197,6 +2302,13 @@ class ct_06jual_list extends ct_06jual {
 		$this->tgl->CurrentValue = ew_UnFormatDateTime($this->tgl->CurrentValue, 7);
 		$this->customer_id->CurrentValue = $this->customer_id->FormValue;
 		$this->total->CurrentValue = $this->total->FormValue;
+		$this->inv_no->CurrentValue = $this->inv_no->FormValue;
+		$this->inv_tgl->CurrentValue = $this->inv_tgl->FormValue;
+		$this->inv_tgl->CurrentValue = ew_UnFormatDateTime($this->inv_tgl->CurrentValue, 7);
+		$this->inv_jml->CurrentValue = $this->inv_jml->FormValue;
+		$this->bayar_tgl->CurrentValue = $this->bayar_tgl->FormValue;
+		$this->bayar_tgl->CurrentValue = ew_UnFormatDateTime($this->bayar_tgl->CurrentValue, 7);
+		$this->bayar_jml->CurrentValue = $this->bayar_jml->FormValue;
 	}
 
 	// Load recordset
@@ -2264,6 +2376,11 @@ class ct_06jual_list extends ct_06jual {
 			$this->customer_id->VirtualValue = ""; // Clear value
 		}
 		$this->total->setDbValue($rs->fields('total'));
+		$this->inv_no->setDbValue($rs->fields('inv_no'));
+		$this->inv_tgl->setDbValue($rs->fields('inv_tgl'));
+		$this->inv_jml->setDbValue($rs->fields('inv_jml'));
+		$this->bayar_tgl->setDbValue($rs->fields('bayar_tgl'));
+		$this->bayar_jml->setDbValue($rs->fields('bayar_jml'));
 	}
 
 	// Load DbValue from recordset
@@ -2275,6 +2392,11 @@ class ct_06jual_list extends ct_06jual {
 		$this->tgl->DbValue = $row['tgl'];
 		$this->customer_id->DbValue = $row['customer_id'];
 		$this->total->DbValue = $row['total'];
+		$this->inv_no->DbValue = $row['inv_no'];
+		$this->inv_tgl->DbValue = $row['inv_tgl'];
+		$this->inv_jml->DbValue = $row['inv_jml'];
+		$this->bayar_tgl->DbValue = $row['bayar_tgl'];
+		$this->bayar_jml->DbValue = $row['bayar_jml'];
 	}
 
 	// Load old record
@@ -2316,6 +2438,14 @@ class ct_06jual_list extends ct_06jual {
 		if ($this->total->FormValue == $this->total->CurrentValue && is_numeric(ew_StrToFloat($this->total->CurrentValue)))
 			$this->total->CurrentValue = ew_StrToFloat($this->total->CurrentValue);
 
+		// Convert decimal values if posted back
+		if ($this->inv_jml->FormValue == $this->inv_jml->CurrentValue && is_numeric(ew_StrToFloat($this->inv_jml->CurrentValue)))
+			$this->inv_jml->CurrentValue = ew_StrToFloat($this->inv_jml->CurrentValue);
+
+		// Convert decimal values if posted back
+		if ($this->bayar_jml->FormValue == $this->bayar_jml->CurrentValue && is_numeric(ew_StrToFloat($this->bayar_jml->CurrentValue)))
+			$this->bayar_jml->CurrentValue = ew_StrToFloat($this->bayar_jml->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
@@ -2325,6 +2455,11 @@ class ct_06jual_list extends ct_06jual {
 		// tgl
 		// customer_id
 		// total
+		// inv_no
+		// inv_tgl
+		// inv_jml
+		// bayar_tgl
+		// bayar_jml
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -2375,6 +2510,32 @@ class ct_06jual_list extends ct_06jual {
 		$this->total->CellCssStyle .= "text-align: right;";
 		$this->total->ViewCustomAttributes = "";
 
+		// inv_no
+		$this->inv_no->ViewValue = $this->inv_no->CurrentValue;
+		$this->inv_no->ViewCustomAttributes = "";
+
+		// inv_tgl
+		$this->inv_tgl->ViewValue = $this->inv_tgl->CurrentValue;
+		$this->inv_tgl->ViewValue = ew_FormatDateTime($this->inv_tgl->ViewValue, 7);
+		$this->inv_tgl->ViewCustomAttributes = "";
+
+		// inv_jml
+		$this->inv_jml->ViewValue = $this->inv_jml->CurrentValue;
+		$this->inv_jml->ViewValue = ew_FormatNumber($this->inv_jml->ViewValue, 0, -2, -2, -2);
+		$this->inv_jml->CellCssStyle .= "text-align: right;";
+		$this->inv_jml->ViewCustomAttributes = "";
+
+		// bayar_tgl
+		$this->bayar_tgl->ViewValue = $this->bayar_tgl->CurrentValue;
+		$this->bayar_tgl->ViewValue = ew_FormatDateTime($this->bayar_tgl->ViewValue, 7);
+		$this->bayar_tgl->ViewCustomAttributes = "";
+
+		// bayar_jml
+		$this->bayar_jml->ViewValue = $this->bayar_jml->CurrentValue;
+		$this->bayar_jml->ViewValue = ew_FormatNumber($this->bayar_jml->ViewValue, 0, -2, -2, -2);
+		$this->bayar_jml->CellCssStyle .= "text-align: right;";
+		$this->bayar_jml->ViewCustomAttributes = "";
+
 			// no_po
 			$this->no_po->LinkCustomAttributes = "";
 			$this->no_po->HrefValue = "";
@@ -2394,6 +2555,31 @@ class ct_06jual_list extends ct_06jual {
 			$this->total->LinkCustomAttributes = "";
 			$this->total->HrefValue = "";
 			$this->total->TooltipValue = "";
+
+			// inv_no
+			$this->inv_no->LinkCustomAttributes = "";
+			$this->inv_no->HrefValue = "";
+			$this->inv_no->TooltipValue = "";
+
+			// inv_tgl
+			$this->inv_tgl->LinkCustomAttributes = "";
+			$this->inv_tgl->HrefValue = "";
+			$this->inv_tgl->TooltipValue = "";
+
+			// inv_jml
+			$this->inv_jml->LinkCustomAttributes = "";
+			$this->inv_jml->HrefValue = "";
+			$this->inv_jml->TooltipValue = "";
+
+			// bayar_tgl
+			$this->bayar_tgl->LinkCustomAttributes = "";
+			$this->bayar_tgl->HrefValue = "";
+			$this->bayar_tgl->TooltipValue = "";
+
+			// bayar_jml
+			$this->bayar_jml->LinkCustomAttributes = "";
+			$this->bayar_jml->HrefValue = "";
+			$this->bayar_jml->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
 			// no_po
@@ -2444,6 +2630,44 @@ class ct_06jual_list extends ct_06jual {
 			$this->total->OldValue = $this->total->EditValue;
 			}
 
+			// inv_no
+			$this->inv_no->EditAttrs["class"] = "form-control";
+			$this->inv_no->EditCustomAttributes = "";
+			$this->inv_no->EditValue = ew_HtmlEncode($this->inv_no->CurrentValue);
+			$this->inv_no->PlaceHolder = ew_RemoveHtml($this->inv_no->FldCaption());
+
+			// inv_tgl
+			$this->inv_tgl->EditAttrs["class"] = "form-control";
+			$this->inv_tgl->EditCustomAttributes = "";
+			$this->inv_tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->inv_tgl->CurrentValue, 7));
+			$this->inv_tgl->PlaceHolder = ew_RemoveHtml($this->inv_tgl->FldCaption());
+
+			// inv_jml
+			$this->inv_jml->EditAttrs["class"] = "form-control";
+			$this->inv_jml->EditCustomAttributes = "";
+			$this->inv_jml->EditValue = ew_HtmlEncode($this->inv_jml->CurrentValue);
+			$this->inv_jml->PlaceHolder = ew_RemoveHtml($this->inv_jml->FldCaption());
+			if (strval($this->inv_jml->EditValue) <> "" && is_numeric($this->inv_jml->EditValue)) {
+			$this->inv_jml->EditValue = ew_FormatNumber($this->inv_jml->EditValue, -2, -2, -2, -2);
+			$this->inv_jml->OldValue = $this->inv_jml->EditValue;
+			}
+
+			// bayar_tgl
+			$this->bayar_tgl->EditAttrs["class"] = "form-control";
+			$this->bayar_tgl->EditCustomAttributes = "";
+			$this->bayar_tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->bayar_tgl->CurrentValue, 7));
+			$this->bayar_tgl->PlaceHolder = ew_RemoveHtml($this->bayar_tgl->FldCaption());
+
+			// bayar_jml
+			$this->bayar_jml->EditAttrs["class"] = "form-control";
+			$this->bayar_jml->EditCustomAttributes = "";
+			$this->bayar_jml->EditValue = ew_HtmlEncode($this->bayar_jml->CurrentValue);
+			$this->bayar_jml->PlaceHolder = ew_RemoveHtml($this->bayar_jml->FldCaption());
+			if (strval($this->bayar_jml->EditValue) <> "" && is_numeric($this->bayar_jml->EditValue)) {
+			$this->bayar_jml->EditValue = ew_FormatNumber($this->bayar_jml->EditValue, -2, -2, -2, -2);
+			$this->bayar_jml->OldValue = $this->bayar_jml->EditValue;
+			}
+
 			// Add refer script
 			// no_po
 
@@ -2461,6 +2685,26 @@ class ct_06jual_list extends ct_06jual {
 			// total
 			$this->total->LinkCustomAttributes = "";
 			$this->total->HrefValue = "";
+
+			// inv_no
+			$this->inv_no->LinkCustomAttributes = "";
+			$this->inv_no->HrefValue = "";
+
+			// inv_tgl
+			$this->inv_tgl->LinkCustomAttributes = "";
+			$this->inv_tgl->HrefValue = "";
+
+			// inv_jml
+			$this->inv_jml->LinkCustomAttributes = "";
+			$this->inv_jml->HrefValue = "";
+
+			// bayar_tgl
+			$this->bayar_tgl->LinkCustomAttributes = "";
+			$this->bayar_tgl->HrefValue = "";
+
+			// bayar_jml
+			$this->bayar_jml->LinkCustomAttributes = "";
+			$this->bayar_jml->HrefValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// no_po
@@ -2511,6 +2755,44 @@ class ct_06jual_list extends ct_06jual {
 			$this->total->OldValue = $this->total->EditValue;
 			}
 
+			// inv_no
+			$this->inv_no->EditAttrs["class"] = "form-control";
+			$this->inv_no->EditCustomAttributes = "";
+			$this->inv_no->EditValue = ew_HtmlEncode($this->inv_no->CurrentValue);
+			$this->inv_no->PlaceHolder = ew_RemoveHtml($this->inv_no->FldCaption());
+
+			// inv_tgl
+			$this->inv_tgl->EditAttrs["class"] = "form-control";
+			$this->inv_tgl->EditCustomAttributes = "";
+			$this->inv_tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->inv_tgl->CurrentValue, 7));
+			$this->inv_tgl->PlaceHolder = ew_RemoveHtml($this->inv_tgl->FldCaption());
+
+			// inv_jml
+			$this->inv_jml->EditAttrs["class"] = "form-control";
+			$this->inv_jml->EditCustomAttributes = "";
+			$this->inv_jml->EditValue = ew_HtmlEncode($this->inv_jml->CurrentValue);
+			$this->inv_jml->PlaceHolder = ew_RemoveHtml($this->inv_jml->FldCaption());
+			if (strval($this->inv_jml->EditValue) <> "" && is_numeric($this->inv_jml->EditValue)) {
+			$this->inv_jml->EditValue = ew_FormatNumber($this->inv_jml->EditValue, -2, -2, -2, -2);
+			$this->inv_jml->OldValue = $this->inv_jml->EditValue;
+			}
+
+			// bayar_tgl
+			$this->bayar_tgl->EditAttrs["class"] = "form-control";
+			$this->bayar_tgl->EditCustomAttributes = "";
+			$this->bayar_tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->bayar_tgl->CurrentValue, 7));
+			$this->bayar_tgl->PlaceHolder = ew_RemoveHtml($this->bayar_tgl->FldCaption());
+
+			// bayar_jml
+			$this->bayar_jml->EditAttrs["class"] = "form-control";
+			$this->bayar_jml->EditCustomAttributes = "";
+			$this->bayar_jml->EditValue = ew_HtmlEncode($this->bayar_jml->CurrentValue);
+			$this->bayar_jml->PlaceHolder = ew_RemoveHtml($this->bayar_jml->FldCaption());
+			if (strval($this->bayar_jml->EditValue) <> "" && is_numeric($this->bayar_jml->EditValue)) {
+			$this->bayar_jml->EditValue = ew_FormatNumber($this->bayar_jml->EditValue, -2, -2, -2, -2);
+			$this->bayar_jml->OldValue = $this->bayar_jml->EditValue;
+			}
+
 			// Edit refer script
 			// no_po
 
@@ -2528,6 +2810,26 @@ class ct_06jual_list extends ct_06jual {
 			// total
 			$this->total->LinkCustomAttributes = "";
 			$this->total->HrefValue = "";
+
+			// inv_no
+			$this->inv_no->LinkCustomAttributes = "";
+			$this->inv_no->HrefValue = "";
+
+			// inv_tgl
+			$this->inv_tgl->LinkCustomAttributes = "";
+			$this->inv_tgl->HrefValue = "";
+
+			// inv_jml
+			$this->inv_jml->LinkCustomAttributes = "";
+			$this->inv_jml->HrefValue = "";
+
+			// bayar_tgl
+			$this->bayar_tgl->LinkCustomAttributes = "";
+			$this->bayar_tgl->HrefValue = "";
+
+			// bayar_jml
+			$this->bayar_jml->LinkCustomAttributes = "";
+			$this->bayar_jml->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -2555,6 +2857,18 @@ class ct_06jual_list extends ct_06jual {
 		}
 		if (!ew_CheckNumber($this->total->FormValue)) {
 			ew_AddMessage($gsFormError, $this->total->FldErrMsg());
+		}
+		if (!ew_CheckEuroDate($this->inv_tgl->FormValue)) {
+			ew_AddMessage($gsFormError, $this->inv_tgl->FldErrMsg());
+		}
+		if (!ew_CheckNumber($this->inv_jml->FormValue)) {
+			ew_AddMessage($gsFormError, $this->inv_jml->FldErrMsg());
+		}
+		if (!ew_CheckEuroDate($this->bayar_tgl->FormValue)) {
+			ew_AddMessage($gsFormError, $this->bayar_tgl->FldErrMsg());
+		}
+		if (!ew_CheckNumber($this->bayar_jml->FormValue)) {
+			ew_AddMessage($gsFormError, $this->bayar_jml->FldErrMsg());
 		}
 
 		// Return validate result
@@ -2701,6 +3015,21 @@ class ct_06jual_list extends ct_06jual {
 			// total
 			$this->total->SetDbValueDef($rsnew, $this->total->CurrentValue, NULL, $this->total->ReadOnly);
 
+			// inv_no
+			$this->inv_no->SetDbValueDef($rsnew, $this->inv_no->CurrentValue, NULL, $this->inv_no->ReadOnly);
+
+			// inv_tgl
+			$this->inv_tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->inv_tgl->CurrentValue, 7), NULL, $this->inv_tgl->ReadOnly);
+
+			// inv_jml
+			$this->inv_jml->SetDbValueDef($rsnew, $this->inv_jml->CurrentValue, NULL, $this->inv_jml->ReadOnly);
+
+			// bayar_tgl
+			$this->bayar_tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->bayar_tgl->CurrentValue, 7), NULL, $this->bayar_tgl->ReadOnly);
+
+			// bayar_jml
+			$this->bayar_jml->SetDbValueDef($rsnew, $this->bayar_jml->CurrentValue, NULL, $this->bayar_jml->ReadOnly);
+
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
 			if ($bUpdateRow) {
@@ -2766,6 +3095,21 @@ class ct_06jual_list extends ct_06jual {
 
 		// total
 		$this->total->SetDbValueDef($rsnew, $this->total->CurrentValue, NULL, FALSE);
+
+		// inv_no
+		$this->inv_no->SetDbValueDef($rsnew, $this->inv_no->CurrentValue, NULL, FALSE);
+
+		// inv_tgl
+		$this->inv_tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->inv_tgl->CurrentValue, 7), NULL, FALSE);
+
+		// inv_jml
+		$this->inv_jml->SetDbValueDef($rsnew, $this->inv_jml->CurrentValue, NULL, FALSE);
+
+		// bayar_tgl
+		$this->bayar_tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->bayar_tgl->CurrentValue, 7), NULL, FALSE);
+
+		// bayar_jml
+		$this->bayar_jml->SetDbValueDef($rsnew, $this->bayar_jml->CurrentValue, NULL, FALSE);
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -3292,6 +3636,18 @@ ft_06juallist.Validate = function() {
 			elm = this.GetElements("x" + infix + "_total");
 			if (elm && !ew_CheckNumber(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->total->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_inv_tgl");
+			if (elm && !ew_CheckEuroDate(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->inv_tgl->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_inv_jml");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->inv_jml->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_bayar_tgl");
+			if (elm && !ew_CheckEuroDate(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->bayar_tgl->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_bayar_jml");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->bayar_jml->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -3312,6 +3668,11 @@ ft_06juallist.EmptyRow = function(infix) {
 	if (ew_ValueChanged(fobj, infix, "tgl", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "customer_id", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "total", false)) return false;
+	if (ew_ValueChanged(fobj, infix, "inv_no", false)) return false;
+	if (ew_ValueChanged(fobj, infix, "inv_tgl", false)) return false;
+	if (ew_ValueChanged(fobj, infix, "inv_jml", false)) return false;
+	if (ew_ValueChanged(fobj, infix, "bayar_tgl", false)) return false;
+	if (ew_ValueChanged(fobj, infix, "bayar_jml", false)) return false;
 	return true;
 }
 
@@ -3564,6 +3925,51 @@ $t_06jual_list->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
+<?php if ($t_06jual->inv_no->Visible) { // inv_no ?>
+	<?php if ($t_06jual->SortUrl($t_06jual->inv_no) == "") { ?>
+		<th data-name="inv_no"><div id="elh_t_06jual_inv_no" class="t_06jual_inv_no"><div class="ewTableHeaderCaption"><?php echo $t_06jual->inv_no->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="inv_no"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t_06jual->SortUrl($t_06jual->inv_no) ?>',2);"><div id="elh_t_06jual_inv_no" class="t_06jual_inv_no">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t_06jual->inv_no->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t_06jual->inv_no->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t_06jual->inv_no->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($t_06jual->inv_tgl->Visible) { // inv_tgl ?>
+	<?php if ($t_06jual->SortUrl($t_06jual->inv_tgl) == "") { ?>
+		<th data-name="inv_tgl"><div id="elh_t_06jual_inv_tgl" class="t_06jual_inv_tgl"><div class="ewTableHeaderCaption"><?php echo $t_06jual->inv_tgl->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="inv_tgl"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t_06jual->SortUrl($t_06jual->inv_tgl) ?>',2);"><div id="elh_t_06jual_inv_tgl" class="t_06jual_inv_tgl">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t_06jual->inv_tgl->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t_06jual->inv_tgl->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t_06jual->inv_tgl->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($t_06jual->inv_jml->Visible) { // inv_jml ?>
+	<?php if ($t_06jual->SortUrl($t_06jual->inv_jml) == "") { ?>
+		<th data-name="inv_jml"><div id="elh_t_06jual_inv_jml" class="t_06jual_inv_jml"><div class="ewTableHeaderCaption"><?php echo $t_06jual->inv_jml->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="inv_jml"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t_06jual->SortUrl($t_06jual->inv_jml) ?>',2);"><div id="elh_t_06jual_inv_jml" class="t_06jual_inv_jml">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t_06jual->inv_jml->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t_06jual->inv_jml->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t_06jual->inv_jml->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($t_06jual->bayar_tgl->Visible) { // bayar_tgl ?>
+	<?php if ($t_06jual->SortUrl($t_06jual->bayar_tgl) == "") { ?>
+		<th data-name="bayar_tgl"><div id="elh_t_06jual_bayar_tgl" class="t_06jual_bayar_tgl"><div class="ewTableHeaderCaption"><?php echo $t_06jual->bayar_tgl->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="bayar_tgl"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t_06jual->SortUrl($t_06jual->bayar_tgl) ?>',2);"><div id="elh_t_06jual_bayar_tgl" class="t_06jual_bayar_tgl">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t_06jual->bayar_tgl->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t_06jual->bayar_tgl->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t_06jual->bayar_tgl->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($t_06jual->bayar_jml->Visible) { // bayar_jml ?>
+	<?php if ($t_06jual->SortUrl($t_06jual->bayar_jml) == "") { ?>
+		<th data-name="bayar_jml"><div id="elh_t_06jual_bayar_jml" class="t_06jual_bayar_jml"><div class="ewTableHeaderCaption"><?php echo $t_06jual->bayar_jml->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="bayar_jml"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t_06jual->SortUrl($t_06jual->bayar_jml) ?>',2);"><div id="elh_t_06jual_bayar_jml" class="t_06jual_bayar_jml">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t_06jual->bayar_jml->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t_06jual->bayar_jml->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t_06jual->bayar_jml->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
 <?php
 
 // Render list options (header, right)
@@ -3652,6 +4058,56 @@ ft_06juallist.CreateAutoSuggest({"id":"x<?php echo $t_06jual_list->RowIndex ?>_c
 <input type="text" data-table="t_06jual" data-field="x_total" name="x<?php echo $t_06jual_list->RowIndex ?>_total" id="x<?php echo $t_06jual_list->RowIndex ?>_total" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_06jual" data-field="x_total" name="o<?php echo $t_06jual_list->RowIndex ?>_total" id="o<?php echo $t_06jual_list->RowIndex ?>_total" value="<?php echo ew_HtmlEncode($t_06jual->total->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->inv_no->Visible) { // inv_no ?>
+		<td data-name="inv_no">
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_no" class="form-group t_06jual_inv_no">
+<input type="text" data-table="t_06jual" data-field="x_inv_no" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_no" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_no" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_no->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_no->EditValue ?>"<?php echo $t_06jual->inv_no->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_inv_no" name="o<?php echo $t_06jual_list->RowIndex ?>_inv_no" id="o<?php echo $t_06jual_list->RowIndex ?>_inv_no" value="<?php echo ew_HtmlEncode($t_06jual->inv_no->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->inv_tgl->Visible) { // inv_tgl ?>
+		<td data-name="inv_tgl">
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_tgl" class="form-group t_06jual_inv_tgl">
+<input type="text" data-table="t_06jual" data-field="x_inv_tgl" data-format="7" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_tgl->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_tgl->EditValue ?>"<?php echo $t_06jual->inv_tgl->EditAttributes() ?>>
+<?php if (!$t_06jual->inv_tgl->ReadOnly && !$t_06jual->inv_tgl->Disabled && !isset($t_06jual->inv_tgl->EditAttrs["readonly"]) && !isset($t_06jual->inv_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft_06juallist", "x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl", 7);
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_inv_tgl" name="o<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" id="o<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" value="<?php echo ew_HtmlEncode($t_06jual->inv_tgl->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->inv_jml->Visible) { // inv_jml ?>
+		<td data-name="inv_jml">
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_jml" class="form-group t_06jual_inv_jml">
+<input type="text" data-table="t_06jual" data-field="x_inv_jml" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_jml" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_jml" size="30" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_jml->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_jml->EditValue ?>"<?php echo $t_06jual->inv_jml->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_inv_jml" name="o<?php echo $t_06jual_list->RowIndex ?>_inv_jml" id="o<?php echo $t_06jual_list->RowIndex ?>_inv_jml" value="<?php echo ew_HtmlEncode($t_06jual->inv_jml->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->bayar_tgl->Visible) { // bayar_tgl ?>
+		<td data-name="bayar_tgl">
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_bayar_tgl" class="form-group t_06jual_bayar_tgl">
+<input type="text" data-table="t_06jual" data-field="x_bayar_tgl" data-format="7" name="x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" id="x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" placeholder="<?php echo ew_HtmlEncode($t_06jual->bayar_tgl->getPlaceHolder()) ?>" value="<?php echo $t_06jual->bayar_tgl->EditValue ?>"<?php echo $t_06jual->bayar_tgl->EditAttributes() ?>>
+<?php if (!$t_06jual->bayar_tgl->ReadOnly && !$t_06jual->bayar_tgl->Disabled && !isset($t_06jual->bayar_tgl->EditAttrs["readonly"]) && !isset($t_06jual->bayar_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft_06juallist", "x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl", 7);
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_bayar_tgl" name="o<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" id="o<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" value="<?php echo ew_HtmlEncode($t_06jual->bayar_tgl->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->bayar_jml->Visible) { // bayar_jml ?>
+		<td data-name="bayar_jml">
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_bayar_jml" class="form-group t_06jual_bayar_jml">
+<input type="text" data-table="t_06jual" data-field="x_bayar_jml" name="x<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" id="x<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" size="30" placeholder="<?php echo ew_HtmlEncode($t_06jual->bayar_jml->getPlaceHolder()) ?>" value="<?php echo $t_06jual->bayar_jml->EditValue ?>"<?php echo $t_06jual->bayar_jml->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_bayar_jml" name="o<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" id="o<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" value="<?php echo ew_HtmlEncode($t_06jual->bayar_jml->OldValue) ?>">
 </td>
 	<?php } ?>
 <?php
@@ -3912,6 +4368,131 @@ ft_06juallist.CreateAutoSuggest({"id":"x<?php echo $t_06jual_list->RowIndex ?>_c
 <?php } ?>
 </td>
 	<?php } ?>
+	<?php if ($t_06jual->inv_no->Visible) { // inv_no ?>
+		<td data-name="inv_no"<?php echo $t_06jual->inv_no->CellAttributes() ?>>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_no" class="form-group t_06jual_inv_no">
+<input type="text" data-table="t_06jual" data-field="x_inv_no" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_no" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_no" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_no->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_no->EditValue ?>"<?php echo $t_06jual->inv_no->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_inv_no" name="o<?php echo $t_06jual_list->RowIndex ?>_inv_no" id="o<?php echo $t_06jual_list->RowIndex ?>_inv_no" value="<?php echo ew_HtmlEncode($t_06jual->inv_no->OldValue) ?>">
+<?php } ?>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_no" class="form-group t_06jual_inv_no">
+<input type="text" data-table="t_06jual" data-field="x_inv_no" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_no" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_no" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_no->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_no->EditValue ?>"<?php echo $t_06jual->inv_no->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_no" class="t_06jual_inv_no">
+<span<?php echo $t_06jual->inv_no->ViewAttributes() ?>>
+<?php echo $t_06jual->inv_no->ListViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->inv_tgl->Visible) { // inv_tgl ?>
+		<td data-name="inv_tgl"<?php echo $t_06jual->inv_tgl->CellAttributes() ?>>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_tgl" class="form-group t_06jual_inv_tgl">
+<input type="text" data-table="t_06jual" data-field="x_inv_tgl" data-format="7" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_tgl->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_tgl->EditValue ?>"<?php echo $t_06jual->inv_tgl->EditAttributes() ?>>
+<?php if (!$t_06jual->inv_tgl->ReadOnly && !$t_06jual->inv_tgl->Disabled && !isset($t_06jual->inv_tgl->EditAttrs["readonly"]) && !isset($t_06jual->inv_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft_06juallist", "x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl", 7);
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_inv_tgl" name="o<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" id="o<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" value="<?php echo ew_HtmlEncode($t_06jual->inv_tgl->OldValue) ?>">
+<?php } ?>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_tgl" class="form-group t_06jual_inv_tgl">
+<input type="text" data-table="t_06jual" data-field="x_inv_tgl" data-format="7" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_tgl->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_tgl->EditValue ?>"<?php echo $t_06jual->inv_tgl->EditAttributes() ?>>
+<?php if (!$t_06jual->inv_tgl->ReadOnly && !$t_06jual->inv_tgl->Disabled && !isset($t_06jual->inv_tgl->EditAttrs["readonly"]) && !isset($t_06jual->inv_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft_06juallist", "x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl", 7);
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_tgl" class="t_06jual_inv_tgl">
+<span<?php echo $t_06jual->inv_tgl->ViewAttributes() ?>>
+<?php echo $t_06jual->inv_tgl->ListViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->inv_jml->Visible) { // inv_jml ?>
+		<td data-name="inv_jml"<?php echo $t_06jual->inv_jml->CellAttributes() ?>>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_jml" class="form-group t_06jual_inv_jml">
+<input type="text" data-table="t_06jual" data-field="x_inv_jml" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_jml" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_jml" size="30" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_jml->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_jml->EditValue ?>"<?php echo $t_06jual->inv_jml->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_inv_jml" name="o<?php echo $t_06jual_list->RowIndex ?>_inv_jml" id="o<?php echo $t_06jual_list->RowIndex ?>_inv_jml" value="<?php echo ew_HtmlEncode($t_06jual->inv_jml->OldValue) ?>">
+<?php } ?>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_jml" class="form-group t_06jual_inv_jml">
+<input type="text" data-table="t_06jual" data-field="x_inv_jml" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_jml" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_jml" size="30" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_jml->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_jml->EditValue ?>"<?php echo $t_06jual->inv_jml->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_inv_jml" class="t_06jual_inv_jml">
+<span<?php echo $t_06jual->inv_jml->ViewAttributes() ?>>
+<?php echo $t_06jual->inv_jml->ListViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->bayar_tgl->Visible) { // bayar_tgl ?>
+		<td data-name="bayar_tgl"<?php echo $t_06jual->bayar_tgl->CellAttributes() ?>>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_bayar_tgl" class="form-group t_06jual_bayar_tgl">
+<input type="text" data-table="t_06jual" data-field="x_bayar_tgl" data-format="7" name="x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" id="x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" placeholder="<?php echo ew_HtmlEncode($t_06jual->bayar_tgl->getPlaceHolder()) ?>" value="<?php echo $t_06jual->bayar_tgl->EditValue ?>"<?php echo $t_06jual->bayar_tgl->EditAttributes() ?>>
+<?php if (!$t_06jual->bayar_tgl->ReadOnly && !$t_06jual->bayar_tgl->Disabled && !isset($t_06jual->bayar_tgl->EditAttrs["readonly"]) && !isset($t_06jual->bayar_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft_06juallist", "x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl", 7);
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_bayar_tgl" name="o<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" id="o<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" value="<?php echo ew_HtmlEncode($t_06jual->bayar_tgl->OldValue) ?>">
+<?php } ?>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_bayar_tgl" class="form-group t_06jual_bayar_tgl">
+<input type="text" data-table="t_06jual" data-field="x_bayar_tgl" data-format="7" name="x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" id="x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" placeholder="<?php echo ew_HtmlEncode($t_06jual->bayar_tgl->getPlaceHolder()) ?>" value="<?php echo $t_06jual->bayar_tgl->EditValue ?>"<?php echo $t_06jual->bayar_tgl->EditAttributes() ?>>
+<?php if (!$t_06jual->bayar_tgl->ReadOnly && !$t_06jual->bayar_tgl->Disabled && !isset($t_06jual->bayar_tgl->EditAttrs["readonly"]) && !isset($t_06jual->bayar_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft_06juallist", "x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl", 7);
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_bayar_tgl" class="t_06jual_bayar_tgl">
+<span<?php echo $t_06jual->bayar_tgl->ViewAttributes() ?>>
+<?php echo $t_06jual->bayar_tgl->ListViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->bayar_jml->Visible) { // bayar_jml ?>
+		<td data-name="bayar_jml"<?php echo $t_06jual->bayar_jml->CellAttributes() ?>>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_bayar_jml" class="form-group t_06jual_bayar_jml">
+<input type="text" data-table="t_06jual" data-field="x_bayar_jml" name="x<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" id="x<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" size="30" placeholder="<?php echo ew_HtmlEncode($t_06jual->bayar_jml->getPlaceHolder()) ?>" value="<?php echo $t_06jual->bayar_jml->EditValue ?>"<?php echo $t_06jual->bayar_jml->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_bayar_jml" name="o<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" id="o<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" value="<?php echo ew_HtmlEncode($t_06jual->bayar_jml->OldValue) ?>">
+<?php } ?>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_bayar_jml" class="form-group t_06jual_bayar_jml">
+<input type="text" data-table="t_06jual" data-field="x_bayar_jml" name="x<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" id="x<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" size="30" placeholder="<?php echo ew_HtmlEncode($t_06jual->bayar_jml->getPlaceHolder()) ?>" value="<?php echo $t_06jual->bayar_jml->EditValue ?>"<?php echo $t_06jual->bayar_jml->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php if ($t_06jual->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t_06jual_list->RowCnt ?>_t_06jual_bayar_jml" class="t_06jual_bayar_jml">
+<span<?php echo $t_06jual->bayar_jml->ViewAttributes() ?>>
+<?php echo $t_06jual->bayar_jml->ListViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+	<?php } ?>
 <?php
 
 // Render list options (body, right)
@@ -4005,6 +4586,56 @@ ft_06juallist.CreateAutoSuggest({"id":"x<?php echo $t_06jual_list->RowIndex ?>_c
 <input type="text" data-table="t_06jual" data-field="x_total" name="x<?php echo $t_06jual_list->RowIndex ?>_total" id="x<?php echo $t_06jual_list->RowIndex ?>_total" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_06jual" data-field="x_total" name="o<?php echo $t_06jual_list->RowIndex ?>_total" id="o<?php echo $t_06jual_list->RowIndex ?>_total" value="<?php echo ew_HtmlEncode($t_06jual->total->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->inv_no->Visible) { // inv_no ?>
+		<td data-name="inv_no">
+<span id="el$rowindex$_t_06jual_inv_no" class="form-group t_06jual_inv_no">
+<input type="text" data-table="t_06jual" data-field="x_inv_no" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_no" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_no" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_no->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_no->EditValue ?>"<?php echo $t_06jual->inv_no->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_inv_no" name="o<?php echo $t_06jual_list->RowIndex ?>_inv_no" id="o<?php echo $t_06jual_list->RowIndex ?>_inv_no" value="<?php echo ew_HtmlEncode($t_06jual->inv_no->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->inv_tgl->Visible) { // inv_tgl ?>
+		<td data-name="inv_tgl">
+<span id="el$rowindex$_t_06jual_inv_tgl" class="form-group t_06jual_inv_tgl">
+<input type="text" data-table="t_06jual" data-field="x_inv_tgl" data-format="7" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_tgl->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_tgl->EditValue ?>"<?php echo $t_06jual->inv_tgl->EditAttributes() ?>>
+<?php if (!$t_06jual->inv_tgl->ReadOnly && !$t_06jual->inv_tgl->Disabled && !isset($t_06jual->inv_tgl->EditAttrs["readonly"]) && !isset($t_06jual->inv_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft_06juallist", "x<?php echo $t_06jual_list->RowIndex ?>_inv_tgl", 7);
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_inv_tgl" name="o<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" id="o<?php echo $t_06jual_list->RowIndex ?>_inv_tgl" value="<?php echo ew_HtmlEncode($t_06jual->inv_tgl->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->inv_jml->Visible) { // inv_jml ?>
+		<td data-name="inv_jml">
+<span id="el$rowindex$_t_06jual_inv_jml" class="form-group t_06jual_inv_jml">
+<input type="text" data-table="t_06jual" data-field="x_inv_jml" name="x<?php echo $t_06jual_list->RowIndex ?>_inv_jml" id="x<?php echo $t_06jual_list->RowIndex ?>_inv_jml" size="30" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_jml->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_jml->EditValue ?>"<?php echo $t_06jual->inv_jml->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_inv_jml" name="o<?php echo $t_06jual_list->RowIndex ?>_inv_jml" id="o<?php echo $t_06jual_list->RowIndex ?>_inv_jml" value="<?php echo ew_HtmlEncode($t_06jual->inv_jml->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->bayar_tgl->Visible) { // bayar_tgl ?>
+		<td data-name="bayar_tgl">
+<span id="el$rowindex$_t_06jual_bayar_tgl" class="form-group t_06jual_bayar_tgl">
+<input type="text" data-table="t_06jual" data-field="x_bayar_tgl" data-format="7" name="x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" id="x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" placeholder="<?php echo ew_HtmlEncode($t_06jual->bayar_tgl->getPlaceHolder()) ?>" value="<?php echo $t_06jual->bayar_tgl->EditValue ?>"<?php echo $t_06jual->bayar_tgl->EditAttributes() ?>>
+<?php if (!$t_06jual->bayar_tgl->ReadOnly && !$t_06jual->bayar_tgl->Disabled && !isset($t_06jual->bayar_tgl->EditAttrs["readonly"]) && !isset($t_06jual->bayar_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft_06juallist", "x<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl", 7);
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_bayar_tgl" name="o<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" id="o<?php echo $t_06jual_list->RowIndex ?>_bayar_tgl" value="<?php echo ew_HtmlEncode($t_06jual->bayar_tgl->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_06jual->bayar_jml->Visible) { // bayar_jml ?>
+		<td data-name="bayar_jml">
+<span id="el$rowindex$_t_06jual_bayar_jml" class="form-group t_06jual_bayar_jml">
+<input type="text" data-table="t_06jual" data-field="x_bayar_jml" name="x<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" id="x<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" size="30" placeholder="<?php echo ew_HtmlEncode($t_06jual->bayar_jml->getPlaceHolder()) ?>" value="<?php echo $t_06jual->bayar_jml->EditValue ?>"<?php echo $t_06jual->bayar_jml->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_06jual" data-field="x_bayar_jml" name="o<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" id="o<?php echo $t_06jual_list->RowIndex ?>_bayar_jml" value="<?php echo ew_HtmlEncode($t_06jual->bayar_jml->OldValue) ?>">
 </td>
 	<?php } ?>
 <?php

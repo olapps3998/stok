@@ -18,6 +18,11 @@ class ct_06jual extends cTable {
 	var $tgl;
 	var $customer_id;
 	var $total;
+	var $inv_no;
+	var $inv_tgl;
+	var $inv_jml;
+	var $bayar_tgl;
+	var $bayar_jml;
 
 	//
 	// Table class constructor
@@ -77,6 +82,35 @@ class ct_06jual extends cTable {
 		$this->total->Sortable = TRUE; // Allow sort
 		$this->total->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
 		$this->fields['total'] = &$this->total;
+
+		// inv_no
+		$this->inv_no = new cField('t_06jual', 't_06jual', 'x_inv_no', 'inv_no', '`inv_no`', '`inv_no`', 200, -1, FALSE, '`inv_no`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->inv_no->Sortable = TRUE; // Allow sort
+		$this->fields['inv_no'] = &$this->inv_no;
+
+		// inv_tgl
+		$this->inv_tgl = new cField('t_06jual', 't_06jual', 'x_inv_tgl', 'inv_tgl', '`inv_tgl`', ew_CastDateFieldForLike('`inv_tgl`', 7, "DB"), 133, 7, FALSE, '`inv_tgl`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->inv_tgl->Sortable = TRUE; // Allow sort
+		$this->inv_tgl->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
+		$this->fields['inv_tgl'] = &$this->inv_tgl;
+
+		// inv_jml
+		$this->inv_jml = new cField('t_06jual', 't_06jual', 'x_inv_jml', 'inv_jml', '`inv_jml`', '`inv_jml`', 4, -1, FALSE, '`inv_jml`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->inv_jml->Sortable = TRUE; // Allow sort
+		$this->inv_jml->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['inv_jml'] = &$this->inv_jml;
+
+		// bayar_tgl
+		$this->bayar_tgl = new cField('t_06jual', 't_06jual', 'x_bayar_tgl', 'bayar_tgl', '`bayar_tgl`', ew_CastDateFieldForLike('`bayar_tgl`', 7, "DB"), 133, 7, FALSE, '`bayar_tgl`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->bayar_tgl->Sortable = TRUE; // Allow sort
+		$this->bayar_tgl->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
+		$this->fields['bayar_tgl'] = &$this->bayar_tgl;
+
+		// bayar_jml
+		$this->bayar_jml = new cField('t_06jual', 't_06jual', 'x_bayar_jml', 'bayar_jml', '`bayar_jml`', '`bayar_jml`', 4, -1, FALSE, '`bayar_jml`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->bayar_jml->Sortable = TRUE; // Allow sort
+		$this->bayar_jml->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['bayar_jml'] = &$this->bayar_jml;
 	}
 
 	// Set Field Visibility
@@ -686,6 +720,11 @@ class ct_06jual extends cTable {
 		$this->tgl->setDbValue($rs->fields('tgl'));
 		$this->customer_id->setDbValue($rs->fields('customer_id'));
 		$this->total->setDbValue($rs->fields('total'));
+		$this->inv_no->setDbValue($rs->fields('inv_no'));
+		$this->inv_tgl->setDbValue($rs->fields('inv_tgl'));
+		$this->inv_jml->setDbValue($rs->fields('inv_jml'));
+		$this->bayar_tgl->setDbValue($rs->fields('bayar_tgl'));
+		$this->bayar_jml->setDbValue($rs->fields('bayar_jml'));
 	}
 
 	// Render list row values
@@ -701,6 +740,11 @@ class ct_06jual extends cTable {
 		// tgl
 		// customer_id
 		// total
+		// inv_no
+		// inv_tgl
+		// inv_jml
+		// bayar_tgl
+		// bayar_jml
 		// jual_id
 
 		$this->jual_id->ViewValue = $this->jual_id->CurrentValue;
@@ -749,6 +793,32 @@ class ct_06jual extends cTable {
 		$this->total->CellCssStyle .= "text-align: right;";
 		$this->total->ViewCustomAttributes = "";
 
+		// inv_no
+		$this->inv_no->ViewValue = $this->inv_no->CurrentValue;
+		$this->inv_no->ViewCustomAttributes = "";
+
+		// inv_tgl
+		$this->inv_tgl->ViewValue = $this->inv_tgl->CurrentValue;
+		$this->inv_tgl->ViewValue = ew_FormatDateTime($this->inv_tgl->ViewValue, 7);
+		$this->inv_tgl->ViewCustomAttributes = "";
+
+		// inv_jml
+		$this->inv_jml->ViewValue = $this->inv_jml->CurrentValue;
+		$this->inv_jml->ViewValue = ew_FormatNumber($this->inv_jml->ViewValue, 0, -2, -2, -2);
+		$this->inv_jml->CellCssStyle .= "text-align: right;";
+		$this->inv_jml->ViewCustomAttributes = "";
+
+		// bayar_tgl
+		$this->bayar_tgl->ViewValue = $this->bayar_tgl->CurrentValue;
+		$this->bayar_tgl->ViewValue = ew_FormatDateTime($this->bayar_tgl->ViewValue, 7);
+		$this->bayar_tgl->ViewCustomAttributes = "";
+
+		// bayar_jml
+		$this->bayar_jml->ViewValue = $this->bayar_jml->CurrentValue;
+		$this->bayar_jml->ViewValue = ew_FormatNumber($this->bayar_jml->ViewValue, 0, -2, -2, -2);
+		$this->bayar_jml->CellCssStyle .= "text-align: right;";
+		$this->bayar_jml->ViewCustomAttributes = "";
+
 		// jual_id
 		$this->jual_id->LinkCustomAttributes = "";
 		$this->jual_id->HrefValue = "";
@@ -773,6 +843,31 @@ class ct_06jual extends cTable {
 		$this->total->LinkCustomAttributes = "";
 		$this->total->HrefValue = "";
 		$this->total->TooltipValue = "";
+
+		// inv_no
+		$this->inv_no->LinkCustomAttributes = "";
+		$this->inv_no->HrefValue = "";
+		$this->inv_no->TooltipValue = "";
+
+		// inv_tgl
+		$this->inv_tgl->LinkCustomAttributes = "";
+		$this->inv_tgl->HrefValue = "";
+		$this->inv_tgl->TooltipValue = "";
+
+		// inv_jml
+		$this->inv_jml->LinkCustomAttributes = "";
+		$this->inv_jml->HrefValue = "";
+		$this->inv_jml->TooltipValue = "";
+
+		// bayar_tgl
+		$this->bayar_tgl->LinkCustomAttributes = "";
+		$this->bayar_tgl->HrefValue = "";
+		$this->bayar_tgl->TooltipValue = "";
+
+		// bayar_jml
+		$this->bayar_jml->LinkCustomAttributes = "";
+		$this->bayar_jml->HrefValue = "";
+		$this->bayar_jml->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -816,6 +911,38 @@ class ct_06jual extends cTable {
 		$this->total->PlaceHolder = ew_RemoveHtml($this->total->FldCaption());
 		if (strval($this->total->EditValue) <> "" && is_numeric($this->total->EditValue)) $this->total->EditValue = ew_FormatNumber($this->total->EditValue, -2, -2, -2, -2);
 
+		// inv_no
+		$this->inv_no->EditAttrs["class"] = "form-control";
+		$this->inv_no->EditCustomAttributes = "";
+		$this->inv_no->EditValue = $this->inv_no->CurrentValue;
+		$this->inv_no->PlaceHolder = ew_RemoveHtml($this->inv_no->FldCaption());
+
+		// inv_tgl
+		$this->inv_tgl->EditAttrs["class"] = "form-control";
+		$this->inv_tgl->EditCustomAttributes = "";
+		$this->inv_tgl->EditValue = ew_FormatDateTime($this->inv_tgl->CurrentValue, 7);
+		$this->inv_tgl->PlaceHolder = ew_RemoveHtml($this->inv_tgl->FldCaption());
+
+		// inv_jml
+		$this->inv_jml->EditAttrs["class"] = "form-control";
+		$this->inv_jml->EditCustomAttributes = "";
+		$this->inv_jml->EditValue = $this->inv_jml->CurrentValue;
+		$this->inv_jml->PlaceHolder = ew_RemoveHtml($this->inv_jml->FldCaption());
+		if (strval($this->inv_jml->EditValue) <> "" && is_numeric($this->inv_jml->EditValue)) $this->inv_jml->EditValue = ew_FormatNumber($this->inv_jml->EditValue, -2, -2, -2, -2);
+
+		// bayar_tgl
+		$this->bayar_tgl->EditAttrs["class"] = "form-control";
+		$this->bayar_tgl->EditCustomAttributes = "";
+		$this->bayar_tgl->EditValue = ew_FormatDateTime($this->bayar_tgl->CurrentValue, 7);
+		$this->bayar_tgl->PlaceHolder = ew_RemoveHtml($this->bayar_tgl->FldCaption());
+
+		// bayar_jml
+		$this->bayar_jml->EditAttrs["class"] = "form-control";
+		$this->bayar_jml->EditCustomAttributes = "";
+		$this->bayar_jml->EditValue = $this->bayar_jml->CurrentValue;
+		$this->bayar_jml->PlaceHolder = ew_RemoveHtml($this->bayar_jml->FldCaption());
+		if (strval($this->bayar_jml->EditValue) <> "" && is_numeric($this->bayar_jml->EditValue)) $this->bayar_jml->EditValue = ew_FormatNumber($this->bayar_jml->EditValue, -2, -2, -2, -2);
+
 		// Call Row Rendered event
 		$this->Row_Rendered();
 	}
@@ -847,12 +974,22 @@ class ct_06jual extends cTable {
 					if ($this->tgl->Exportable) $Doc->ExportCaption($this->tgl);
 					if ($this->customer_id->Exportable) $Doc->ExportCaption($this->customer_id);
 					if ($this->total->Exportable) $Doc->ExportCaption($this->total);
+					if ($this->inv_no->Exportable) $Doc->ExportCaption($this->inv_no);
+					if ($this->inv_tgl->Exportable) $Doc->ExportCaption($this->inv_tgl);
+					if ($this->inv_jml->Exportable) $Doc->ExportCaption($this->inv_jml);
+					if ($this->bayar_tgl->Exportable) $Doc->ExportCaption($this->bayar_tgl);
+					if ($this->bayar_jml->Exportable) $Doc->ExportCaption($this->bayar_jml);
 				} else {
 					if ($this->jual_id->Exportable) $Doc->ExportCaption($this->jual_id);
 					if ($this->no_po->Exportable) $Doc->ExportCaption($this->no_po);
 					if ($this->tgl->Exportable) $Doc->ExportCaption($this->tgl);
 					if ($this->customer_id->Exportable) $Doc->ExportCaption($this->customer_id);
 					if ($this->total->Exportable) $Doc->ExportCaption($this->total);
+					if ($this->inv_no->Exportable) $Doc->ExportCaption($this->inv_no);
+					if ($this->inv_tgl->Exportable) $Doc->ExportCaption($this->inv_tgl);
+					if ($this->inv_jml->Exportable) $Doc->ExportCaption($this->inv_jml);
+					if ($this->bayar_tgl->Exportable) $Doc->ExportCaption($this->bayar_tgl);
+					if ($this->bayar_jml->Exportable) $Doc->ExportCaption($this->bayar_jml);
 				}
 				$Doc->EndExportRow();
 			}
@@ -888,12 +1025,22 @@ class ct_06jual extends cTable {
 						if ($this->tgl->Exportable) $Doc->ExportField($this->tgl);
 						if ($this->customer_id->Exportable) $Doc->ExportField($this->customer_id);
 						if ($this->total->Exportable) $Doc->ExportField($this->total);
+						if ($this->inv_no->Exportable) $Doc->ExportField($this->inv_no);
+						if ($this->inv_tgl->Exportable) $Doc->ExportField($this->inv_tgl);
+						if ($this->inv_jml->Exportable) $Doc->ExportField($this->inv_jml);
+						if ($this->bayar_tgl->Exportable) $Doc->ExportField($this->bayar_tgl);
+						if ($this->bayar_jml->Exportable) $Doc->ExportField($this->bayar_jml);
 					} else {
 						if ($this->jual_id->Exportable) $Doc->ExportField($this->jual_id);
 						if ($this->no_po->Exportable) $Doc->ExportField($this->no_po);
 						if ($this->tgl->Exportable) $Doc->ExportField($this->tgl);
 						if ($this->customer_id->Exportable) $Doc->ExportField($this->customer_id);
 						if ($this->total->Exportable) $Doc->ExportField($this->total);
+						if ($this->inv_no->Exportable) $Doc->ExportField($this->inv_no);
+						if ($this->inv_tgl->Exportable) $Doc->ExportField($this->inv_tgl);
+						if ($this->inv_jml->Exportable) $Doc->ExportField($this->inv_jml);
+						if ($this->bayar_tgl->Exportable) $Doc->ExportField($this->bayar_tgl);
+						if ($this->bayar_jml->Exportable) $Doc->ExportField($this->bayar_jml);
 					}
 					$Doc->EndExportRow();
 				}

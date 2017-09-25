@@ -583,6 +583,15 @@
   <project>
     <phrase id="bodytitle" value="STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="10043">
+      <phrase id="menutext" value="Detail Penjualan" />
+    </menu>
+    <menu id="10044">
+      <phrase id="menutext" value="v 02jual laporan" />
+    </menu>
+    <menu id="10045">
+      <phrase id="menutext" value="v 11piutang" />
+    </menu>
     <menu id="10039">
       <phrase id="menutext" value="v 01beli laporan" />
     </menu>
@@ -661,8 +670,8 @@
     <menu id="10029">
       <phrase id="menutext" value="Hutang" />
     </menu>
-    <menu id="10021">
-      <phrase id="menutext" value="v 03masuk" />
+    <menu id="10031">
+      <phrase id="menutext" value="Piutang" />
     </menu>
     <menu id="10024">
       <phrase id="menutext" value="v 04stok" />
@@ -670,14 +679,11 @@
     <menu id="10014">
       <phrase id="menutext" value="Transaksi" />
     </menu>
-    <menu id="10032">
+    <menu id="10033">
       <phrase id="menutext" value="v 04keluar" />
     </menu>
     <menu id="10030">
-      <phrase id="menutext" value="Detail Penjualan" />
-    </menu>
-    <menu id="10031">
-      <phrase id="menutext" value="v 02jual laporan" />
+      <phrase id="menutext" value="v 11piutang" />
     </menu>
     <menu id="10028">
       <phrase id="menutext" value="v 10hutang" />
@@ -693,6 +699,9 @@
     </menu>
     <menu id="10023">
       <phrase id="menutext" value="v 07mutasi" />
+    </menu>
+    <menu id="10032">
+      <phrase id="menutext" value="v 03masuk" />
     </menu>
     <menu id="10020">
       <phrase id="menutext" value="v 05stok" />
@@ -900,6 +909,21 @@
       <field id="total">
         <phrase id="fldcaption" value="Total" />
       </field>
+      <field id="inv_no">
+        <phrase id="fldcaption" value="No. Invoice" />
+      </field>
+      <field id="inv_tgl">
+        <phrase id="fldcaption" value="Tgl. Invoice" />
+      </field>
+      <field id="inv_jml">
+        <phrase id="fldcaption" value="Jumlah Invoice" />
+      </field>
+      <field id="bayar_tgl">
+        <phrase id="fldcaption" value="Tgl. Pembayaran" />
+      </field>
+      <field id="bayar_jml">
+        <phrase id="fldcaption" value="Jumlah Pembayaran" />
+      </field>
     </table>
     <table id="t_07jual_detail">
       <phrase id="tblcaption" value="Detail Penjualan" />
@@ -1097,6 +1121,42 @@
       </field>
       <field id="tot_lunas">
         <phrase id="fldcaption" value="tot lunas" />
+      </field>
+      <field id="sisa">
+        <phrase id="fldcaption" value="sisa" />
+      </field>
+    </table>
+    <table id="v_11piutang">
+      <phrase id="tblcaption" value="v 11piutang" />
+      <field id="no_po">
+        <phrase id="fldcaption" value="no po" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
+      </field>
+      <field id="customer_nama">
+        <phrase id="fldcaption" value="customer nama" />
+      </field>
+      <field id="tot_piutang">
+        <phrase id="fldcaption" value="tot piutang" />
+      </field>
+      <field id="tot_bayar">
+        <phrase id="fldcaption" value="tot bayar" />
+      </field>
+      <field id="sisa">
+        <phrase id="fldcaption" value="sisa" />
+      </field>
+      <field id="inv_no">
+        <phrase id="fldcaption" value="inv no" />
+      </field>
+      <field id="inv_tgl">
+        <phrase id="fldcaption" value="inv tgl" />
+      </field>
+      <field id="inv_jml">
+        <phrase id="fldcaption" value="inv jml" />
+      </field>
+      <field id="bayar_tgl">
+        <phrase id="fldcaption" value="bayar tgl" />
       </field>
     </table>
   </project>

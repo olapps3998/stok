@@ -259,6 +259,11 @@ class ct_06jual_add extends ct_06jual {
 		$this->tgl->SetVisibility();
 		$this->customer_id->SetVisibility();
 		$this->total->SetVisibility();
+		$this->inv_no->SetVisibility();
+		$this->inv_tgl->SetVisibility();
+		$this->inv_jml->SetVisibility();
+		$this->bayar_tgl->SetVisibility();
+		$this->bayar_jml->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -473,6 +478,16 @@ class ct_06jual_add extends ct_06jual {
 		$this->customer_id->OldValue = $this->customer_id->CurrentValue;
 		$this->total->CurrentValue = NULL;
 		$this->total->OldValue = $this->total->CurrentValue;
+		$this->inv_no->CurrentValue = NULL;
+		$this->inv_no->OldValue = $this->inv_no->CurrentValue;
+		$this->inv_tgl->CurrentValue = NULL;
+		$this->inv_tgl->OldValue = $this->inv_tgl->CurrentValue;
+		$this->inv_jml->CurrentValue = NULL;
+		$this->inv_jml->OldValue = $this->inv_jml->CurrentValue;
+		$this->bayar_tgl->CurrentValue = NULL;
+		$this->bayar_tgl->OldValue = $this->bayar_tgl->CurrentValue;
+		$this->bayar_jml->CurrentValue = NULL;
+		$this->bayar_jml->OldValue = $this->bayar_jml->CurrentValue;
 	}
 
 	// Load form values
@@ -493,6 +508,23 @@ class ct_06jual_add extends ct_06jual {
 		if (!$this->total->FldIsDetailKey) {
 			$this->total->setFormValue($objForm->GetValue("x_total"));
 		}
+		if (!$this->inv_no->FldIsDetailKey) {
+			$this->inv_no->setFormValue($objForm->GetValue("x_inv_no"));
+		}
+		if (!$this->inv_tgl->FldIsDetailKey) {
+			$this->inv_tgl->setFormValue($objForm->GetValue("x_inv_tgl"));
+			$this->inv_tgl->CurrentValue = ew_UnFormatDateTime($this->inv_tgl->CurrentValue, 7);
+		}
+		if (!$this->inv_jml->FldIsDetailKey) {
+			$this->inv_jml->setFormValue($objForm->GetValue("x_inv_jml"));
+		}
+		if (!$this->bayar_tgl->FldIsDetailKey) {
+			$this->bayar_tgl->setFormValue($objForm->GetValue("x_bayar_tgl"));
+			$this->bayar_tgl->CurrentValue = ew_UnFormatDateTime($this->bayar_tgl->CurrentValue, 7);
+		}
+		if (!$this->bayar_jml->FldIsDetailKey) {
+			$this->bayar_jml->setFormValue($objForm->GetValue("x_bayar_jml"));
+		}
 	}
 
 	// Restore form values
@@ -504,6 +536,13 @@ class ct_06jual_add extends ct_06jual {
 		$this->tgl->CurrentValue = ew_UnFormatDateTime($this->tgl->CurrentValue, 7);
 		$this->customer_id->CurrentValue = $this->customer_id->FormValue;
 		$this->total->CurrentValue = $this->total->FormValue;
+		$this->inv_no->CurrentValue = $this->inv_no->FormValue;
+		$this->inv_tgl->CurrentValue = $this->inv_tgl->FormValue;
+		$this->inv_tgl->CurrentValue = ew_UnFormatDateTime($this->inv_tgl->CurrentValue, 7);
+		$this->inv_jml->CurrentValue = $this->inv_jml->FormValue;
+		$this->bayar_tgl->CurrentValue = $this->bayar_tgl->FormValue;
+		$this->bayar_tgl->CurrentValue = ew_UnFormatDateTime($this->bayar_tgl->CurrentValue, 7);
+		$this->bayar_jml->CurrentValue = $this->bayar_jml->FormValue;
 	}
 
 	// Load row based on key values
@@ -545,6 +584,11 @@ class ct_06jual_add extends ct_06jual {
 			$this->customer_id->VirtualValue = ""; // Clear value
 		}
 		$this->total->setDbValue($rs->fields('total'));
+		$this->inv_no->setDbValue($rs->fields('inv_no'));
+		$this->inv_tgl->setDbValue($rs->fields('inv_tgl'));
+		$this->inv_jml->setDbValue($rs->fields('inv_jml'));
+		$this->bayar_tgl->setDbValue($rs->fields('bayar_tgl'));
+		$this->bayar_jml->setDbValue($rs->fields('bayar_jml'));
 	}
 
 	// Load DbValue from recordset
@@ -556,6 +600,11 @@ class ct_06jual_add extends ct_06jual {
 		$this->tgl->DbValue = $row['tgl'];
 		$this->customer_id->DbValue = $row['customer_id'];
 		$this->total->DbValue = $row['total'];
+		$this->inv_no->DbValue = $row['inv_no'];
+		$this->inv_tgl->DbValue = $row['inv_tgl'];
+		$this->inv_jml->DbValue = $row['inv_jml'];
+		$this->bayar_tgl->DbValue = $row['bayar_tgl'];
+		$this->bayar_jml->DbValue = $row['bayar_jml'];
 	}
 
 	// Load old record
@@ -591,6 +640,14 @@ class ct_06jual_add extends ct_06jual {
 		if ($this->total->FormValue == $this->total->CurrentValue && is_numeric(ew_StrToFloat($this->total->CurrentValue)))
 			$this->total->CurrentValue = ew_StrToFloat($this->total->CurrentValue);
 
+		// Convert decimal values if posted back
+		if ($this->inv_jml->FormValue == $this->inv_jml->CurrentValue && is_numeric(ew_StrToFloat($this->inv_jml->CurrentValue)))
+			$this->inv_jml->CurrentValue = ew_StrToFloat($this->inv_jml->CurrentValue);
+
+		// Convert decimal values if posted back
+		if ($this->bayar_jml->FormValue == $this->bayar_jml->CurrentValue && is_numeric(ew_StrToFloat($this->bayar_jml->CurrentValue)))
+			$this->bayar_jml->CurrentValue = ew_StrToFloat($this->bayar_jml->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
@@ -600,6 +657,11 @@ class ct_06jual_add extends ct_06jual {
 		// tgl
 		// customer_id
 		// total
+		// inv_no
+		// inv_tgl
+		// inv_jml
+		// bayar_tgl
+		// bayar_jml
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -650,6 +712,32 @@ class ct_06jual_add extends ct_06jual {
 		$this->total->CellCssStyle .= "text-align: right;";
 		$this->total->ViewCustomAttributes = "";
 
+		// inv_no
+		$this->inv_no->ViewValue = $this->inv_no->CurrentValue;
+		$this->inv_no->ViewCustomAttributes = "";
+
+		// inv_tgl
+		$this->inv_tgl->ViewValue = $this->inv_tgl->CurrentValue;
+		$this->inv_tgl->ViewValue = ew_FormatDateTime($this->inv_tgl->ViewValue, 7);
+		$this->inv_tgl->ViewCustomAttributes = "";
+
+		// inv_jml
+		$this->inv_jml->ViewValue = $this->inv_jml->CurrentValue;
+		$this->inv_jml->ViewValue = ew_FormatNumber($this->inv_jml->ViewValue, 0, -2, -2, -2);
+		$this->inv_jml->CellCssStyle .= "text-align: right;";
+		$this->inv_jml->ViewCustomAttributes = "";
+
+		// bayar_tgl
+		$this->bayar_tgl->ViewValue = $this->bayar_tgl->CurrentValue;
+		$this->bayar_tgl->ViewValue = ew_FormatDateTime($this->bayar_tgl->ViewValue, 7);
+		$this->bayar_tgl->ViewCustomAttributes = "";
+
+		// bayar_jml
+		$this->bayar_jml->ViewValue = $this->bayar_jml->CurrentValue;
+		$this->bayar_jml->ViewValue = ew_FormatNumber($this->bayar_jml->ViewValue, 0, -2, -2, -2);
+		$this->bayar_jml->CellCssStyle .= "text-align: right;";
+		$this->bayar_jml->ViewCustomAttributes = "";
+
 			// no_po
 			$this->no_po->LinkCustomAttributes = "";
 			$this->no_po->HrefValue = "";
@@ -669,6 +757,31 @@ class ct_06jual_add extends ct_06jual {
 			$this->total->LinkCustomAttributes = "";
 			$this->total->HrefValue = "";
 			$this->total->TooltipValue = "";
+
+			// inv_no
+			$this->inv_no->LinkCustomAttributes = "";
+			$this->inv_no->HrefValue = "";
+			$this->inv_no->TooltipValue = "";
+
+			// inv_tgl
+			$this->inv_tgl->LinkCustomAttributes = "";
+			$this->inv_tgl->HrefValue = "";
+			$this->inv_tgl->TooltipValue = "";
+
+			// inv_jml
+			$this->inv_jml->LinkCustomAttributes = "";
+			$this->inv_jml->HrefValue = "";
+			$this->inv_jml->TooltipValue = "";
+
+			// bayar_tgl
+			$this->bayar_tgl->LinkCustomAttributes = "";
+			$this->bayar_tgl->HrefValue = "";
+			$this->bayar_tgl->TooltipValue = "";
+
+			// bayar_jml
+			$this->bayar_jml->LinkCustomAttributes = "";
+			$this->bayar_jml->HrefValue = "";
+			$this->bayar_jml->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
 			// no_po
@@ -716,6 +829,38 @@ class ct_06jual_add extends ct_06jual {
 			$this->total->PlaceHolder = ew_RemoveHtml($this->total->FldCaption());
 			if (strval($this->total->EditValue) <> "" && is_numeric($this->total->EditValue)) $this->total->EditValue = ew_FormatNumber($this->total->EditValue, -2, -2, -2, -2);
 
+			// inv_no
+			$this->inv_no->EditAttrs["class"] = "form-control";
+			$this->inv_no->EditCustomAttributes = "";
+			$this->inv_no->EditValue = ew_HtmlEncode($this->inv_no->CurrentValue);
+			$this->inv_no->PlaceHolder = ew_RemoveHtml($this->inv_no->FldCaption());
+
+			// inv_tgl
+			$this->inv_tgl->EditAttrs["class"] = "form-control";
+			$this->inv_tgl->EditCustomAttributes = "";
+			$this->inv_tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->inv_tgl->CurrentValue, 7));
+			$this->inv_tgl->PlaceHolder = ew_RemoveHtml($this->inv_tgl->FldCaption());
+
+			// inv_jml
+			$this->inv_jml->EditAttrs["class"] = "form-control";
+			$this->inv_jml->EditCustomAttributes = "";
+			$this->inv_jml->EditValue = ew_HtmlEncode($this->inv_jml->CurrentValue);
+			$this->inv_jml->PlaceHolder = ew_RemoveHtml($this->inv_jml->FldCaption());
+			if (strval($this->inv_jml->EditValue) <> "" && is_numeric($this->inv_jml->EditValue)) $this->inv_jml->EditValue = ew_FormatNumber($this->inv_jml->EditValue, -2, -2, -2, -2);
+
+			// bayar_tgl
+			$this->bayar_tgl->EditAttrs["class"] = "form-control";
+			$this->bayar_tgl->EditCustomAttributes = "";
+			$this->bayar_tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->bayar_tgl->CurrentValue, 7));
+			$this->bayar_tgl->PlaceHolder = ew_RemoveHtml($this->bayar_tgl->FldCaption());
+
+			// bayar_jml
+			$this->bayar_jml->EditAttrs["class"] = "form-control";
+			$this->bayar_jml->EditCustomAttributes = "";
+			$this->bayar_jml->EditValue = ew_HtmlEncode($this->bayar_jml->CurrentValue);
+			$this->bayar_jml->PlaceHolder = ew_RemoveHtml($this->bayar_jml->FldCaption());
+			if (strval($this->bayar_jml->EditValue) <> "" && is_numeric($this->bayar_jml->EditValue)) $this->bayar_jml->EditValue = ew_FormatNumber($this->bayar_jml->EditValue, -2, -2, -2, -2);
+
 			// Add refer script
 			// no_po
 
@@ -733,6 +878,26 @@ class ct_06jual_add extends ct_06jual {
 			// total
 			$this->total->LinkCustomAttributes = "";
 			$this->total->HrefValue = "";
+
+			// inv_no
+			$this->inv_no->LinkCustomAttributes = "";
+			$this->inv_no->HrefValue = "";
+
+			// inv_tgl
+			$this->inv_tgl->LinkCustomAttributes = "";
+			$this->inv_tgl->HrefValue = "";
+
+			// inv_jml
+			$this->inv_jml->LinkCustomAttributes = "";
+			$this->inv_jml->HrefValue = "";
+
+			// bayar_tgl
+			$this->bayar_tgl->LinkCustomAttributes = "";
+			$this->bayar_tgl->HrefValue = "";
+
+			// bayar_jml
+			$this->bayar_jml->LinkCustomAttributes = "";
+			$this->bayar_jml->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -760,6 +925,18 @@ class ct_06jual_add extends ct_06jual {
 		}
 		if (!ew_CheckNumber($this->total->FormValue)) {
 			ew_AddMessage($gsFormError, $this->total->FldErrMsg());
+		}
+		if (!ew_CheckEuroDate($this->inv_tgl->FormValue)) {
+			ew_AddMessage($gsFormError, $this->inv_tgl->FldErrMsg());
+		}
+		if (!ew_CheckNumber($this->inv_jml->FormValue)) {
+			ew_AddMessage($gsFormError, $this->inv_jml->FldErrMsg());
+		}
+		if (!ew_CheckEuroDate($this->bayar_tgl->FormValue)) {
+			ew_AddMessage($gsFormError, $this->bayar_tgl->FldErrMsg());
+		}
+		if (!ew_CheckNumber($this->bayar_jml->FormValue)) {
+			ew_AddMessage($gsFormError, $this->bayar_jml->FldErrMsg());
 		}
 
 		// Validate detail grid
@@ -818,6 +995,21 @@ class ct_06jual_add extends ct_06jual {
 
 		// total
 		$this->total->SetDbValueDef($rsnew, $this->total->CurrentValue, NULL, FALSE);
+
+		// inv_no
+		$this->inv_no->SetDbValueDef($rsnew, $this->inv_no->CurrentValue, NULL, FALSE);
+
+		// inv_tgl
+		$this->inv_tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->inv_tgl->CurrentValue, 7), NULL, FALSE);
+
+		// inv_jml
+		$this->inv_jml->SetDbValueDef($rsnew, $this->inv_jml->CurrentValue, NULL, FALSE);
+
+		// bayar_tgl
+		$this->bayar_tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->bayar_tgl->CurrentValue, 7), NULL, FALSE);
+
+		// bayar_jml
+		$this->bayar_jml->SetDbValueDef($rsnew, $this->bayar_jml->CurrentValue, NULL, FALSE);
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -1068,6 +1260,18 @@ ft_06jualadd.Validate = function() {
 			elm = this.GetElements("x" + infix + "_total");
 			if (elm && !ew_CheckNumber(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->total->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_inv_tgl");
+			if (elm && !ew_CheckEuroDate(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->inv_tgl->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_inv_jml");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->inv_jml->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_bayar_tgl");
+			if (elm && !ew_CheckEuroDate(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->bayar_tgl->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_bayar_jml");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_06jual->bayar_jml->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1189,6 +1393,66 @@ ft_06jualadd.CreateAutoSuggest({"id":"x_customer_id","forceSelect":true});
 <input type="text" data-table="t_06jual" data-field="x_total" name="x_total" id="x_total" placeholder="<?php echo ew_HtmlEncode($t_06jual->total->getPlaceHolder()) ?>" value="<?php echo $t_06jual->total->EditValue ?>"<?php echo $t_06jual->total->EditAttributes() ?>>
 </span>
 <?php echo $t_06jual->total->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_06jual->inv_no->Visible) { // inv_no ?>
+	<div id="r_inv_no" class="form-group">
+		<label id="elh_t_06jual_inv_no" for="x_inv_no" class="col-sm-2 control-label ewLabel"><?php echo $t_06jual->inv_no->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_06jual->inv_no->CellAttributes() ?>>
+<span id="el_t_06jual_inv_no">
+<input type="text" data-table="t_06jual" data-field="x_inv_no" name="x_inv_no" id="x_inv_no" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_no->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_no->EditValue ?>"<?php echo $t_06jual->inv_no->EditAttributes() ?>>
+</span>
+<?php echo $t_06jual->inv_no->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_06jual->inv_tgl->Visible) { // inv_tgl ?>
+	<div id="r_inv_tgl" class="form-group">
+		<label id="elh_t_06jual_inv_tgl" for="x_inv_tgl" class="col-sm-2 control-label ewLabel"><?php echo $t_06jual->inv_tgl->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_06jual->inv_tgl->CellAttributes() ?>>
+<span id="el_t_06jual_inv_tgl">
+<input type="text" data-table="t_06jual" data-field="x_inv_tgl" data-format="7" name="x_inv_tgl" id="x_inv_tgl" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_tgl->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_tgl->EditValue ?>"<?php echo $t_06jual->inv_tgl->EditAttributes() ?>>
+<?php if (!$t_06jual->inv_tgl->ReadOnly && !$t_06jual->inv_tgl->Disabled && !isset($t_06jual->inv_tgl->EditAttrs["readonly"]) && !isset($t_06jual->inv_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft_06jualadd", "x_inv_tgl", 7);
+</script>
+<?php } ?>
+</span>
+<?php echo $t_06jual->inv_tgl->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_06jual->inv_jml->Visible) { // inv_jml ?>
+	<div id="r_inv_jml" class="form-group">
+		<label id="elh_t_06jual_inv_jml" for="x_inv_jml" class="col-sm-2 control-label ewLabel"><?php echo $t_06jual->inv_jml->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_06jual->inv_jml->CellAttributes() ?>>
+<span id="el_t_06jual_inv_jml">
+<input type="text" data-table="t_06jual" data-field="x_inv_jml" name="x_inv_jml" id="x_inv_jml" size="30" placeholder="<?php echo ew_HtmlEncode($t_06jual->inv_jml->getPlaceHolder()) ?>" value="<?php echo $t_06jual->inv_jml->EditValue ?>"<?php echo $t_06jual->inv_jml->EditAttributes() ?>>
+</span>
+<?php echo $t_06jual->inv_jml->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_06jual->bayar_tgl->Visible) { // bayar_tgl ?>
+	<div id="r_bayar_tgl" class="form-group">
+		<label id="elh_t_06jual_bayar_tgl" for="x_bayar_tgl" class="col-sm-2 control-label ewLabel"><?php echo $t_06jual->bayar_tgl->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_06jual->bayar_tgl->CellAttributes() ?>>
+<span id="el_t_06jual_bayar_tgl">
+<input type="text" data-table="t_06jual" data-field="x_bayar_tgl" data-format="7" name="x_bayar_tgl" id="x_bayar_tgl" placeholder="<?php echo ew_HtmlEncode($t_06jual->bayar_tgl->getPlaceHolder()) ?>" value="<?php echo $t_06jual->bayar_tgl->EditValue ?>"<?php echo $t_06jual->bayar_tgl->EditAttributes() ?>>
+<?php if (!$t_06jual->bayar_tgl->ReadOnly && !$t_06jual->bayar_tgl->Disabled && !isset($t_06jual->bayar_tgl->EditAttrs["readonly"]) && !isset($t_06jual->bayar_tgl->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft_06jualadd", "x_bayar_tgl", 7);
+</script>
+<?php } ?>
+</span>
+<?php echo $t_06jual->bayar_tgl->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_06jual->bayar_jml->Visible) { // bayar_jml ?>
+	<div id="r_bayar_jml" class="form-group">
+		<label id="elh_t_06jual_bayar_jml" for="x_bayar_jml" class="col-sm-2 control-label ewLabel"><?php echo $t_06jual->bayar_jml->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_06jual->bayar_jml->CellAttributes() ?>>
+<span id="el_t_06jual_bayar_jml">
+<input type="text" data-table="t_06jual" data-field="x_bayar_jml" name="x_bayar_jml" id="x_bayar_jml" size="30" placeholder="<?php echo ew_HtmlEncode($t_06jual->bayar_jml->getPlaceHolder()) ?>" value="<?php echo $t_06jual->bayar_jml->EditValue ?>"<?php echo $t_06jual->bayar_jml->EditAttributes() ?>>
+</span>
+<?php echo $t_06jual->bayar_jml->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div>
