@@ -136,3 +136,19 @@ From t_04beli a
 Where ((Case When isnull(a.jml_dp) Then 0 Else a.jml_dp End) + (Case
     When isnull(a.jml_lunas) Then 0 Else a.jml_lunas End)) < a.sub_total
 Group By a.vendor_id;
+
+create view v_11piutang as
+Select a.no_po As no_po,
+  a.tgl As tgl,
+  b.customer_nama As customer_nama,
+  a.total As tot_piutang,
+  a.inv_no As inv_no,
+  a.inv_tgl As inv_tgl,
+  a.inv_jml As inv_jml,
+  a.bayar_tgl As bayar_tgl,
+  a.bayar_jml As tot_bayar,
+  (a.total - (Case When isnull(a.bayar_jml) Then 0 Else a.bayar_jml
+  End)) As sisa
+From t_06jual a
+  Left Join t_05customer b On a.customer_id = b.customer_id
+Where (Case When isnull(a.bayar_jml) Then 0 Else a.bayar_jml End) < a.total;
