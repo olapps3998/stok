@@ -928,6 +928,9 @@
       <field id="tot_lunas">
         <phrase id="fldcaption" value="tot lunas" />
       </field>
+      <field id="sisa">
+        <phrase id="fldcaption" value="sisa" />
+      </field>
     </table>
     <table id="r_hutang">
       <phrase id="tblcaption" value="Hutang" />
@@ -935,13 +938,16 @@
         <phrase id="fldcaption" value="Sub Vendor" />
       </field>
       <field id="tot_hutang">
-        <phrase id="fldcaption" value="Jumlah Hutang" />
+        <phrase id="fldcaption" value="Jumlah Pembelian" />
       </field>
       <field id="tot_dp">
         <phrase id="fldcaption" value="Jumlah DP" />
       </field>
       <field id="tot_lunas">
         <phrase id="fldcaption" value="Jumlah Pelunasan" />
+      </field>
+      <field id="sisa">
+        <phrase id="fldcaption" value="Jumlah Sisa Hutang" />
       </field>
     </table>
   </project>

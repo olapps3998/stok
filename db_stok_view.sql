@@ -129,7 +129,8 @@ create view v_10hutang as
 Select b.vendor_nama As vendor_nama,
   Sum(a.sub_total) As tot_hutang,
   Sum(a.jml_dp) As tot_dp,
-  Sum(a.jml_lunas) As tot_lunas
+  Sum(a.jml_lunas) As tot_lunas,
+  (Sum(a.sub_total) - (Sum(a.jml_dp) + Sum(a.jml_lunas))) As sisa
 From t_04beli a
   Left Join t_01vendor b On a.vendor_id = b.vendor_id
 Where ((Case When isnull(a.jml_dp) Then 0 Else a.jml_dp End) + (Case

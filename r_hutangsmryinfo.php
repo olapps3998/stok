@@ -13,6 +13,7 @@ class crr_hutang extends crTableBase {
 	var $tot_hutang;
 	var $tot_dp;
 	var $tot_lunas;
+	var $sisa;
 
 	//
 	// Table class constructor
@@ -60,6 +61,15 @@ class crr_hutang extends crTableBase {
 		$this->tot_lunas->DateFilter = "";
 		$this->tot_lunas->SqlSelect = "";
 		$this->tot_lunas->SqlOrderBy = "";
+
+		// sisa
+		$this->sisa = new crField('r_hutang', 'r_hutang', 'x_sisa', 'sisa', '`sisa`', 5, EWR_DATATYPE_NUMBER, -1);
+		$this->sisa->Sortable = TRUE; // Allow sort
+		$this->sisa->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->fields['sisa'] = &$this->sisa;
+		$this->sisa->DateFilter = "";
+		$this->sisa->SqlSelect = "";
+		$this->sisa->SqlOrderBy = "";
 	}
 
 	// Set Field Visibility
@@ -269,7 +279,7 @@ class crr_hutang extends crTableBase {
 	var $_SqlSelectAgg = "";
 
 	function getSqlSelectAgg() {
-		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`tot_hutang`) AS `sum_tot_hutang`, SUM(`tot_dp`) AS `sum_tot_dp`, SUM(`tot_lunas`) AS `sum_tot_lunas` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`tot_hutang`) AS `sum_tot_hutang`, SUM(`tot_dp`) AS `sum_tot_dp`, SUM(`tot_lunas`) AS `sum_tot_lunas`, SUM(`sisa`) AS `sum_sisa` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelectAgg() { // For backward compatibility

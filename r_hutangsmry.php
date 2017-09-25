@@ -514,12 +514,13 @@ class crr_hutang_summary extends crr_hutang {
 		$this->tot_hutang->SetVisibility();
 		$this->tot_dp->SetVisibility();
 		$this->tot_lunas->SetVisibility();
+		$this->sisa->SetVisibility();
 
 		// Aggregate variables
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 5;
+		$nDtls = 6;
 		$nGrps = 1;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -532,7 +533,7 @@ class crr_hutang_summary extends crr_hutang {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -745,6 +746,7 @@ class crr_hutang_summary extends crr_hutang {
 				$this->FirstRowData['tot_hutang'] = ewr_Conv($rs->fields('tot_hutang'), 5);
 				$this->FirstRowData['tot_dp'] = ewr_Conv($rs->fields('tot_dp'), 5);
 				$this->FirstRowData['tot_lunas'] = ewr_Conv($rs->fields('tot_lunas'), 5);
+				$this->FirstRowData['sisa'] = ewr_Conv($rs->fields('sisa'), 5);
 		} else { // Get next row
 			$rs->MoveNext();
 		}
@@ -753,15 +755,18 @@ class crr_hutang_summary extends crr_hutang {
 			$this->tot_hutang->setDbValue($rs->fields('tot_hutang'));
 			$this->tot_dp->setDbValue($rs->fields('tot_dp'));
 			$this->tot_lunas->setDbValue($rs->fields('tot_lunas'));
+			$this->sisa->setDbValue($rs->fields('sisa'));
 			$this->Val[1] = $this->vendor_nama->CurrentValue;
 			$this->Val[2] = $this->tot_hutang->CurrentValue;
 			$this->Val[3] = $this->tot_dp->CurrentValue;
 			$this->Val[4] = $this->tot_lunas->CurrentValue;
+			$this->Val[5] = $this->sisa->CurrentValue;
 		} else {
 			$this->vendor_nama->setDbValue("");
 			$this->tot_hutang->setDbValue("");
 			$this->tot_dp->setDbValue("");
 			$this->tot_lunas->setDbValue("");
+			$this->sisa->setDbValue("");
 		}
 	}
 
@@ -941,6 +946,8 @@ class crr_hutang_summary extends crr_hutang {
 				$this->GrandSmry[3] = $rsagg->fields("sum_tot_dp");
 				$this->GrandCnt[4] = $this->TotCount;
 				$this->GrandSmry[4] = $rsagg->fields("sum_tot_lunas");
+				$this->GrandCnt[5] = $this->TotCount;
+				$this->GrandSmry[5] = $rsagg->fields("sum_sisa");
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -989,6 +996,12 @@ class crr_hutang_summary extends crr_hutang {
 			$this->tot_lunas->CellAttrs["style"] = "text-align:right;";
 			$this->tot_lunas->CellAttrs["class"] = ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel;
 
+			// sisa
+			$this->sisa->SumViewValue = $this->sisa->SumValue;
+			$this->sisa->SumViewValue = ewr_FormatNumber($this->sisa->SumViewValue, 0, -2, -2, -2);
+			$this->sisa->CellAttrs["style"] = "text-align:right;";
+			$this->sisa->CellAttrs["class"] = ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel;
+
 			// vendor_nama
 			$this->vendor_nama->HrefValue = "";
 
@@ -1000,6 +1013,9 @@ class crr_hutang_summary extends crr_hutang {
 
 			// tot_lunas
 			$this->tot_lunas->HrefValue = "";
+
+			// sisa
+			$this->sisa->HrefValue = "";
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
 			} else {
@@ -1027,6 +1043,12 @@ class crr_hutang_summary extends crr_hutang {
 			$this->tot_lunas->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 			$this->tot_lunas->CellAttrs["style"] = "text-align:right;";
 
+			// sisa
+			$this->sisa->ViewValue = $this->sisa->CurrentValue;
+			$this->sisa->ViewValue = ewr_FormatNumber($this->sisa->ViewValue, 0, -2, -2, -2);
+			$this->sisa->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+			$this->sisa->CellAttrs["style"] = "text-align:right;";
+
 			// vendor_nama
 			$this->vendor_nama->HrefValue = "";
 
@@ -1038,6 +1060,9 @@ class crr_hutang_summary extends crr_hutang {
 
 			// tot_lunas
 			$this->tot_lunas->HrefValue = "";
+
+			// sisa
+			$this->sisa->HrefValue = "";
 		}
 
 		// Call Cell_Rendered event
@@ -1069,6 +1094,15 @@ class crr_hutang_summary extends crr_hutang {
 			$HrefValue = &$this->tot_lunas->HrefValue;
 			$LinkAttrs = &$this->tot_lunas->LinkAttrs;
 			$this->Cell_Rendered($this->tot_lunas, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// sisa
+			$CurrentValue = $this->sisa->SumValue;
+			$ViewValue = &$this->sisa->SumViewValue;
+			$ViewAttrs = &$this->sisa->ViewAttrs;
+			$CellAttrs = &$this->sisa->CellAttrs;
+			$HrefValue = &$this->sisa->HrefValue;
+			$LinkAttrs = &$this->sisa->LinkAttrs;
+			$this->Cell_Rendered($this->sisa, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		} else {
 
 			// vendor_nama
@@ -1106,6 +1140,15 @@ class crr_hutang_summary extends crr_hutang {
 			$HrefValue = &$this->tot_lunas->HrefValue;
 			$LinkAttrs = &$this->tot_lunas->LinkAttrs;
 			$this->Cell_Rendered($this->tot_lunas, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// sisa
+			$CurrentValue = $this->sisa->CurrentValue;
+			$ViewValue = &$this->sisa->ViewValue;
+			$ViewAttrs = &$this->sisa->ViewAttrs;
+			$CellAttrs = &$this->sisa->CellAttrs;
+			$HrefValue = &$this->sisa->HrefValue;
+			$LinkAttrs = &$this->sisa->LinkAttrs;
+			$this->Cell_Rendered($this->sisa, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		}
 
 		// Call Row_Rendered event
@@ -1122,6 +1165,7 @@ class crr_hutang_summary extends crr_hutang {
 		if ($this->tot_hutang->Visible) $this->DtlColumnCount += 1;
 		if ($this->tot_dp->Visible) $this->DtlColumnCount += 1;
 		if ($this->tot_lunas->Visible) $this->DtlColumnCount += 1;
+		if ($this->sisa->Visible) $this->DtlColumnCount += 1;
 	}
 
 	// Set up Breadcrumb
@@ -1648,6 +1692,7 @@ class crr_hutang_summary extends crr_hutang {
 			$this->tot_hutang->setSort("");
 			$this->tot_dp->setSort("");
 			$this->tot_lunas->setSort("");
+			$this->sisa->setSort("");
 
 		// Check for an Order parameter
 		} elseif ($orderBy <> "") {
@@ -1657,6 +1702,7 @@ class crr_hutang_summary extends crr_hutang {
 			$this->UpdateSort($this->tot_hutang, $bCtrl); // tot_hutang
 			$this->UpdateSort($this->tot_dp, $bCtrl); // tot_dp
 			$this->UpdateSort($this->tot_lunas, $bCtrl); // tot_lunas
+			$this->UpdateSort($this->sisa, $bCtrl); // sisa
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
 			$this->setStartGroup(1);
@@ -2245,6 +2291,24 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 	</td>
 <?php } ?>
 <?php } ?>
+<?php if ($Page->sisa->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="sisa"><div class="r_hutang_sisa" style="text-align: right;"><span class="ewTableHeaderCaption"><?php echo $Page->sisa->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="sisa">
+<?php if ($Page->SortUrl($Page->sisa) == "") { ?>
+		<div class="ewTableHeaderBtn r_hutang_sisa" style="text-align: right;">
+			<span class="ewTableHeaderCaption"><?php echo $Page->sisa->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r_hutang_sisa" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->sisa) ?>',2);" style="text-align: right;">
+			<span class="ewTableHeaderCaption"><?php echo $Page->sisa->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->sisa->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->sisa->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 	</tr>
 </thead>
 <tbody>
@@ -2279,6 +2343,10 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 		<td data-field="tot_lunas"<?php echo $Page->tot_lunas->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_hutang_tot_lunas"<?php echo $Page->tot_lunas->ViewAttributes() ?>><?php echo $Page->tot_lunas->ListViewValue() ?></span></td>
 <?php } ?>
+<?php if ($Page->sisa->Visible) { ?>
+		<td data-field="sisa"<?php echo $Page->sisa->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_hutang_sisa"<?php echo $Page->sisa->ViewAttributes() ?>><?php echo $Page->sisa->ListViewValue() ?></span></td>
+<?php } ?>
 	</tr>
 <?php
 
@@ -2300,6 +2368,8 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 	$Page->tot_dp->SumValue = $Page->GrandSmry[3]; // Load SUM
 	$Page->tot_lunas->Count = $Page->GrandCnt[4];
 	$Page->tot_lunas->SumValue = $Page->GrandSmry[4]; // Load SUM
+	$Page->sisa->Count = $Page->GrandCnt[5];
+	$Page->sisa->SumValue = $Page->GrandSmry[5]; // Load SUM
 	$Page->ResetAttrs();
 	$Page->RowType = EWR_ROWTYPE_TOTAL;
 	$Page->RowTotalType = EWR_ROWTOTAL_GRAND;
@@ -2323,6 +2393,10 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 <?php if ($Page->tot_lunas->Visible) { ?>
 		<td data-field="tot_lunas"<?php echo $Page->tot_lunas->CellAttributes() ?>><span class="ewAggregate"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateColon") ?>
 <span data-class="tpts_r_hutang_tot_lunas"<?php echo $Page->tot_lunas->ViewAttributes() ?>><?php echo $Page->tot_lunas->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->sisa->Visible) { ?>
+		<td data-field="sisa"<?php echo $Page->sisa->CellAttributes() ?>><span class="ewAggregate"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateColon") ?>
+<span data-class="tpts_r_hutang_sisa"<?php echo $Page->sisa->ViewAttributes() ?>><?php echo $Page->sisa->SumViewValue ?></span></td>
 <?php } ?>
 	</tr>
 	</tfoot>
