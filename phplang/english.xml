@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/9/23" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/9/25" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -589,17 +589,17 @@
     <menu id="10036">
       <phrase id="menutext" value="v 07mutasi" />
     </menu>
-    <menu id="10029">
-      <phrase id="menutext" value="v 01beli laporan" />
+    <menu id="10037">
+      <phrase id="menutext" value="v 08harga jual terakhir" />
+    </menu>
+    <menu id="10038">
+      <phrase id="menutext" value="v 09margin" />
     </menu>
     <menu id="10030">
       <phrase id="menutext" value="Detail Penjualan" />
     </menu>
     <menu id="10034">
       <phrase id="menutext" value="v 04keluar" />
-    </menu>
-    <menu id="10028">
-      <phrase id="menutext" value="v 05stok" />
     </menu>
     <menu id="6">
       <phrase id="menutext" value="Home" />
@@ -646,17 +646,14 @@
     <menu id="10017">
       <phrase id="menutext" value="Mutasi" />
     </menu>
+    <menu id="10027">
+      <phrase id="menutext" value="Margin" />
+    </menu>
     <menu id="10021">
       <phrase id="menutext" value="v 03masuk" />
     </menu>
     <menu id="10024">
       <phrase id="menutext" value="v 04stok" />
-    </menu>
-    <menu id="10026">
-      <phrase id="menutext" value="v 03masuk" />
-    </menu>
-    <menu id="10025">
-      <phrase id="menutext" value="Mutasi" />
     </menu>
     <menu id="10014">
       <phrase id="menutext" value="Transaksi" />
@@ -666,6 +663,18 @@
     </menu>
     <menu id="10032">
       <phrase id="menutext" value="v 04keluar" />
+    </menu>
+    <menu id="10028">
+      <phrase id="menutext" value="v 05stok" />
+    </menu>
+    <menu id="10029">
+      <phrase id="menutext" value="v 01beli laporan" />
+    </menu>
+    <menu id="10025">
+      <phrase id="menutext" value="v 08harga jual terakhir" />
+    </menu>
+    <menu id="10026">
+      <phrase id="menutext" value="v 09margin" />
     </menu>
     <menu id="10022">
       <phrase id="menutext" value="v 06transaksi" />
@@ -1025,6 +1034,42 @@
       </field>
       <field id="saldo">
         <phrase id="fldcaption" value="saldo" />
+      </field>
+    </table>
+    <table id="v_08harga_jual_terakhir">
+      <phrase id="tblcaption" value="v 08harga jual terakhir" />
+      <field id="tgl_kirim_terakhir">
+        <phrase id="fldcaption" value="tgl kirim terakhir" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="harga" />
+      </field>
+    </table>
+    <table id="v_09margin">
+      <phrase id="tblcaption" value="v 09margin" />
+      <field id="vendor_nama">
+        <phrase id="fldcaption" value="vendor nama" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="satuan_nama">
+        <phrase id="fldcaption" value="satuan nama" />
+      </field>
+      <field id="harga_beli">
+        <phrase id="fldcaption" value="harga beli" />
+      </field>
+      <field id="harga_jual">
+        <phrase id="fldcaption" value="harga jual" />
+      </field>
+      <field id="margin_rp">
+        <phrase id="fldcaption" value="margin rp" />
+      </field>
+      <field id="margin_prosen">
+        <phrase id="fldcaption" value="margin prosen" />
       </field>
     </table>
   </project>

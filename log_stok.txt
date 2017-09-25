@@ -1,0 +1,30 @@
+lembayung :
+- sampai dengan hitung otomatis sub total dan pelunasan : X
+- coba contoh di demo phpmaker 2018 : X
+
+5:29 PM 9/17/2017
+- harga harus bisa desimal
+- sub total & DP & pelunasan :: pembulatan
+
+12:09 AM 9/18/2017
+- uploaded to stok.aimpglobal.com
+
+5:07 PM 9/18/2017
+- koma di field penjualan :: qty - harga - sub total :: kadang tidak sesuai pemisah ribuan
+- lebar kolom kurang lebar untuk input nilai numerik
+
+9:59 AM 9/20/2017
+- policy :: apakah bisa menjual item tanpa ada input pembelian item ?
+  -- logika nya mungkin tidak boleh
+  -- tapi untuk mempermudah proses penjualan :: diijinkan dulu, lalu menginput data pembelian belakangan
+  -- mungkin karena tidak sempat input data pembelian walau barang sudah dibelikan
+  -- berarti :: di proses input data penjualan :: diperbolehkan untuk menambah master-data item
+
+buat view stok
+buat view mutasi
+hapus view transaksi
+
+9:33 PM 9/22/2017
+sudah selesai sampai dengan laporan stok dan laporan mutasi
+
+

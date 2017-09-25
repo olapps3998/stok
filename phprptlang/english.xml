@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/9/23" version="10.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/9/25" version="10.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -350,6 +350,15 @@
   <project>
     <phrase id="bodytitle" value="STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="25">
+      <phrase id="menutext" value="v 08harga jual terakhir" />
+    </menu>
+    <menu id="26">
+      <phrase id="menutext" value="v 09margin" />
+    </menu>
+    <menu id="27">
+      <phrase id="menutext" value="Margin" />
+    </menu>
     <menu id="22">
       <phrase id="menutext" value="v 06transaksi" />
     </menu>
@@ -837,6 +846,66 @@
       </field>
       <field id="saldo">
         <phrase id="fldcaption" value="Saldo" />
+      </field>
+    </table>
+    <table id="v_08harga_jual_terakhir">
+      <phrase id="tblcaption" value="v 08harga jual terakhir" />
+      <field id="tgl_kirim_terakhir">
+        <phrase id="fldcaption" value="tgl kirim terakhir" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="harga" />
+      </field>
+    </table>
+    <table id="v_09margin">
+      <phrase id="tblcaption" value="v 09margin" />
+      <field id="vendor_nama">
+        <phrase id="fldcaption" value="vendor nama" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="satuan_nama">
+        <phrase id="fldcaption" value="satuan nama" />
+      </field>
+      <field id="harga_beli">
+        <phrase id="fldcaption" value="harga beli" />
+      </field>
+      <field id="harga_jual">
+        <phrase id="fldcaption" value="harga jual" />
+      </field>
+      <field id="margin_rp">
+        <phrase id="fldcaption" value="margin rp" />
+      </field>
+      <field id="margin_prosen">
+        <phrase id="fldcaption" value="margin prosen" />
+      </field>
+    </table>
+    <table id="r_margin">
+      <phrase id="tblcaption" value="Margin" />
+      <field id="vendor_nama">
+        <phrase id="fldcaption" value="Sub Vendor" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="Item" />
+      </field>
+      <field id="satuan_nama">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="harga_beli">
+        <phrase id="fldcaption" value="Harga Satuan" />
+      </field>
+      <field id="harga_jual">
+        <phrase id="fldcaption" value="Harga Jual" />
+      </field>
+      <field id="margin_rp">
+        <phrase id="fldcaption" value="Rp." />
+      </field>
+      <field id="margin_prosen">
+        <phrase id="fldcaption" value="%" />
       </field>
     </table>
   </project>

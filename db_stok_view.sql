@@ -100,17 +100,27 @@ Select v_06transaksi.item_id As item_id,
   v_06transaksi.qty As saldo
 From v_06transaksi;
 
-select
-	b.vendor_nama
-    , c.item_nama
-    , d.satuan_nama
-    , a.harga
-	, a.*
-from
-	t_04beli a
-	left join t_01vendor b on a.vendor_id = b.vendor_id
-    left join t_02item c on a.item_id = c.item_id
-    left join t_03satuan d on a.satuan_id = d.satuan_id
-order by
-	a.item_id
-    , a.tgl_beli
+create view v_08harga_jual_terakhir as
+Select Max(t_07jual_detail.tgl_kirim) As tgl_kirim_terakhir,
+  t_07jual_detail.item_id As item_id,
+  t_07jual_detail.harga As harga
+From t_07jual_detail
+Group By t_07jual_detail.item_id;
+
+create view v_09margin as
+Select b.vendor_nama As vendor_nama,
+  c.item_nama As item_nama,
+  d.satuan_nama As satuan_nama,
+  a.harga As harga_beli,
+  e.harga As harga_jual,
+  (e.harga - a.harga) As margin_rp,
+  (((e.harga - a.harga) / a.harga) * 100) As margin_prosen
+From (((t_04beli a
+  Left Join t_01vendor b On a.vendor_id = b.vendor_id)
+  Left Join t_02item c On a.item_id = c.item_id)
+  Left Join t_03satuan d On a.satuan_id = d.satuan_id)
+  Left Join v_08harga_jual_terakhir e On a.item_id = e.item_id
+Group By a.harga,
+  a.item_id
+Order By a.item_id,
+  a.tgl_beli;
