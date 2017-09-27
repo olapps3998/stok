@@ -2087,14 +2087,8 @@ class ct_08item_saldo_list extends ct_08item_saldo {
 		if (!ew_CheckEuroDate($this->tgl->FormValue)) {
 			ew_AddMessage($gsFormError, $this->tgl->FldErrMsg());
 		}
-		if (!$this->qty->FldIsDetailKey && !is_null($this->qty->FormValue) && $this->qty->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->qty->FldCaption(), $this->qty->ReqErrMsg));
-		}
 		if (!ew_CheckNumber($this->qty->FormValue)) {
 			ew_AddMessage($gsFormError, $this->qty->FldErrMsg());
-		}
-		if (!$this->harga->FldIsDetailKey && !is_null($this->harga->FormValue) && $this->harga->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->harga->FldCaption(), $this->harga->ReqErrMsg));
 		}
 		if (!ew_CheckNumber($this->harga->FormValue)) {
 			ew_AddMessage($gsFormError, $this->harga->FldErrMsg());
@@ -2275,10 +2269,10 @@ class ct_08item_saldo_list extends ct_08item_saldo {
 		$this->tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl->CurrentValue, 7), ew_CurrentDate(), FALSE);
 
 		// qty
-		$this->qty->SetDbValueDef($rsnew, $this->qty->CurrentValue, 0, FALSE);
+		$this->qty->SetDbValueDef($rsnew, $this->qty->CurrentValue, 0, strval($this->qty->CurrentValue) == "");
 
 		// harga
-		$this->harga->SetDbValueDef($rsnew, $this->harga->CurrentValue, 0, FALSE);
+		$this->harga->SetDbValueDef($rsnew, $this->harga->CurrentValue, 0, strval($this->harga->CurrentValue) == "");
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -2806,14 +2800,8 @@ ft_08item_saldolist.Validate = function() {
 			if (elm && !ew_CheckEuroDate(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_08item_saldo->tgl->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_qty");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_08item_saldo->qty->FldCaption(), $t_08item_saldo->qty->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_qty");
 			if (elm && !ew_CheckNumber(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_08item_saldo->qty->FldErrMsg()) ?>");
-			elm = this.GetElements("x" + infix + "_harga");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_08item_saldo->harga->FldCaption(), $t_08item_saldo->harga->ReqErrMsg)) ?>");
 			elm = this.GetElements("x" + infix + "_harga");
 			if (elm && !ew_CheckNumber(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_08item_saldo->harga->FldErrMsg()) ?>");

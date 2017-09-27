@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t_08item_saldoinfo.php" ?>
+<?php include_once "t_99beliinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -13,9 +13,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t_08item_saldo_edit = NULL; // Initialize page object first
+$t_99beli_edit = NULL; // Initialize page object first
 
-class ct_08item_saldo_edit extends ct_08item_saldo {
+class ct_99beli_edit extends ct_99beli {
 
 	// Page ID
 	var $PageID = 'edit';
@@ -24,10 +24,10 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 	var $ProjectID = "{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}";
 
 	// Table name
-	var $TableName = 't_08item_saldo';
+	var $TableName = 't_99beli';
 
 	// Page object name
-	var $PageObjName = 't_08item_saldo_edit';
+	var $PageObjName = 't_99beli_edit';
 
 	// Page name
 	function PageName() {
@@ -224,10 +224,10 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t_08item_saldo)
-		if (!isset($GLOBALS["t_08item_saldo"]) || get_class($GLOBALS["t_08item_saldo"]) == "ct_08item_saldo") {
-			$GLOBALS["t_08item_saldo"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t_08item_saldo"];
+		// Table object (t_99beli)
+		if (!isset($GLOBALS["t_99beli"]) || get_class($GLOBALS["t_99beli"]) == "ct_99beli") {
+			$GLOBALS["t_99beli"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t_99beli"];
 		}
 
 		// Page ID
@@ -236,7 +236,7 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't_08item_saldo', TRUE);
+			define("EW_TABLE_NAME", 't_99beli', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -254,10 +254,14 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
+		$this->temp_beli_id->SetVisibility();
+		$this->temp_beli_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->beli_id->SetVisibility();
 		$this->item_id->SetVisibility();
-		$this->tgl->SetVisibility();
+		$this->tgl_beli->SetVisibility();
 		$this->qty->SetVisibility();
 		$this->harga->SetVisibility();
+		$this->sub_total->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -303,13 +307,13 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t_08item_saldo;
+		global $EW_EXPORT, $t_99beli;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t_08item_saldo);
+				$doc = new $class($t_99beli);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -372,9 +376,9 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		$bMatchRecord = FALSE;
 
 		// Load key from QueryString
-		if (@$_GET["sld_id"] <> "") {
-			$this->sld_id->setQueryStringValue($_GET["sld_id"]);
-			$this->RecKey["sld_id"] = $this->sld_id->QueryStringValue;
+		if (@$_GET["temp_beli_id"] <> "") {
+			$this->temp_beli_id->setQueryStringValue($_GET["temp_beli_id"]);
+			$this->RecKey["temp_beli_id"] = $this->temp_beli_id->QueryStringValue;
 		} else {
 			$bLoadCurrentRecord = TRUE;
 		}
@@ -386,7 +390,7 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		if ($this->TotalRecs <= 0) { // No record found
 			if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 				$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-			$this->Page_Terminate("t_08item_saldolist.php"); // Return to list page
+			$this->Page_Terminate("t_99belilist.php"); // Return to list page
 		} elseif ($bLoadCurrentRecord) { // Load current record position
 			$this->SetUpStartRec(); // Set up start record position
 
@@ -397,7 +401,7 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 			}
 		} else { // Match key values
 			while (!$this->Recordset->EOF) {
-				if (strval($this->sld_id->CurrentValue) == strval($this->Recordset->fields('sld_id'))) {
+				if (strval($this->temp_beli_id->CurrentValue) == strval($this->Recordset->fields('temp_beli_id'))) {
 					$this->setStartRecordNumber($this->StartRec); // Save record position
 					$bMatchRecord = TRUE;
 					break;
@@ -430,14 +434,14 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 				if (!$bMatchRecord) {
 					if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 						$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-					$this->Page_Terminate("t_08item_saldolist.php"); // Return to list page
+					$this->Page_Terminate("t_99belilist.php"); // Return to list page
 				} else {
 					$this->LoadRowValues($this->Recordset); // Load row values
 				}
 				break;
 			Case "U": // Update
 				$sReturnUrl = $this->getReturnUrl();
-				if (ew_GetPageName($sReturnUrl) == "t_08item_saldolist.php")
+				if (ew_GetPageName($sReturnUrl) == "t_99belilist.php")
 					$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
 				$this->SendEmail = TRUE; // Send email on update success
 				if ($this->EditRow()) { // Update record based on key
@@ -509,12 +513,17 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 
 		// Load from form
 		global $objForm;
+		if (!$this->temp_beli_id->FldIsDetailKey)
+			$this->temp_beli_id->setFormValue($objForm->GetValue("x_temp_beli_id"));
+		if (!$this->beli_id->FldIsDetailKey) {
+			$this->beli_id->setFormValue($objForm->GetValue("x_beli_id"));
+		}
 		if (!$this->item_id->FldIsDetailKey) {
 			$this->item_id->setFormValue($objForm->GetValue("x_item_id"));
 		}
-		if (!$this->tgl->FldIsDetailKey) {
-			$this->tgl->setFormValue($objForm->GetValue("x_tgl"));
-			$this->tgl->CurrentValue = ew_UnFormatDateTime($this->tgl->CurrentValue, 7);
+		if (!$this->tgl_beli->FldIsDetailKey) {
+			$this->tgl_beli->setFormValue($objForm->GetValue("x_tgl_beli"));
+			$this->tgl_beli->CurrentValue = ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 0);
 		}
 		if (!$this->qty->FldIsDetailKey) {
 			$this->qty->setFormValue($objForm->GetValue("x_qty"));
@@ -522,20 +531,23 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		if (!$this->harga->FldIsDetailKey) {
 			$this->harga->setFormValue($objForm->GetValue("x_harga"));
 		}
-		if (!$this->sld_id->FldIsDetailKey)
-			$this->sld_id->setFormValue($objForm->GetValue("x_sld_id"));
+		if (!$this->sub_total->FldIsDetailKey) {
+			$this->sub_total->setFormValue($objForm->GetValue("x_sub_total"));
+		}
 	}
 
 	// Restore form values
 	function RestoreFormValues() {
 		global $objForm;
 		$this->LoadRow();
-		$this->sld_id->CurrentValue = $this->sld_id->FormValue;
+		$this->temp_beli_id->CurrentValue = $this->temp_beli_id->FormValue;
+		$this->beli_id->CurrentValue = $this->beli_id->FormValue;
 		$this->item_id->CurrentValue = $this->item_id->FormValue;
-		$this->tgl->CurrentValue = $this->tgl->FormValue;
-		$this->tgl->CurrentValue = ew_UnFormatDateTime($this->tgl->CurrentValue, 7);
+		$this->tgl_beli->CurrentValue = $this->tgl_beli->FormValue;
+		$this->tgl_beli->CurrentValue = ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 0);
 		$this->qty->CurrentValue = $this->qty->FormValue;
 		$this->harga->CurrentValue = $this->harga->FormValue;
+		$this->sub_total->CurrentValue = $this->sub_total->FormValue;
 	}
 
 	// Load recordset
@@ -550,7 +562,7 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -593,27 +605,26 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->sld_id->setDbValue($rs->fields('sld_id'));
+		$this->temp_beli_id->setDbValue($rs->fields('temp_beli_id'));
+		$this->beli_id->setDbValue($rs->fields('beli_id'));
 		$this->item_id->setDbValue($rs->fields('item_id'));
-		if (array_key_exists('EV__item_id', $rs->fields)) {
-			$this->item_id->VirtualValue = $rs->fields('EV__item_id'); // Set up virtual field value
-		} else {
-			$this->item_id->VirtualValue = ""; // Clear value
-		}
-		$this->tgl->setDbValue($rs->fields('tgl'));
+		$this->tgl_beli->setDbValue($rs->fields('tgl_beli'));
 		$this->qty->setDbValue($rs->fields('qty'));
 		$this->harga->setDbValue($rs->fields('harga'));
+		$this->sub_total->setDbValue($rs->fields('sub_total'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->sld_id->DbValue = $row['sld_id'];
+		$this->temp_beli_id->DbValue = $row['temp_beli_id'];
+		$this->beli_id->DbValue = $row['beli_id'];
 		$this->item_id->DbValue = $row['item_id'];
-		$this->tgl->DbValue = $row['tgl'];
+		$this->tgl_beli->DbValue = $row['tgl_beli'];
 		$this->qty->DbValue = $row['qty'];
 		$this->harga->DbValue = $row['harga'];
+		$this->sub_total->DbValue = $row['sub_total'];
 	}
 
 	// Render row values based on field settings
@@ -630,76 +641,72 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		if ($this->harga->FormValue == $this->harga->CurrentValue && is_numeric(ew_StrToFloat($this->harga->CurrentValue)))
 			$this->harga->CurrentValue = ew_StrToFloat($this->harga->CurrentValue);
 
+		// Convert decimal values if posted back
+		if ($this->sub_total->FormValue == $this->sub_total->CurrentValue && is_numeric(ew_StrToFloat($this->sub_total->CurrentValue)))
+			$this->sub_total->CurrentValue = ew_StrToFloat($this->sub_total->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// sld_id
+		// temp_beli_id
+		// beli_id
 		// item_id
-		// tgl
+		// tgl_beli
 		// qty
 		// harga
+		// sub_total
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// sld_id
-		$this->sld_id->ViewValue = $this->sld_id->CurrentValue;
-		$this->sld_id->ViewCustomAttributes = "";
+		// temp_beli_id
+		$this->temp_beli_id->ViewValue = $this->temp_beli_id->CurrentValue;
+		$this->temp_beli_id->ViewCustomAttributes = "";
+
+		// beli_id
+		$this->beli_id->ViewValue = $this->beli_id->CurrentValue;
+		$this->beli_id->ViewCustomAttributes = "";
 
 		// item_id
-		if ($this->item_id->VirtualValue <> "") {
-			$this->item_id->ViewValue = $this->item_id->VirtualValue;
-		} else {
-			$this->item_id->ViewValue = $this->item_id->CurrentValue;
-		if (strval($this->item_id->CurrentValue) <> "") {
-			$sFilterWrk = "`item_id`" . ew_SearchString("=", $this->item_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `item_id`, `item_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_02item`";
-		$sWhereWrk = "";
-		$this->item_id->LookupFilters = array();
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->item_id, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->item_id->ViewValue = $this->item_id->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->item_id->ViewValue = $this->item_id->CurrentValue;
-			}
-		} else {
-			$this->item_id->ViewValue = NULL;
-		}
-		}
+		$this->item_id->ViewValue = $this->item_id->CurrentValue;
 		$this->item_id->ViewCustomAttributes = "";
 
-		// tgl
-		$this->tgl->ViewValue = $this->tgl->CurrentValue;
-		$this->tgl->ViewValue = ew_FormatDateTime($this->tgl->ViewValue, 7);
-		$this->tgl->ViewCustomAttributes = "";
+		// tgl_beli
+		$this->tgl_beli->ViewValue = $this->tgl_beli->CurrentValue;
+		$this->tgl_beli->ViewValue = ew_FormatDateTime($this->tgl_beli->ViewValue, 0);
+		$this->tgl_beli->ViewCustomAttributes = "";
 
 		// qty
 		$this->qty->ViewValue = $this->qty->CurrentValue;
-		$this->qty->ViewValue = ew_FormatNumber($this->qty->ViewValue, 0, -2, -2, -2);
-		$this->qty->CellCssStyle .= "text-align: right;";
 		$this->qty->ViewCustomAttributes = "";
 
 		// harga
 		$this->harga->ViewValue = $this->harga->CurrentValue;
-		$this->harga->ViewValue = ew_FormatNumber($this->harga->ViewValue, 0, -2, -2, -2);
-		$this->harga->CellCssStyle .= "text-align: right;";
 		$this->harga->ViewCustomAttributes = "";
+
+		// sub_total
+		$this->sub_total->ViewValue = $this->sub_total->CurrentValue;
+		$this->sub_total->ViewCustomAttributes = "";
+
+			// temp_beli_id
+			$this->temp_beli_id->LinkCustomAttributes = "";
+			$this->temp_beli_id->HrefValue = "";
+			$this->temp_beli_id->TooltipValue = "";
+
+			// beli_id
+			$this->beli_id->LinkCustomAttributes = "";
+			$this->beli_id->HrefValue = "";
+			$this->beli_id->TooltipValue = "";
 
 			// item_id
 			$this->item_id->LinkCustomAttributes = "";
 			$this->item_id->HrefValue = "";
 			$this->item_id->TooltipValue = "";
 
-			// tgl
-			$this->tgl->LinkCustomAttributes = "";
-			$this->tgl->HrefValue = "";
-			$this->tgl->TooltipValue = "";
+			// tgl_beli
+			$this->tgl_beli->LinkCustomAttributes = "";
+			$this->tgl_beli->HrefValue = "";
+			$this->tgl_beli->TooltipValue = "";
 
 			// qty
 			$this->qty->LinkCustomAttributes = "";
@@ -710,7 +717,24 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 			$this->harga->LinkCustomAttributes = "";
 			$this->harga->HrefValue = "";
 			$this->harga->TooltipValue = "";
+
+			// sub_total
+			$this->sub_total->LinkCustomAttributes = "";
+			$this->sub_total->HrefValue = "";
+			$this->sub_total->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
+
+			// temp_beli_id
+			$this->temp_beli_id->EditAttrs["class"] = "form-control";
+			$this->temp_beli_id->EditCustomAttributes = "";
+			$this->temp_beli_id->EditValue = $this->temp_beli_id->CurrentValue;
+			$this->temp_beli_id->ViewCustomAttributes = "";
+
+			// beli_id
+			$this->beli_id->EditAttrs["class"] = "form-control";
+			$this->beli_id->EditCustomAttributes = "";
+			$this->beli_id->EditValue = ew_HtmlEncode($this->beli_id->CurrentValue);
+			$this->beli_id->PlaceHolder = ew_RemoveHtml($this->beli_id->FldCaption());
 
 			// item_id
 			$this->item_id->EditAttrs["class"] = "form-control";
@@ -718,35 +742,50 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 			$this->item_id->EditValue = ew_HtmlEncode($this->item_id->CurrentValue);
 			$this->item_id->PlaceHolder = ew_RemoveHtml($this->item_id->FldCaption());
 
-			// tgl
-			$this->tgl->EditAttrs["class"] = "form-control";
-			$this->tgl->EditCustomAttributes = "";
-			$this->tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->tgl->CurrentValue, 7));
-			$this->tgl->PlaceHolder = ew_RemoveHtml($this->tgl->FldCaption());
+			// tgl_beli
+			$this->tgl_beli->EditAttrs["class"] = "form-control";
+			$this->tgl_beli->EditCustomAttributes = "";
+			$this->tgl_beli->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->tgl_beli->CurrentValue, 8));
+			$this->tgl_beli->PlaceHolder = ew_RemoveHtml($this->tgl_beli->FldCaption());
 
 			// qty
 			$this->qty->EditAttrs["class"] = "form-control";
 			$this->qty->EditCustomAttributes = "";
 			$this->qty->EditValue = ew_HtmlEncode($this->qty->CurrentValue);
 			$this->qty->PlaceHolder = ew_RemoveHtml($this->qty->FldCaption());
-			if (strval($this->qty->EditValue) <> "" && is_numeric($this->qty->EditValue)) $this->qty->EditValue = ew_FormatNumber($this->qty->EditValue, -2, -2, -2, -2);
+			if (strval($this->qty->EditValue) <> "" && is_numeric($this->qty->EditValue)) $this->qty->EditValue = ew_FormatNumber($this->qty->EditValue, -2, -1, -2, 0);
 
 			// harga
 			$this->harga->EditAttrs["class"] = "form-control";
 			$this->harga->EditCustomAttributes = "";
 			$this->harga->EditValue = ew_HtmlEncode($this->harga->CurrentValue);
 			$this->harga->PlaceHolder = ew_RemoveHtml($this->harga->FldCaption());
-			if (strval($this->harga->EditValue) <> "" && is_numeric($this->harga->EditValue)) $this->harga->EditValue = ew_FormatNumber($this->harga->EditValue, -2, -2, -2, -2);
+			if (strval($this->harga->EditValue) <> "" && is_numeric($this->harga->EditValue)) $this->harga->EditValue = ew_FormatNumber($this->harga->EditValue, -2, -1, -2, 0);
+
+			// sub_total
+			$this->sub_total->EditAttrs["class"] = "form-control";
+			$this->sub_total->EditCustomAttributes = "";
+			$this->sub_total->EditValue = ew_HtmlEncode($this->sub_total->CurrentValue);
+			$this->sub_total->PlaceHolder = ew_RemoveHtml($this->sub_total->FldCaption());
+			if (strval($this->sub_total->EditValue) <> "" && is_numeric($this->sub_total->EditValue)) $this->sub_total->EditValue = ew_FormatNumber($this->sub_total->EditValue, -2, -1, -2, 0);
 
 			// Edit refer script
-			// item_id
+			// temp_beli_id
 
+			$this->temp_beli_id->LinkCustomAttributes = "";
+			$this->temp_beli_id->HrefValue = "";
+
+			// beli_id
+			$this->beli_id->LinkCustomAttributes = "";
+			$this->beli_id->HrefValue = "";
+
+			// item_id
 			$this->item_id->LinkCustomAttributes = "";
 			$this->item_id->HrefValue = "";
 
-			// tgl
-			$this->tgl->LinkCustomAttributes = "";
-			$this->tgl->HrefValue = "";
+			// tgl_beli
+			$this->tgl_beli->LinkCustomAttributes = "";
+			$this->tgl_beli->HrefValue = "";
 
 			// qty
 			$this->qty->LinkCustomAttributes = "";
@@ -755,6 +794,10 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 			// harga
 			$this->harga->LinkCustomAttributes = "";
 			$this->harga->HrefValue = "";
+
+			// sub_total
+			$this->sub_total->LinkCustomAttributes = "";
+			$this->sub_total->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -777,20 +820,41 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
+		if (!$this->beli_id->FldIsDetailKey && !is_null($this->beli_id->FormValue) && $this->beli_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->beli_id->FldCaption(), $this->beli_id->ReqErrMsg));
+		}
+		if (!ew_CheckInteger($this->beli_id->FormValue)) {
+			ew_AddMessage($gsFormError, $this->beli_id->FldErrMsg());
+		}
 		if (!$this->item_id->FldIsDetailKey && !is_null($this->item_id->FormValue) && $this->item_id->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->item_id->FldCaption(), $this->item_id->ReqErrMsg));
 		}
-		if (!$this->tgl->FldIsDetailKey && !is_null($this->tgl->FormValue) && $this->tgl->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->tgl->FldCaption(), $this->tgl->ReqErrMsg));
+		if (!ew_CheckInteger($this->item_id->FormValue)) {
+			ew_AddMessage($gsFormError, $this->item_id->FldErrMsg());
 		}
-		if (!ew_CheckEuroDate($this->tgl->FormValue)) {
-			ew_AddMessage($gsFormError, $this->tgl->FldErrMsg());
+		if (!$this->tgl_beli->FldIsDetailKey && !is_null($this->tgl_beli->FormValue) && $this->tgl_beli->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->tgl_beli->FldCaption(), $this->tgl_beli->ReqErrMsg));
+		}
+		if (!ew_CheckDateDef($this->tgl_beli->FormValue)) {
+			ew_AddMessage($gsFormError, $this->tgl_beli->FldErrMsg());
+		}
+		if (!$this->qty->FldIsDetailKey && !is_null($this->qty->FormValue) && $this->qty->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->qty->FldCaption(), $this->qty->ReqErrMsg));
 		}
 		if (!ew_CheckNumber($this->qty->FormValue)) {
 			ew_AddMessage($gsFormError, $this->qty->FldErrMsg());
 		}
+		if (!$this->harga->FldIsDetailKey && !is_null($this->harga->FormValue) && $this->harga->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->harga->FldCaption(), $this->harga->ReqErrMsg));
+		}
 		if (!ew_CheckNumber($this->harga->FormValue)) {
 			ew_AddMessage($gsFormError, $this->harga->FldErrMsg());
+		}
+		if (!$this->sub_total->FldIsDetailKey && !is_null($this->sub_total->FormValue) && $this->sub_total->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->sub_total->FldCaption(), $this->sub_total->ReqErrMsg));
+		}
+		if (!ew_CheckNumber($this->sub_total->FormValue)) {
+			ew_AddMessage($gsFormError, $this->sub_total->FldErrMsg());
 		}
 
 		// Return validate result
@@ -828,17 +892,23 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 			$this->LoadDbValues($rsold);
 			$rsnew = array();
 
+			// beli_id
+			$this->beli_id->SetDbValueDef($rsnew, $this->beli_id->CurrentValue, 0, $this->beli_id->ReadOnly);
+
 			// item_id
 			$this->item_id->SetDbValueDef($rsnew, $this->item_id->CurrentValue, 0, $this->item_id->ReadOnly);
 
-			// tgl
-			$this->tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl->CurrentValue, 7), ew_CurrentDate(), $this->tgl->ReadOnly);
+			// tgl_beli
+			$this->tgl_beli->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 0), ew_CurrentDate(), $this->tgl_beli->ReadOnly);
 
 			// qty
 			$this->qty->SetDbValueDef($rsnew, $this->qty->CurrentValue, 0, $this->qty->ReadOnly);
 
 			// harga
 			$this->harga->SetDbValueDef($rsnew, $this->harga->CurrentValue, 0, $this->harga->ReadOnly);
+
+			// sub_total
+			$this->sub_total->SetDbValueDef($rsnew, $this->sub_total->CurrentValue, 0, $this->sub_total->ReadOnly);
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -877,7 +947,7 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_08item_saldolist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_99belilist.php"), "", $this->TableVar, TRUE);
 		$PageId = "edit";
 		$Breadcrumb->Add("edit", $PageId, $url);
 	}
@@ -887,18 +957,6 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
-		case "x_item_id":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `item_id` AS `LinkFld`, `item_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_02item`";
-			$sWhereWrk = "{filter}";
-			$this->item_id->LookupFilters = array();
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`item_id` = {filter_value}', "t0" => "3", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->item_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
 		}
 	}
 
@@ -907,19 +965,6 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
-		case "x_item_id":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `item_id`, `item_nama` AS `DispFld` FROM `t_02item`";
-			$sWhereWrk = "`item_nama` LIKE '{query_value}%'";
-			$this->item_id->LookupFilters = array();
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->item_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$sSqlWrk .= " LIMIT " . EW_AUTO_SUGGEST_MAX_ENTRIES;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
 		}
 	}
 
@@ -995,29 +1040,29 @@ class ct_08item_saldo_edit extends ct_08item_saldo {
 <?php
 
 // Create page object
-if (!isset($t_08item_saldo_edit)) $t_08item_saldo_edit = new ct_08item_saldo_edit();
+if (!isset($t_99beli_edit)) $t_99beli_edit = new ct_99beli_edit();
 
 // Page init
-$t_08item_saldo_edit->Page_Init();
+$t_99beli_edit->Page_Init();
 
 // Page main
-$t_08item_saldo_edit->Page_Main();
+$t_99beli_edit->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t_08item_saldo_edit->Page_Render();
+$t_99beli_edit->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "edit";
-var CurrentForm = ft_08item_saldoedit = new ew_Form("ft_08item_saldoedit", "edit");
+var CurrentForm = ft_99beliedit = new ew_Form("ft_99beliedit", "edit");
 
 // Validate form
-ft_08item_saldoedit.Validate = function() {
+ft_99beliedit.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -1031,21 +1076,42 @@ ft_08item_saldoedit.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
+			elm = this.GetElements("x" + infix + "_beli_id");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_99beli->beli_id->FldCaption(), $t_99beli->beli_id->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_beli_id");
+			if (elm && !ew_CheckInteger(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_99beli->beli_id->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_item_id");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_08item_saldo->item_id->FldCaption(), $t_08item_saldo->item_id->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_tgl");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_99beli->item_id->FldCaption(), $t_99beli->item_id->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_item_id");
+			if (elm && !ew_CheckInteger(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_99beli->item_id->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_tgl_beli");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_08item_saldo->tgl->FldCaption(), $t_08item_saldo->tgl->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_tgl");
-			if (elm && !ew_CheckEuroDate(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t_08item_saldo->tgl->FldErrMsg()) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_99beli->tgl_beli->FldCaption(), $t_99beli->tgl_beli->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_tgl_beli");
+			if (elm && !ew_CheckDateDef(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_99beli->tgl_beli->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_qty");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_99beli->qty->FldCaption(), $t_99beli->qty->ReqErrMsg)) ?>");
 			elm = this.GetElements("x" + infix + "_qty");
 			if (elm && !ew_CheckNumber(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t_08item_saldo->qty->FldErrMsg()) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_99beli->qty->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_harga");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_99beli->harga->FldCaption(), $t_99beli->harga->ReqErrMsg)) ?>");
 			elm = this.GetElements("x" + infix + "_harga");
 			if (elm && !ew_CheckNumber(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t_08item_saldo->harga->FldErrMsg()) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_99beli->harga->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_sub_total");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_99beli->sub_total->FldCaption(), $t_99beli->sub_total->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_sub_total");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_99beli->sub_total->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1064,7 +1130,7 @@ ft_08item_saldoedit.Validate = function() {
 }
 
 // Form_CustomValidate event
-ft_08item_saldoedit.Form_CustomValidate = 
+ft_99beliedit.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1073,202 +1139,213 @@ ft_08item_saldoedit.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft_08item_saldoedit.ValidateRequired = true;
+ft_99beliedit.ValidateRequired = true;
 <?php } else { ?>
-ft_08item_saldoedit.ValidateRequired = false; 
+ft_99beliedit.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-ft_08item_saldoedit.Lists["x_item_id"] = {"LinkField":"x_item_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_item_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_02item"};
-
 // Form object for search
+
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php if (!$t_08item_saldo_edit->IsModal) { ?>
+<?php if (!$t_99beli_edit->IsModal) { ?>
 <div class="ewToolbar">
 <?php $Breadcrumb->Render(); ?>
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $t_08item_saldo_edit->ShowPageHeader(); ?>
+<?php $t_99beli_edit->ShowPageHeader(); ?>
 <?php
-$t_08item_saldo_edit->ShowMessage();
+$t_99beli_edit->ShowMessage();
 ?>
-<?php if (!$t_08item_saldo_edit->IsModal) { ?>
+<?php if (!$t_99beli_edit->IsModal) { ?>
 <form name="ewPagerForm" class="form-horizontal ewForm ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($t_08item_saldo_edit->Pager)) $t_08item_saldo_edit->Pager = new cPrevNextPager($t_08item_saldo_edit->StartRec, $t_08item_saldo_edit->DisplayRecs, $t_08item_saldo_edit->TotalRecs) ?>
-<?php if ($t_08item_saldo_edit->Pager->RecordCount > 0 && $t_08item_saldo_edit->Pager->Visible) { ?>
+<?php if (!isset($t_99beli_edit->Pager)) $t_99beli_edit->Pager = new cPrevNextPager($t_99beli_edit->StartRec, $t_99beli_edit->DisplayRecs, $t_99beli_edit->TotalRecs) ?>
+<?php if ($t_99beli_edit->Pager->RecordCount > 0 && $t_99beli_edit->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t_08item_saldo_edit->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_08item_saldo_edit->PageUrl() ?>start=<?php echo $t_08item_saldo_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t_99beli_edit->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_99beli_edit->PageUrl() ?>start=<?php echo $t_99beli_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t_08item_saldo_edit->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_08item_saldo_edit->PageUrl() ?>start=<?php echo $t_08item_saldo_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t_99beli_edit->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_99beli_edit->PageUrl() ?>start=<?php echo $t_99beli_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_08item_saldo_edit->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_99beli_edit->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t_08item_saldo_edit->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_08item_saldo_edit->PageUrl() ?>start=<?php echo $t_08item_saldo_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t_99beli_edit->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_99beli_edit->PageUrl() ?>start=<?php echo $t_99beli_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t_08item_saldo_edit->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_08item_saldo_edit->PageUrl() ?>start=<?php echo $t_08item_saldo_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t_99beli_edit->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_99beli_edit->PageUrl() ?>start=<?php echo $t_99beli_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_08item_saldo_edit->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_99beli_edit->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 </form>
 <?php } ?>
-<form name="ft_08item_saldoedit" id="ft_08item_saldoedit" class="<?php echo $t_08item_saldo_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t_08item_saldo_edit->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_08item_saldo_edit->Token ?>">
+<form name="ft_99beliedit" id="ft_99beliedit" class="<?php echo $t_99beli_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t_99beli_edit->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_99beli_edit->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t_08item_saldo">
+<input type="hidden" name="t" value="t_99beli">
 <input type="hidden" name="a_edit" id="a_edit" value="U">
-<?php if ($t_08item_saldo_edit->IsModal) { ?>
+<?php if ($t_99beli_edit->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <div>
-<?php if ($t_08item_saldo->item_id->Visible) { // item_id ?>
+<?php if ($t_99beli->temp_beli_id->Visible) { // temp_beli_id ?>
+	<div id="r_temp_beli_id" class="form-group">
+		<label id="elh_t_99beli_temp_beli_id" class="col-sm-2 control-label ewLabel"><?php echo $t_99beli->temp_beli_id->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_99beli->temp_beli_id->CellAttributes() ?>>
+<span id="el_t_99beli_temp_beli_id">
+<span<?php echo $t_99beli->temp_beli_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t_99beli->temp_beli_id->EditValue ?></p></span>
+</span>
+<input type="hidden" data-table="t_99beli" data-field="x_temp_beli_id" name="x_temp_beli_id" id="x_temp_beli_id" value="<?php echo ew_HtmlEncode($t_99beli->temp_beli_id->CurrentValue) ?>">
+<?php echo $t_99beli->temp_beli_id->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_99beli->beli_id->Visible) { // beli_id ?>
+	<div id="r_beli_id" class="form-group">
+		<label id="elh_t_99beli_beli_id" for="x_beli_id" class="col-sm-2 control-label ewLabel"><?php echo $t_99beli->beli_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t_99beli->beli_id->CellAttributes() ?>>
+<span id="el_t_99beli_beli_id">
+<input type="text" data-table="t_99beli" data-field="x_beli_id" name="x_beli_id" id="x_beli_id" size="30" placeholder="<?php echo ew_HtmlEncode($t_99beli->beli_id->getPlaceHolder()) ?>" value="<?php echo $t_99beli->beli_id->EditValue ?>"<?php echo $t_99beli->beli_id->EditAttributes() ?>>
+</span>
+<?php echo $t_99beli->beli_id->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_99beli->item_id->Visible) { // item_id ?>
 	<div id="r_item_id" class="form-group">
-		<label id="elh_t_08item_saldo_item_id" class="col-sm-2 control-label ewLabel"><?php echo $t_08item_saldo->item_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $t_08item_saldo->item_id->CellAttributes() ?>>
-<span id="el_t_08item_saldo_item_id">
-<?php
-$wrkonchange = trim(" " . @$t_08item_saldo->item_id->EditAttrs["onchange"]);
-if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
-$t_08item_saldo->item_id->EditAttrs["onchange"] = "";
-?>
-<span id="as_x_item_id" style="white-space: nowrap; z-index: 8980">
-	<input type="text" name="sv_x_item_id" id="sv_x_item_id" value="<?php echo $t_08item_saldo->item_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($t_08item_saldo->item_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_08item_saldo->item_id->getPlaceHolder()) ?>"<?php echo $t_08item_saldo->item_id->EditAttributes() ?>>
+		<label id="elh_t_99beli_item_id" for="x_item_id" class="col-sm-2 control-label ewLabel"><?php echo $t_99beli->item_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t_99beli->item_id->CellAttributes() ?>>
+<span id="el_t_99beli_item_id">
+<input type="text" data-table="t_99beli" data-field="x_item_id" name="x_item_id" id="x_item_id" size="30" placeholder="<?php echo ew_HtmlEncode($t_99beli->item_id->getPlaceHolder()) ?>" value="<?php echo $t_99beli->item_id->EditValue ?>"<?php echo $t_99beli->item_id->EditAttributes() ?>>
 </span>
-<input type="hidden" data-table="t_08item_saldo" data-field="x_item_id" data-value-separator="<?php echo $t_08item_saldo->item_id->DisplayValueSeparatorAttribute() ?>" name="x_item_id" id="x_item_id" value="<?php echo ew_HtmlEncode($t_08item_saldo->item_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
-<input type="hidden" name="q_x_item_id" id="q_x_item_id" value="<?php echo $t_08item_saldo->item_id->LookupFilterQuery(true) ?>">
-<script type="text/javascript">
-ft_08item_saldoedit.CreateAutoSuggest({"id":"x_item_id","forceSelect":false});
-</script>
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_08item_saldo->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_08item_saldo->item_id->FldCaption() ?></span></button>
-<input type="hidden" name="s_x_item_id" id="s_x_item_id" value="<?php echo $t_08item_saldo->item_id->LookupFilterQuery() ?>">
-</span>
-<?php echo $t_08item_saldo->item_id->CustomMsg ?></div></div>
+<?php echo $t_99beli->item_id->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t_08item_saldo->tgl->Visible) { // tgl ?>
-	<div id="r_tgl" class="form-group">
-		<label id="elh_t_08item_saldo_tgl" for="x_tgl" class="col-sm-2 control-label ewLabel"><?php echo $t_08item_saldo->tgl->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $t_08item_saldo->tgl->CellAttributes() ?>>
-<span id="el_t_08item_saldo_tgl">
-<input type="text" data-table="t_08item_saldo" data-field="x_tgl" data-format="7" name="x_tgl" id="x_tgl" placeholder="<?php echo ew_HtmlEncode($t_08item_saldo->tgl->getPlaceHolder()) ?>" value="<?php echo $t_08item_saldo->tgl->EditValue ?>"<?php echo $t_08item_saldo->tgl->EditAttributes() ?>>
-<?php if (!$t_08item_saldo->tgl->ReadOnly && !$t_08item_saldo->tgl->Disabled && !isset($t_08item_saldo->tgl->EditAttrs["readonly"]) && !isset($t_08item_saldo->tgl->EditAttrs["disabled"])) { ?>
-<script type="text/javascript">
-ew_CreateCalendar("ft_08item_saldoedit", "x_tgl", 7);
-</script>
-<?php } ?>
+<?php if ($t_99beli->tgl_beli->Visible) { // tgl_beli ?>
+	<div id="r_tgl_beli" class="form-group">
+		<label id="elh_t_99beli_tgl_beli" for="x_tgl_beli" class="col-sm-2 control-label ewLabel"><?php echo $t_99beli->tgl_beli->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t_99beli->tgl_beli->CellAttributes() ?>>
+<span id="el_t_99beli_tgl_beli">
+<input type="text" data-table="t_99beli" data-field="x_tgl_beli" name="x_tgl_beli" id="x_tgl_beli" placeholder="<?php echo ew_HtmlEncode($t_99beli->tgl_beli->getPlaceHolder()) ?>" value="<?php echo $t_99beli->tgl_beli->EditValue ?>"<?php echo $t_99beli->tgl_beli->EditAttributes() ?>>
 </span>
-<?php echo $t_08item_saldo->tgl->CustomMsg ?></div></div>
+<?php echo $t_99beli->tgl_beli->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t_08item_saldo->qty->Visible) { // qty ?>
+<?php if ($t_99beli->qty->Visible) { // qty ?>
 	<div id="r_qty" class="form-group">
-		<label id="elh_t_08item_saldo_qty" for="x_qty" class="col-sm-2 control-label ewLabel"><?php echo $t_08item_saldo->qty->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $t_08item_saldo->qty->CellAttributes() ?>>
-<span id="el_t_08item_saldo_qty">
-<input type="text" data-table="t_08item_saldo" data-field="x_qty" name="x_qty" id="x_qty" size="30" placeholder="<?php echo ew_HtmlEncode($t_08item_saldo->qty->getPlaceHolder()) ?>" value="<?php echo $t_08item_saldo->qty->EditValue ?>"<?php echo $t_08item_saldo->qty->EditAttributes() ?>>
+		<label id="elh_t_99beli_qty" for="x_qty" class="col-sm-2 control-label ewLabel"><?php echo $t_99beli->qty->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t_99beli->qty->CellAttributes() ?>>
+<span id="el_t_99beli_qty">
+<input type="text" data-table="t_99beli" data-field="x_qty" name="x_qty" id="x_qty" size="30" placeholder="<?php echo ew_HtmlEncode($t_99beli->qty->getPlaceHolder()) ?>" value="<?php echo $t_99beli->qty->EditValue ?>"<?php echo $t_99beli->qty->EditAttributes() ?>>
 </span>
-<?php echo $t_08item_saldo->qty->CustomMsg ?></div></div>
+<?php echo $t_99beli->qty->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t_08item_saldo->harga->Visible) { // harga ?>
+<?php if ($t_99beli->harga->Visible) { // harga ?>
 	<div id="r_harga" class="form-group">
-		<label id="elh_t_08item_saldo_harga" for="x_harga" class="col-sm-2 control-label ewLabel"><?php echo $t_08item_saldo->harga->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $t_08item_saldo->harga->CellAttributes() ?>>
-<span id="el_t_08item_saldo_harga">
-<input type="text" data-table="t_08item_saldo" data-field="x_harga" name="x_harga" id="x_harga" size="30" placeholder="<?php echo ew_HtmlEncode($t_08item_saldo->harga->getPlaceHolder()) ?>" value="<?php echo $t_08item_saldo->harga->EditValue ?>"<?php echo $t_08item_saldo->harga->EditAttributes() ?>>
+		<label id="elh_t_99beli_harga" for="x_harga" class="col-sm-2 control-label ewLabel"><?php echo $t_99beli->harga->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t_99beli->harga->CellAttributes() ?>>
+<span id="el_t_99beli_harga">
+<input type="text" data-table="t_99beli" data-field="x_harga" name="x_harga" id="x_harga" size="30" placeholder="<?php echo ew_HtmlEncode($t_99beli->harga->getPlaceHolder()) ?>" value="<?php echo $t_99beli->harga->EditValue ?>"<?php echo $t_99beli->harga->EditAttributes() ?>>
 </span>
-<?php echo $t_08item_saldo->harga->CustomMsg ?></div></div>
+<?php echo $t_99beli->harga->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_99beli->sub_total->Visible) { // sub_total ?>
+	<div id="r_sub_total" class="form-group">
+		<label id="elh_t_99beli_sub_total" for="x_sub_total" class="col-sm-2 control-label ewLabel"><?php echo $t_99beli->sub_total->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t_99beli->sub_total->CellAttributes() ?>>
+<span id="el_t_99beli_sub_total">
+<input type="text" data-table="t_99beli" data-field="x_sub_total" name="x_sub_total" id="x_sub_total" size="30" placeholder="<?php echo ew_HtmlEncode($t_99beli->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_99beli->sub_total->EditValue ?>"<?php echo $t_99beli->sub_total->EditAttributes() ?>>
+</span>
+<?php echo $t_99beli->sub_total->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div>
-<input type="hidden" data-table="t_08item_saldo" data-field="x_sld_id" name="x_sld_id" id="x_sld_id" value="<?php echo ew_HtmlEncode($t_08item_saldo->sld_id->CurrentValue) ?>">
-<?php if (!$t_08item_saldo_edit->IsModal) { ?>
+<?php if (!$t_99beli_edit->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("SaveBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t_08item_saldo_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t_99beli_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 	</div>
 </div>
-<?php if (!isset($t_08item_saldo_edit->Pager)) $t_08item_saldo_edit->Pager = new cPrevNextPager($t_08item_saldo_edit->StartRec, $t_08item_saldo_edit->DisplayRecs, $t_08item_saldo_edit->TotalRecs) ?>
-<?php if ($t_08item_saldo_edit->Pager->RecordCount > 0 && $t_08item_saldo_edit->Pager->Visible) { ?>
+<?php if (!isset($t_99beli_edit->Pager)) $t_99beli_edit->Pager = new cPrevNextPager($t_99beli_edit->StartRec, $t_99beli_edit->DisplayRecs, $t_99beli_edit->TotalRecs) ?>
+<?php if ($t_99beli_edit->Pager->RecordCount > 0 && $t_99beli_edit->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t_08item_saldo_edit->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_08item_saldo_edit->PageUrl() ?>start=<?php echo $t_08item_saldo_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t_99beli_edit->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_99beli_edit->PageUrl() ?>start=<?php echo $t_99beli_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t_08item_saldo_edit->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_08item_saldo_edit->PageUrl() ?>start=<?php echo $t_08item_saldo_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t_99beli_edit->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_99beli_edit->PageUrl() ?>start=<?php echo $t_99beli_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_08item_saldo_edit->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_99beli_edit->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t_08item_saldo_edit->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_08item_saldo_edit->PageUrl() ?>start=<?php echo $t_08item_saldo_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t_99beli_edit->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_99beli_edit->PageUrl() ?>start=<?php echo $t_99beli_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t_08item_saldo_edit->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_08item_saldo_edit->PageUrl() ?>start=<?php echo $t_08item_saldo_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t_99beli_edit->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_99beli_edit->PageUrl() ?>start=<?php echo $t_99beli_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_08item_saldo_edit->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_99beli_edit->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 <?php } ?>
 </form>
 <script type="text/javascript">
-ft_08item_saldoedit.Init();
+ft_99beliedit.Init();
 </script>
 <?php
-$t_08item_saldo_edit->ShowPageFooter();
+$t_99beli_edit->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1280,5 +1357,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t_08item_saldo_edit->Page_Terminate();
+$t_99beli_edit->Page_Terminate();
 ?>

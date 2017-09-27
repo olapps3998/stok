@@ -1,20 +1,19 @@
 <?php
 
 // Global variable for table object
-$t_02item = NULL;
+$t_99beli = NULL;
 
 //
-// Table class for t_02item
+// Table class for t_99beli
 //
-class ct_02item extends cTable {
-	var $AuditTrailOnAdd = TRUE;
-	var $AuditTrailOnEdit = TRUE;
-	var $AuditTrailOnDelete = TRUE;
-	var $AuditTrailOnView = FALSE;
-	var $AuditTrailOnViewData = FALSE;
-	var $AuditTrailOnSearch = FALSE;
+class ct_99beli extends cTable {
+	var $temp_beli_id;
+	var $beli_id;
 	var $item_id;
-	var $item_nama;
+	var $tgl_beli;
+	var $qty;
+	var $harga;
+	var $sub_total;
 
 	//
 	// Table class constructor
@@ -24,12 +23,12 @@ class ct_02item extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 't_02item';
-		$this->TableName = 't_02item';
+		$this->TableVar = 't_99beli';
+		$this->TableName = 't_99beli';
 		$this->TableType = 'TABLE';
 
 		// Update Table
-		$this->UpdateTable = "`t_02item`";
+		$this->UpdateTable = "`t_99beli`";
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -46,16 +45,47 @@ class ct_02item extends cTable {
 		$this->UserIDAllowSecurity = 0; // User ID Allow
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
+		// temp_beli_id
+		$this->temp_beli_id = new cField('t_99beli', 't_99beli', 'x_temp_beli_id', 'temp_beli_id', '`temp_beli_id`', '`temp_beli_id`', 3, -1, FALSE, '`temp_beli_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
+		$this->temp_beli_id->Sortable = TRUE; // Allow sort
+		$this->temp_beli_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['temp_beli_id'] = &$this->temp_beli_id;
+
+		// beli_id
+		$this->beli_id = new cField('t_99beli', 't_99beli', 'x_beli_id', 'beli_id', '`beli_id`', '`beli_id`', 3, -1, FALSE, '`beli_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->beli_id->Sortable = TRUE; // Allow sort
+		$this->beli_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['beli_id'] = &$this->beli_id;
+
 		// item_id
-		$this->item_id = new cField('t_02item', 't_02item', 'x_item_id', 'item_id', '`item_id`', '`item_id`', 3, -1, FALSE, '`item_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
+		$this->item_id = new cField('t_99beli', 't_99beli', 'x_item_id', 'item_id', '`item_id`', '`item_id`', 3, -1, FALSE, '`item_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->item_id->Sortable = TRUE; // Allow sort
 		$this->item_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['item_id'] = &$this->item_id;
 
-		// item_nama
-		$this->item_nama = new cField('t_02item', 't_02item', 'x_item_nama', 'item_nama', '`item_nama`', '`item_nama`', 200, -1, FALSE, '`item_nama`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->item_nama->Sortable = TRUE; // Allow sort
-		$this->fields['item_nama'] = &$this->item_nama;
+		// tgl_beli
+		$this->tgl_beli = new cField('t_99beli', 't_99beli', 'x_tgl_beli', 'tgl_beli', '`tgl_beli`', ew_CastDateFieldForLike('`tgl_beli`', 0, "DB"), 133, 0, FALSE, '`tgl_beli`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl_beli->Sortable = TRUE; // Allow sort
+		$this->tgl_beli->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_FORMAT"], $Language->Phrase("IncorrectDate"));
+		$this->fields['tgl_beli'] = &$this->tgl_beli;
+
+		// qty
+		$this->qty = new cField('t_99beli', 't_99beli', 'x_qty', 'qty', '`qty`', '`qty`', 4, -1, FALSE, '`qty`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->qty->Sortable = TRUE; // Allow sort
+		$this->qty->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['qty'] = &$this->qty;
+
+		// harga
+		$this->harga = new cField('t_99beli', 't_99beli', 'x_harga', 'harga', '`harga`', '`harga`', 4, -1, FALSE, '`harga`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->harga->Sortable = TRUE; // Allow sort
+		$this->harga->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['harga'] = &$this->harga;
+
+		// sub_total
+		$this->sub_total = new cField('t_99beli', 't_99beli', 'x_sub_total', 'sub_total', '`sub_total`', '`sub_total`', 4, -1, FALSE, '`sub_total`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->sub_total->Sortable = TRUE; // Allow sort
+		$this->sub_total->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['sub_total'] = &$this->sub_total;
 	}
 
 	// Set Field Visibility
@@ -96,7 +126,7 @@ class ct_02item extends cTable {
 	var $_SqlFrom = "";
 
 	function getSqlFrom() { // From
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t_02item`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t_99beli`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -319,10 +349,8 @@ class ct_02item extends cTable {
 		if ($bInsert) {
 
 			// Get insert id if necessary
-			$this->item_id->setDbValue($conn->Insert_ID());
-			$rs['item_id'] = $this->item_id->DbValue;
-			if ($this->AuditTrailOnAdd)
-				$this->WriteAuditTrailOnAdd($rs);
+			$this->temp_beli_id->setDbValue($conn->Insert_ID());
+			$rs['temp_beli_id'] = $this->temp_beli_id->DbValue;
 		}
 		return $bInsert;
 	}
@@ -350,12 +378,6 @@ class ct_02item extends cTable {
 	function Update(&$rs, $where = "", $rsold = NULL, $curfilter = TRUE) {
 		$conn = &$this->Connection();
 		$bUpdate = $conn->Execute($this->UpdateSQL($rs, $where, $curfilter));
-		if ($bUpdate && $this->AuditTrailOnEdit) {
-			$rsaudit = $rs;
-			$fldname = 'item_id';
-			if (!array_key_exists($fldname, $rsaudit)) $rsaudit[$fldname] = $rsold[$fldname];
-			$this->WriteAuditTrailOnEdit($rsold, $rsaudit);
-		}
 		return $bUpdate;
 	}
 
@@ -365,8 +387,8 @@ class ct_02item extends cTable {
 		if (is_array($where))
 			$where = $this->ArrayToFilter($where);
 		if ($rs) {
-			if (array_key_exists('item_id', $rs))
-				ew_AddFilter($where, ew_QuotedName('item_id', $this->DBID) . '=' . ew_QuotedValue($rs['item_id'], $this->item_id->FldDataType, $this->DBID));
+			if (array_key_exists('temp_beli_id', $rs))
+				ew_AddFilter($where, ew_QuotedName('temp_beli_id', $this->DBID) . '=' . ew_QuotedValue($rs['temp_beli_id'], $this->temp_beli_id->FldDataType, $this->DBID));
 		}
 		$filter = ($curfilter) ? $this->CurrentFilter : "";
 		ew_AddFilter($filter, $where);
@@ -381,22 +403,20 @@ class ct_02item extends cTable {
 	function Delete(&$rs, $where = "", $curfilter = TRUE) {
 		$conn = &$this->Connection();
 		$bDelete = $conn->Execute($this->DeleteSQL($rs, $where, $curfilter));
-		if ($bDelete && $this->AuditTrailOnDelete)
-			$this->WriteAuditTrailOnDelete($rs);
 		return $bDelete;
 	}
 
 	// Key filter WHERE clause
 	function SqlKeyFilter() {
-		return "`item_id` = @item_id@";
+		return "`temp_beli_id` = @temp_beli_id@";
 	}
 
 	// Key filter
 	function KeyFilter() {
 		$sKeyFilter = $this->SqlKeyFilter();
-		if (!is_numeric($this->item_id->CurrentValue))
+		if (!is_numeric($this->temp_beli_id->CurrentValue))
 			$sKeyFilter = "0=1"; // Invalid key
-		$sKeyFilter = str_replace("@item_id@", ew_AdjustSql($this->item_id->CurrentValue, $this->DBID), $sKeyFilter); // Replace key value
+		$sKeyFilter = str_replace("@temp_beli_id@", ew_AdjustSql($this->temp_beli_id->CurrentValue, $this->DBID), $sKeyFilter); // Replace key value
 		return $sKeyFilter;
 	}
 
@@ -410,7 +430,7 @@ class ct_02item extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "t_02itemlist.php";
+			return "t_99belilist.php";
 		}
 	}
 
@@ -420,30 +440,30 @@ class ct_02item extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "t_02itemlist.php";
+		return "t_99belilist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			$url = $this->KeyUrl("t_02itemview.php", $this->UrlParm($parm));
+			$url = $this->KeyUrl("t_99beliview.php", $this->UrlParm($parm));
 		else
-			$url = $this->KeyUrl("t_02itemview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			$url = $this->KeyUrl("t_99beliview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 		return $this->AddMasterUrl($url);
 	}
 
 	// Add URL
 	function GetAddUrl($parm = "") {
 		if ($parm <> "")
-			$url = "t_02itemadd.php?" . $this->UrlParm($parm);
+			$url = "t_99beliadd.php?" . $this->UrlParm($parm);
 		else
-			$url = "t_02itemadd.php";
+			$url = "t_99beliadd.php";
 		return $this->AddMasterUrl($url);
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		$url = $this->KeyUrl("t_02itemedit.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t_99beliedit.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -455,7 +475,7 @@ class ct_02item extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		$url = $this->KeyUrl("t_02itemadd.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t_99beliadd.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -467,7 +487,7 @@ class ct_02item extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("t_02itemdelete.php", $this->UrlParm());
+		return $this->KeyUrl("t_99belidelete.php", $this->UrlParm());
 	}
 
 	// Add master url
@@ -477,7 +497,7 @@ class ct_02item extends cTable {
 
 	function KeyToJson() {
 		$json = "";
-		$json .= "item_id:" . ew_VarToJson($this->item_id->CurrentValue, "number", "'");
+		$json .= "temp_beli_id:" . ew_VarToJson($this->temp_beli_id->CurrentValue, "number", "'");
 		return "{" . $json . "}";
 	}
 
@@ -485,8 +505,8 @@ class ct_02item extends cTable {
 	function KeyUrl($url, $parm = "") {
 		$sUrl = $url . "?";
 		if ($parm <> "") $sUrl .= $parm . "&";
-		if (!is_null($this->item_id->CurrentValue)) {
-			$sUrl .= "item_id=" . urlencode($this->item_id->CurrentValue);
+		if (!is_null($this->temp_beli_id->CurrentValue)) {
+			$sUrl .= "temp_beli_id=" . urlencode($this->temp_beli_id->CurrentValue);
 		} else {
 			return "javascript:ew_Alert(ewLanguage.Phrase('InvalidRecord'));";
 		}
@@ -519,10 +539,10 @@ class ct_02item extends cTable {
 			$cnt = count($arKeys);
 		} elseif (!empty($_GET) || !empty($_POST)) {
 			$isPost = ew_IsHttpPost();
-			if ($isPost && isset($_POST["item_id"]))
-				$arKeys[] = ew_StripSlashes($_POST["item_id"]);
-			elseif (isset($_GET["item_id"]))
-				$arKeys[] = ew_StripSlashes($_GET["item_id"]);
+			if ($isPost && isset($_POST["temp_beli_id"]))
+				$arKeys[] = ew_StripSlashes($_POST["temp_beli_id"]);
+			elseif (isset($_GET["temp_beli_id"]))
+				$arKeys[] = ew_StripSlashes($_GET["temp_beli_id"]);
 			else
 				$arKeys = NULL; // Do not setup
 
@@ -547,7 +567,7 @@ class ct_02item extends cTable {
 		$sKeyFilter = "";
 		foreach ($arKeys as $key) {
 			if ($sKeyFilter <> "") $sKeyFilter .= " OR ";
-			$this->item_id->CurrentValue = $key;
+			$this->temp_beli_id->CurrentValue = $key;
 			$sKeyFilter .= "(" . $this->KeyFilter() . ")";
 		}
 		return $sKeyFilter;
@@ -568,8 +588,13 @@ class ct_02item extends cTable {
 
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
+		$this->temp_beli_id->setDbValue($rs->fields('temp_beli_id'));
+		$this->beli_id->setDbValue($rs->fields('beli_id'));
 		$this->item_id->setDbValue($rs->fields('item_id'));
-		$this->item_nama->setDbValue($rs->fields('item_nama'));
+		$this->tgl_beli->setDbValue($rs->fields('tgl_beli'));
+		$this->qty->setDbValue($rs->fields('qty'));
+		$this->harga->setDbValue($rs->fields('harga'));
+		$this->sub_total->setDbValue($rs->fields('sub_total'));
 	}
 
 	// Render list row values
@@ -580,26 +605,77 @@ class ct_02item extends cTable {
 		$this->Row_Rendering();
 
    // Common render codes
+		// temp_beli_id
+		// beli_id
 		// item_id
-		// item_nama
-		// item_id
+		// tgl_beli
+		// qty
+		// harga
+		// sub_total
+		// temp_beli_id
 
+		$this->temp_beli_id->ViewValue = $this->temp_beli_id->CurrentValue;
+		$this->temp_beli_id->ViewCustomAttributes = "";
+
+		// beli_id
+		$this->beli_id->ViewValue = $this->beli_id->CurrentValue;
+		$this->beli_id->ViewCustomAttributes = "";
+
+		// item_id
 		$this->item_id->ViewValue = $this->item_id->CurrentValue;
 		$this->item_id->ViewCustomAttributes = "";
 
-		// item_nama
-		$this->item_nama->ViewValue = $this->item_nama->CurrentValue;
-		$this->item_nama->ViewCustomAttributes = "";
+		// tgl_beli
+		$this->tgl_beli->ViewValue = $this->tgl_beli->CurrentValue;
+		$this->tgl_beli->ViewValue = ew_FormatDateTime($this->tgl_beli->ViewValue, 0);
+		$this->tgl_beli->ViewCustomAttributes = "";
+
+		// qty
+		$this->qty->ViewValue = $this->qty->CurrentValue;
+		$this->qty->ViewCustomAttributes = "";
+
+		// harga
+		$this->harga->ViewValue = $this->harga->CurrentValue;
+		$this->harga->ViewCustomAttributes = "";
+
+		// sub_total
+		$this->sub_total->ViewValue = $this->sub_total->CurrentValue;
+		$this->sub_total->ViewCustomAttributes = "";
+
+		// temp_beli_id
+		$this->temp_beli_id->LinkCustomAttributes = "";
+		$this->temp_beli_id->HrefValue = "";
+		$this->temp_beli_id->TooltipValue = "";
+
+		// beli_id
+		$this->beli_id->LinkCustomAttributes = "";
+		$this->beli_id->HrefValue = "";
+		$this->beli_id->TooltipValue = "";
 
 		// item_id
 		$this->item_id->LinkCustomAttributes = "";
 		$this->item_id->HrefValue = "";
 		$this->item_id->TooltipValue = "";
 
-		// item_nama
-		$this->item_nama->LinkCustomAttributes = "";
-		$this->item_nama->HrefValue = "";
-		$this->item_nama->TooltipValue = "";
+		// tgl_beli
+		$this->tgl_beli->LinkCustomAttributes = "";
+		$this->tgl_beli->HrefValue = "";
+		$this->tgl_beli->TooltipValue = "";
+
+		// qty
+		$this->qty->LinkCustomAttributes = "";
+		$this->qty->HrefValue = "";
+		$this->qty->TooltipValue = "";
+
+		// harga
+		$this->harga->LinkCustomAttributes = "";
+		$this->harga->HrefValue = "";
+		$this->harga->TooltipValue = "";
+
+		// sub_total
+		$this->sub_total->LinkCustomAttributes = "";
+		$this->sub_total->HrefValue = "";
+		$this->sub_total->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -612,17 +688,50 @@ class ct_02item extends cTable {
 		// Call Row Rendering event
 		$this->Row_Rendering();
 
+		// temp_beli_id
+		$this->temp_beli_id->EditAttrs["class"] = "form-control";
+		$this->temp_beli_id->EditCustomAttributes = "";
+		$this->temp_beli_id->EditValue = $this->temp_beli_id->CurrentValue;
+		$this->temp_beli_id->ViewCustomAttributes = "";
+
+		// beli_id
+		$this->beli_id->EditAttrs["class"] = "form-control";
+		$this->beli_id->EditCustomAttributes = "";
+		$this->beli_id->EditValue = $this->beli_id->CurrentValue;
+		$this->beli_id->PlaceHolder = ew_RemoveHtml($this->beli_id->FldCaption());
+
 		// item_id
 		$this->item_id->EditAttrs["class"] = "form-control";
 		$this->item_id->EditCustomAttributes = "";
 		$this->item_id->EditValue = $this->item_id->CurrentValue;
-		$this->item_id->ViewCustomAttributes = "";
+		$this->item_id->PlaceHolder = ew_RemoveHtml($this->item_id->FldCaption());
 
-		// item_nama
-		$this->item_nama->EditAttrs["class"] = "form-control";
-		$this->item_nama->EditCustomAttributes = "";
-		$this->item_nama->EditValue = $this->item_nama->CurrentValue;
-		$this->item_nama->PlaceHolder = ew_RemoveHtml($this->item_nama->FldCaption());
+		// tgl_beli
+		$this->tgl_beli->EditAttrs["class"] = "form-control";
+		$this->tgl_beli->EditCustomAttributes = "";
+		$this->tgl_beli->EditValue = ew_FormatDateTime($this->tgl_beli->CurrentValue, 8);
+		$this->tgl_beli->PlaceHolder = ew_RemoveHtml($this->tgl_beli->FldCaption());
+
+		// qty
+		$this->qty->EditAttrs["class"] = "form-control";
+		$this->qty->EditCustomAttributes = "";
+		$this->qty->EditValue = $this->qty->CurrentValue;
+		$this->qty->PlaceHolder = ew_RemoveHtml($this->qty->FldCaption());
+		if (strval($this->qty->EditValue) <> "" && is_numeric($this->qty->EditValue)) $this->qty->EditValue = ew_FormatNumber($this->qty->EditValue, -2, -1, -2, 0);
+
+		// harga
+		$this->harga->EditAttrs["class"] = "form-control";
+		$this->harga->EditCustomAttributes = "";
+		$this->harga->EditValue = $this->harga->CurrentValue;
+		$this->harga->PlaceHolder = ew_RemoveHtml($this->harga->FldCaption());
+		if (strval($this->harga->EditValue) <> "" && is_numeric($this->harga->EditValue)) $this->harga->EditValue = ew_FormatNumber($this->harga->EditValue, -2, -1, -2, 0);
+
+		// sub_total
+		$this->sub_total->EditAttrs["class"] = "form-control";
+		$this->sub_total->EditCustomAttributes = "";
+		$this->sub_total->EditValue = $this->sub_total->CurrentValue;
+		$this->sub_total->PlaceHolder = ew_RemoveHtml($this->sub_total->FldCaption());
+		if (strval($this->sub_total->EditValue) <> "" && is_numeric($this->sub_total->EditValue)) $this->sub_total->EditValue = ew_FormatNumber($this->sub_total->EditValue, -2, -1, -2, 0);
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -651,11 +760,21 @@ class ct_02item extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
+					if ($this->temp_beli_id->Exportable) $Doc->ExportCaption($this->temp_beli_id);
+					if ($this->beli_id->Exportable) $Doc->ExportCaption($this->beli_id);
 					if ($this->item_id->Exportable) $Doc->ExportCaption($this->item_id);
-					if ($this->item_nama->Exportable) $Doc->ExportCaption($this->item_nama);
+					if ($this->tgl_beli->Exportable) $Doc->ExportCaption($this->tgl_beli);
+					if ($this->qty->Exportable) $Doc->ExportCaption($this->qty);
+					if ($this->harga->Exportable) $Doc->ExportCaption($this->harga);
+					if ($this->sub_total->Exportable) $Doc->ExportCaption($this->sub_total);
 				} else {
+					if ($this->temp_beli_id->Exportable) $Doc->ExportCaption($this->temp_beli_id);
+					if ($this->beli_id->Exportable) $Doc->ExportCaption($this->beli_id);
 					if ($this->item_id->Exportable) $Doc->ExportCaption($this->item_id);
-					if ($this->item_nama->Exportable) $Doc->ExportCaption($this->item_nama);
+					if ($this->tgl_beli->Exportable) $Doc->ExportCaption($this->tgl_beli);
+					if ($this->qty->Exportable) $Doc->ExportCaption($this->qty);
+					if ($this->harga->Exportable) $Doc->ExportCaption($this->harga);
+					if ($this->sub_total->Exportable) $Doc->ExportCaption($this->sub_total);
 				}
 				$Doc->EndExportRow();
 			}
@@ -687,11 +806,21 @@ class ct_02item extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
+						if ($this->temp_beli_id->Exportable) $Doc->ExportField($this->temp_beli_id);
+						if ($this->beli_id->Exportable) $Doc->ExportField($this->beli_id);
 						if ($this->item_id->Exportable) $Doc->ExportField($this->item_id);
-						if ($this->item_nama->Exportable) $Doc->ExportField($this->item_nama);
+						if ($this->tgl_beli->Exportable) $Doc->ExportField($this->tgl_beli);
+						if ($this->qty->Exportable) $Doc->ExportField($this->qty);
+						if ($this->harga->Exportable) $Doc->ExportField($this->harga);
+						if ($this->sub_total->Exportable) $Doc->ExportField($this->sub_total);
 					} else {
+						if ($this->temp_beli_id->Exportable) $Doc->ExportField($this->temp_beli_id);
+						if ($this->beli_id->Exportable) $Doc->ExportField($this->beli_id);
 						if ($this->item_id->Exportable) $Doc->ExportField($this->item_id);
-						if ($this->item_nama->Exportable) $Doc->ExportField($this->item_nama);
+						if ($this->tgl_beli->Exportable) $Doc->ExportField($this->tgl_beli);
+						if ($this->qty->Exportable) $Doc->ExportField($this->qty);
+						if ($this->harga->Exportable) $Doc->ExportField($this->harga);
+						if ($this->sub_total->Exportable) $Doc->ExportField($this->sub_total);
 					}
 					$Doc->EndExportRow();
 				}
@@ -730,129 +859,6 @@ class ct_02item extends cTable {
 			return ew_ArrayToJson($rsarr);
 		} else {
 			return FALSE;
-		}
-	}
-
-	// Write Audit Trail start/end for grid update
-	function WriteAuditTrailDummy($typ) {
-		$table = 't_02item';
-		$usr = CurrentUserName();
-		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
-	}
-
-	// Write Audit Trail (add page)
-	function WriteAuditTrailOnAdd(&$rs) {
-		global $Language;
-		if (!$this->AuditTrailOnAdd) return;
-		$table = 't_02item';
-
-		// Get key value
-		$key = "";
-		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs['item_id'];
-
-		// Write Audit Trail
-		$dt = ew_StdCurrentDateTime();
-		$id = ew_ScriptName();
-		$usr = CurrentUserName();
-		foreach (array_keys($rs) as $fldname) {
-			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
-				if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") {
-					$newvalue = $Language->Phrase("PasswordMask"); // Password Field
-				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
-					if (EW_AUDIT_TRAIL_TO_DATABASE)
-						$newvalue = $rs[$fldname];
-					else
-						$newvalue = "[MEMO]"; // Memo Field
-				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) {
-					$newvalue = "[XML]"; // XML Field
-				} else {
-					$newvalue = $rs[$fldname];
-				}
-				ew_WriteAuditTrail("log", $dt, $id, $usr, "A", $table, $fldname, $key, "", $newvalue);
-			}
-		}
-	}
-
-	// Write Audit Trail (edit page)
-	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
-		global $Language;
-		if (!$this->AuditTrailOnEdit) return;
-		$table = 't_02item';
-
-		// Get key value
-		$key = "";
-		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rsold['item_id'];
-
-		// Write Audit Trail
-		$dt = ew_StdCurrentDateTime();
-		$id = ew_ScriptName();
-		$usr = CurrentUserName();
-		foreach (array_keys($rsnew) as $fldname) {
-			if (array_key_exists($fldname, $this->fields) && array_key_exists($fldname, $rsold) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
-				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_DATE) { // DateTime field
-					$modified = (ew_FormatDateTime($rsold[$fldname], 0) <> ew_FormatDateTime($rsnew[$fldname], 0));
-				} else {
-					$modified = !ew_CompareValue($rsold[$fldname], $rsnew[$fldname]);
-				}
-				if ($modified) {
-					if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") { // Password Field
-						$oldvalue = $Language->Phrase("PasswordMask");
-						$newvalue = $Language->Phrase("PasswordMask");
-					} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) { // Memo field
-						if (EW_AUDIT_TRAIL_TO_DATABASE) {
-							$oldvalue = $rsold[$fldname];
-							$newvalue = $rsnew[$fldname];
-						} else {
-							$oldvalue = "[MEMO]";
-							$newvalue = "[MEMO]";
-						}
-					} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) { // XML field
-						$oldvalue = "[XML]";
-						$newvalue = "[XML]";
-					} else {
-						$oldvalue = $rsold[$fldname];
-						$newvalue = $rsnew[$fldname];
-					}
-					ew_WriteAuditTrail("log", $dt, $id, $usr, "U", $table, $fldname, $key, $oldvalue, $newvalue);
-				}
-			}
-		}
-	}
-
-	// Write Audit Trail (delete page)
-	function WriteAuditTrailOnDelete(&$rs) {
-		global $Language;
-		if (!$this->AuditTrailOnDelete) return;
-		$table = 't_02item';
-
-		// Get key value
-		$key = "";
-		if ($key <> "")
-			$key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs['item_id'];
-
-		// Write Audit Trail
-		$dt = ew_StdCurrentDateTime();
-		$id = ew_ScriptName();
-		$curUser = CurrentUserName();
-		foreach (array_keys($rs) as $fldname) {
-			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
-				if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") {
-					$oldvalue = $Language->Phrase("PasswordMask"); // Password Field
-				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
-					if (EW_AUDIT_TRAIL_TO_DATABASE)
-						$oldvalue = $rs[$fldname];
-					else
-						$oldvalue = "[MEMO]"; // Memo field
-				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) {
-					$oldvalue = "[XML]"; // XML field
-				} else {
-					$oldvalue = $rs[$fldname];
-				}
-				ew_WriteAuditTrail("log", $dt, $id, $curUser, "D", $table, $fldname, $key, $oldvalue, "");
-			}
 		}
 	}
 
@@ -908,8 +914,6 @@ class ct_02item extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
-		$q = "insert into t_08item_saldo values (null, ".$rsnew["item_id"].", '".date("Y-m-")."-01"."', 0, 0)";
-		ew_Execute($q);
 	}
 
 	// Row Updating event
