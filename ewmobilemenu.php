@@ -5,9 +5,10 @@
 $RootMenu->IsRoot = TRUE;
 $RootMenu->AddMenuItem(6, "mmi_cf_00home_php", $Language->MenuPhrase("6", "MenuText"), "cf_00home.php", -1, "", TRUE, FALSE, TRUE);
 $RootMenu->AddMenuItem(7, "mmci_Master", $Language->MenuPhrase("7", "MenuText"), "", -1, "", TRUE, FALSE, TRUE);
-$RootMenu->AddMenuItem(2, "mmi_t_01vendor", $Language->MenuPhrase("2", "MenuText"), "t_01vendorlist.php", 7, "", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(3, "mmi_t_02item", $Language->MenuPhrase("3", "MenuText"), "t_02itemlist.php", 7, "", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(4, "mmi_t_03satuan", $Language->MenuPhrase("4", "MenuText"), "t_03satuanlist.php", 7, "", TRUE, FALSE, FALSE);
+$RootMenu->AddMenuItem(10046, "mmi_t_08item_saldo", $Language->MenuPhrase("10046", "MenuText"), "t_08item_saldolist.php", 7, "", TRUE, FALSE, FALSE);
+$RootMenu->AddMenuItem(2, "mmi_t_01vendor", $Language->MenuPhrase("2", "MenuText"), "t_01vendorlist.php", 7, "", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(10018, "mmi_t_05customer", $Language->MenuPhrase("10018", "MenuText"), "t_05customerlist.php", 7, "", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(10016, "mmci_Transaksi", $Language->MenuPhrase("10016", "MenuText"), "", -1, "", TRUE, FALSE, TRUE);
 $RootMenu->AddMenuItem(5, "mmi_t_04beli", $Language->MenuPhrase("5", "MenuText"), "t_04belilist.php", 10016, "", TRUE, FALSE, FALSE);

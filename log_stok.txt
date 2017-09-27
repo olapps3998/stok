@@ -31,3 +31,12 @@ sudah selesai sampai dengan laporan stok dan laporan mutasi
 laporan hutang
 - nilai hutang = sub total - (jumlah DP + jumlah pelunasan)
 
+4:01 PM 9/25/2017
+laporan piutang
+- tambah field di t_06jual, antara lain :
+  -- inv_no
+  -- inv_tgl
+  -- inv_jml
+  -- bayar_tgl
+  -- bayar_jml
+  
