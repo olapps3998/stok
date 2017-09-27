@@ -122,6 +122,7 @@ var ewVar = <?php echo json_encode($EW_CLIENT_VAR); ?>;
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
+<link rel="shortcut icon" type="image/vnd.microsoft.icon" href="<?php echo ew_ConvertFullUrl("favicon.ico") ?>"><link rel="icon" type="image/vnd.microsoft.icon" href="<?php echo ew_ConvertFullUrl("favicon.ico") ?>">
 <meta name="generator" content="PHPMaker v2017.0.7">
 </head>
 <body>
