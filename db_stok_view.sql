@@ -49,13 +49,16 @@ Group By t_07jual_detail.item_id;
 create view v_05stok as
 Select a.item_id As item_id,
   a.item_nama As item_nama,
-  (Case When isnull(b.masuk) Then 0 Else b.masuk End) As masuk,
+  ((Case When isnull(b.masuk) Then 0 Else b.masuk End) + (Case
+    When isnull(d.qty) Then 0 Else d.qty End)) As masuk,
   (Case When isnull(c.keluar) Then 0 Else c.keluar End) As keluar,
-  ((Case When isnull(b.masuk) Then 0 Else b.masuk End) - (Case
+  (((Case When isnull(b.masuk) Then 0 Else b.masuk End) + (Case
+    When isnull(d.qty) Then 0 Else d.qty End)) - (Case
     When isnull(c.keluar) Then 0 Else c.keluar End)) As saldo
-From (t_02item a
+From ((t_02item a
   Left Join v_03masuk b On a.item_id = b.item_id)
-  Left Join v_04keluar c On a.item_id = c.item_id
+  Left Join v_04keluar c On a.item_id = c.item_id)
+  Left Join t_08item_saldo d On a.item_id = d.item_id
 Order By item_id;
 
 create view v_06transaksi as
@@ -98,7 +101,18 @@ Select v_06transaksi.item_id As item_id,
   (Case v_06transaksi.jenis When 'K' Then v_06transaksi.qty Else 0
   End) As keluar,
   v_06transaksi.qty As saldo
-From v_06transaksi;
+From v_06transaksi
+union All
+Select a.item_id As item_id,
+  b.item_nama As item_nama,
+  a.tgl As tgl,
+  a.qty As qty,
+  0 As `0`,
+  a.qty As qty
+From t_08item_saldo a
+  Left Join t_02item b On a.item_id = b.item_id
+Order By item_id,
+  tgl;
 
 create view v_08harga_jual_terakhir as
 Select Max(t_07jual_detail.tgl_kirim) As tgl_kirim_terakhir,
