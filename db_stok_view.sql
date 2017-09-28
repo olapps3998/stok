@@ -152,3 +152,36 @@ Select a.no_po As no_po,
 From t_06jual a
   Left Join t_05customer b On a.customer_id = b.customer_id
 Where (Case When isnull(a.bayar_jml) Then 0 Else a.bayar_jml End) < a.total;
+
+create view v_12nilai_stok as
+Select a.item_id As item_id,
+  a.item_nama As item_nama,
+  b.tgl_beli As tgl,
+  y.vendor_nama As vendor_customer,
+  b.qty As qty,
+  'M' As jenis,
+  z.satuan_nama As satuan_nama,
+  b.harga As harga,
+  b.sub_total As sub_total
+From ((t_02item a
+  Left Join t_04beli b On a.item_id = b.item_id)
+  Left Join t_01vendor y On b.vendor_id = y.vendor_id)
+  Left Join t_03satuan z On b.satuan_id = z.satuan_id
+union All
+Select a.item_id As item_id,
+  a.item_nama As item_nama,
+  b.tgl_kirim As tgl_kirim,
+  y.customer_nama As customer_nama,
+  b.qty As qty,
+  'K' As K,
+  z.satuan_nama As satuan_nama,
+  b.harga As harga,
+  b.sub_total As sub_total
+From (((t_02item a
+  Left Join t_07jual_detail b On a.item_id = b.item_id)
+  Left Join t_06jual c On b.jual_id = c.jual_id)
+  Left Join t_05customer y On c.customer_id = y.customer_id)
+  Left Join t_03satuan z On b.satuan_id = z.satuan_id
+Order By item_id,
+  tgl,
+  jenis Desc;

@@ -1169,10 +1169,10 @@
         <phrase id="fldcaption" value="id" />
       </field>
       <field id="item_id">
-        <phrase id="fldcaption" value="item id" />
+        <phrase id="fldcaption" value="Item ID" />
       </field>
       <field id="tgl">
-        <phrase id="fldcaption" value="tgl" />
+        <phrase id="fldcaption" value="Tgl." />
       </field>
       <field id="in_qty">
         <phrase id="fldcaption" value="IN Qty." />
