@@ -516,11 +516,6 @@ class ct_08item_saldo_add extends ct_08item_saldo {
 		$this->Row_Selected($row);
 		$this->sld_id->setDbValue($rs->fields('sld_id'));
 		$this->item_id->setDbValue($rs->fields('item_id'));
-		if (array_key_exists('EV__item_id', $rs->fields)) {
-			$this->item_id->VirtualValue = $rs->fields('EV__item_id'); // Set up virtual field value
-		} else {
-			$this->item_id->VirtualValue = ""; // Clear value
-		}
 		$this->tgl->setDbValue($rs->fields('tgl'));
 		$this->qty->setDbValue($rs->fields('qty'));
 		$this->harga->setDbValue($rs->fields('harga'));
@@ -591,15 +586,12 @@ class ct_08item_saldo_add extends ct_08item_saldo {
 		$this->sld_id->ViewCustomAttributes = "";
 
 		// item_id
-		if ($this->item_id->VirtualValue <> "") {
-			$this->item_id->ViewValue = $this->item_id->VirtualValue;
-		} else {
-			$this->item_id->ViewValue = $this->item_id->CurrentValue;
+		$this->item_id->ViewValue = $this->item_id->CurrentValue;
 		if (strval($this->item_id->CurrentValue) <> "") {
 			$sFilterWrk = "`item_id`" . ew_SearchString("=", $this->item_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `item_id`, `item_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_02item`";
 		$sWhereWrk = "";
-		$this->item_id->LookupFilters = array();
+		$this->item_id->LookupFilters = array("dx1" => '`item_nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->item_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -614,7 +606,6 @@ class ct_08item_saldo_add extends ct_08item_saldo {
 			}
 		} else {
 			$this->item_id->ViewValue = NULL;
-		}
 		}
 		$this->item_id->ViewCustomAttributes = "";
 
@@ -660,6 +651,26 @@ class ct_08item_saldo_add extends ct_08item_saldo {
 			$this->item_id->EditAttrs["class"] = "form-control";
 			$this->item_id->EditCustomAttributes = "";
 			$this->item_id->EditValue = ew_HtmlEncode($this->item_id->CurrentValue);
+			if (strval($this->item_id->CurrentValue) <> "") {
+				$sFilterWrk = "`item_id`" . ew_SearchString("=", $this->item_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$sSqlWrk = "SELECT `item_id`, `item_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_02item`";
+			$sWhereWrk = "";
+			$this->item_id->LookupFilters = array("dx1" => '`item_nama`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->item_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
+					$this->item_id->EditValue = $this->item_id->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->item_id->EditValue = ew_HtmlEncode($this->item_id->CurrentValue);
+				}
+			} else {
+				$this->item_id->EditValue = NULL;
+			}
 			$this->item_id->PlaceHolder = ew_RemoveHtml($this->item_id->FldCaption());
 
 			// tgl
@@ -723,6 +734,9 @@ class ct_08item_saldo_add extends ct_08item_saldo {
 			return ($gsFormError == "");
 		if (!$this->item_id->FldIsDetailKey && !is_null($this->item_id->FormValue) && $this->item_id->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->item_id->FldCaption(), $this->item_id->ReqErrMsg));
+		}
+		if (!ew_CheckInteger($this->item_id->FormValue)) {
+			ew_AddMessage($gsFormError, $this->item_id->FldErrMsg());
 		}
 		if (!$this->tgl->FldIsDetailKey && !is_null($this->tgl->FormValue) && $this->tgl->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->tgl->FldCaption(), $this->tgl->ReqErrMsg));
@@ -821,7 +835,7 @@ class ct_08item_saldo_add extends ct_08item_saldo {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `item_id` AS `LinkFld`, `item_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_02item`";
 			$sWhereWrk = "{filter}";
-			$this->item_id->LookupFilters = array();
+			$this->item_id->LookupFilters = array("dx1" => '`item_nama`');
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`item_id` = {filter_value}', "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->item_id, $sWhereWrk); // Call Lookup selecting
@@ -841,7 +855,7 @@ class ct_08item_saldo_add extends ct_08item_saldo {
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `item_id`, `item_nama` AS `DispFld` FROM `t_02item`";
 			$sWhereWrk = "`item_nama` LIKE '{query_value}%'";
-			$this->item_id->LookupFilters = array();
+			$this->item_id->LookupFilters = array("dx1" => '`item_nama`');
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->item_id, $sWhereWrk); // Call Lookup selecting
@@ -964,6 +978,9 @@ ft_08item_saldoadd.Validate = function() {
 			elm = this.GetElements("x" + infix + "_item_id");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_08item_saldo->item_id->FldCaption(), $t_08item_saldo->item_id->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_item_id");
+			if (elm && !ew_CheckInteger(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_08item_saldo->item_id->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_tgl");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_08item_saldo->tgl->FldCaption(), $t_08item_saldo->tgl->ReqErrMsg)) ?>");
@@ -1051,13 +1068,13 @@ $t_08item_saldo->item_id->EditAttrs["onchange"] = "";
 <span id="as_x_item_id" style="white-space: nowrap; z-index: 8980">
 	<input type="text" name="sv_x_item_id" id="sv_x_item_id" value="<?php echo $t_08item_saldo->item_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($t_08item_saldo->item_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_08item_saldo->item_id->getPlaceHolder()) ?>"<?php echo $t_08item_saldo->item_id->EditAttributes() ?>>
 </span>
-<input type="hidden" data-table="t_08item_saldo" data-field="x_item_id" data-value-separator="<?php echo $t_08item_saldo->item_id->DisplayValueSeparatorAttribute() ?>" name="x_item_id" id="x_item_id" value="<?php echo ew_HtmlEncode($t_08item_saldo->item_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<input type="hidden" data-table="t_08item_saldo" data-field="x_item_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_08item_saldo->item_id->DisplayValueSeparatorAttribute() ?>" name="x_item_id" id="x_item_id" value="<?php echo ew_HtmlEncode($t_08item_saldo->item_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
 <input type="hidden" name="q_x_item_id" id="q_x_item_id" value="<?php echo $t_08item_saldo->item_id->LookupFilterQuery(true) ?>">
 <script type="text/javascript">
-ft_08item_saldoadd.CreateAutoSuggest({"id":"x_item_id","forceSelect":false});
+ft_08item_saldoadd.CreateAutoSuggest({"id":"x_item_id","forceSelect":true});
 </script>
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_08item_saldo->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_08item_saldo->item_id->FldCaption() ?></span></button>
-<input type="hidden" name="s_x_item_id" id="s_x_item_id" value="<?php echo $t_08item_saldo->item_id->LookupFilterQuery() ?>">
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_08item_saldo->item_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_item_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" name="s_x_item_id" id="s_x_item_id" value="<?php echo $t_08item_saldo->item_id->LookupFilterQuery(false) ?>">
 </span>
 <?php echo $t_08item_saldo->item_id->CustomMsg ?></div></div>
 	</div>

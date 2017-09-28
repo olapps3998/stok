@@ -628,7 +628,7 @@ class ct_08item_saldo_view extends ct_08item_saldo {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -674,11 +674,6 @@ class ct_08item_saldo_view extends ct_08item_saldo {
 		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
 		$this->sld_id->setDbValue($rs->fields('sld_id'));
 		$this->item_id->setDbValue($rs->fields('item_id'));
-		if (array_key_exists('EV__item_id', $rs->fields)) {
-			$this->item_id->VirtualValue = $rs->fields('EV__item_id'); // Set up virtual field value
-		} else {
-			$this->item_id->VirtualValue = ""; // Clear value
-		}
 		$this->tgl->setDbValue($rs->fields('tgl'));
 		$this->qty->setDbValue($rs->fields('qty'));
 		$this->harga->setDbValue($rs->fields('harga'));
@@ -732,15 +727,12 @@ class ct_08item_saldo_view extends ct_08item_saldo {
 		$this->sld_id->ViewCustomAttributes = "";
 
 		// item_id
-		if ($this->item_id->VirtualValue <> "") {
-			$this->item_id->ViewValue = $this->item_id->VirtualValue;
-		} else {
-			$this->item_id->ViewValue = $this->item_id->CurrentValue;
+		$this->item_id->ViewValue = $this->item_id->CurrentValue;
 		if (strval($this->item_id->CurrentValue) <> "") {
 			$sFilterWrk = "`item_id`" . ew_SearchString("=", $this->item_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `item_id`, `item_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_02item`";
 		$sWhereWrk = "";
-		$this->item_id->LookupFilters = array();
+		$this->item_id->LookupFilters = array("dx1" => '`item_nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->item_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -755,7 +747,6 @@ class ct_08item_saldo_view extends ct_08item_saldo {
 			}
 		} else {
 			$this->item_id->ViewValue = NULL;
-		}
 		}
 		$this->item_id->ViewCustomAttributes = "";
 

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/9/27" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/9/28" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -643,6 +643,9 @@
     <menu id="10015">
       <phrase id="menutext" value="Stok" />
     </menu>
+    <menu id="10036">
+      <phrase id="menutext" value="Nilai Stok" />
+    </menu>
     <menu id="10017">
       <phrase id="menutext" value="Mutasi" />
     </menu>
@@ -670,20 +673,11 @@
     <menu id="10042">
       <phrase id="menutext" value="v 10hutang" />
     </menu>
-    <menu id="10035">
-      <phrase id="menutext" value="v 06transaksi" />
-    </menu>
-    <menu id="10036">
-      <phrase id="menutext" value="v 07mutasi" />
-    </menu>
     <menu id="10037">
       <phrase id="menutext" value="v 08harga jual terakhir" />
     </menu>
     <menu id="10038">
       <phrase id="menutext" value="v 09margin" />
-    </menu>
-    <menu id="10034">
-      <phrase id="menutext" value="v 04keluar" />
     </menu>
     <menu id="10024">
       <phrase id="menutext" value="v 04stok" />
@@ -691,8 +685,17 @@
     <menu id="10014">
       <phrase id="menutext" value="Transaksi" />
     </menu>
+    <menu id="10032">
+      <phrase id="menutext" value="t 08item saldo" />
+    </menu>
     <menu id="10033">
-      <phrase id="menutext" value="v 04keluar" />
+      <phrase id="menutext" value="t 99beli" />
+    </menu>
+    <menu id="10034">
+      <phrase id="menutext" value="t 09nilai stok" />
+    </menu>
+    <menu id="10035">
+      <phrase id="menutext" value="v 12nilai stok" />
     </menu>
     <menu id="10030">
       <phrase id="menutext" value="v 11piutang" />
@@ -712,8 +715,11 @@
     <menu id="10023">
       <phrase id="menutext" value="v 07mutasi" />
     </menu>
-    <menu id="10032">
+    <menu id="10102">
       <phrase id="menutext" value="v 03masuk" />
+    </menu>
+    <menu id="10103">
+      <phrase id="menutext" value="v 04keluar" />
     </menu>
     <menu id="10020">
       <phrase id="menutext" value="v 05stok" />
@@ -748,6 +754,12 @@
     <menu id="10005">
       <phrase id="menutext" value="Pembelian" />
     </menu>
+    <table id="cf_00home_php">
+      <phrase id="tblcaption" value="Home" />
+    </table>
+    <table id="cf_01hitung_nilai_stok_php">
+      <phrase id="tblcaption" value="Hitung Nilai Stok" />
+    </table>
     <table id="t_00audit_trail">
       <phrase id="tblcaption" value="t 00audit trail" />
       <field id="id">
@@ -850,51 +862,6 @@
         <phrase id="fldcaption" value="Jumlah Pelunasan" />
       </field>
     </table>
-    <table id="cf_00home_php">
-      <phrase id="tblcaption" value="Home" />
-    </table>
-    <table id="v_01beli_laporan">
-      <phrase id="tblcaption" value="v 01beli laporan" />
-      <field id="beli_id">
-        <phrase id="fldcaption" value="beli id" />
-      </field>
-      <field id="tgl_beli">
-        <phrase id="fldcaption" value="tgl beli" />
-      </field>
-      <field id="tgl_kirim">
-        <phrase id="fldcaption" value="tgl kirim" />
-      </field>
-      <field id="vendor_nama">
-        <phrase id="fldcaption" value="vendor nama" />
-      </field>
-      <field id="item_nama">
-        <phrase id="fldcaption" value="item nama" />
-      </field>
-      <field id="qty">
-        <phrase id="fldcaption" value="qty" />
-      </field>
-      <field id="satuan_nama">
-        <phrase id="fldcaption" value="satuan nama" />
-      </field>
-      <field id="harga">
-        <phrase id="fldcaption" value="harga" />
-      </field>
-      <field id="sub_total">
-        <phrase id="fldcaption" value="sub total" />
-      </field>
-      <field id="tgl_dp">
-        <phrase id="fldcaption" value="tgl dp" />
-      </field>
-      <field id="jml_dp">
-        <phrase id="fldcaption" value="jml dp" />
-      </field>
-      <field id="tgl_lunas">
-        <phrase id="fldcaption" value="tgl lunas" />
-      </field>
-      <field id="jml_lunas">
-        <phrase id="fldcaption" value="jml lunas" />
-      </field>
-    </table>
     <table id="t_05customer">
       <phrase id="tblcaption" value="Customer" />
       <field id="customer_id">
@@ -962,6 +929,129 @@
       </field>
       <field id="sub_total">
         <phrase id="fldcaption" value="Sub Total" />
+      </field>
+    </table>
+    <table id="t_08item_saldo">
+      <phrase id="tblcaption" value="Saldo Awal" />
+      <field id="sld_id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="Item" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="Tgl." />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty." />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="Harga" />
+      </field>
+    </table>
+    <table id="t_09nilai_stok">
+      <phrase id="tblcaption" value="t 09nilai stok" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
+      </field>
+      <field id="in_qty">
+        <phrase id="fldcaption" value="in qty" />
+      </field>
+      <field id="in_harga">
+        <phrase id="fldcaption" value="in harga" />
+      </field>
+      <field id="in_sub_total">
+        <phrase id="fldcaption" value="in sub total" />
+      </field>
+      <field id="out_qty">
+        <phrase id="fldcaption" value="out qty" />
+      </field>
+      <field id="out_harga">
+        <phrase id="fldcaption" value="out harga" />
+      </field>
+      <field id="out_sub_total">
+        <phrase id="fldcaption" value="out sub total" />
+      </field>
+      <field id="saldo_qty">
+        <phrase id="fldcaption" value="saldo qty" />
+      </field>
+      <field id="saldo_harga">
+        <phrase id="fldcaption" value="saldo harga" />
+      </field>
+      <field id="saldo_sub_total">
+        <phrase id="fldcaption" value="saldo sub total" />
+      </field>
+    </table>
+    <table id="t_99beli">
+      <phrase id="tblcaption" value="t 99beli" />
+      <field id="temp_beli_id">
+        <phrase id="fldcaption" value="temp beli id" />
+      </field>
+      <field id="beli_id">
+        <phrase id="fldcaption" value="beli id" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="tgl_beli">
+        <phrase id="fldcaption" value="tgl beli" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="qty" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="harga" />
+      </field>
+      <field id="sub_total">
+        <phrase id="fldcaption" value="sub total" />
+      </field>
+    </table>
+    <table id="v_01beli_laporan">
+      <phrase id="tblcaption" value="v 01beli laporan" />
+      <field id="beli_id">
+        <phrase id="fldcaption" value="beli id" />
+      </field>
+      <field id="tgl_beli">
+        <phrase id="fldcaption" value="tgl beli" />
+      </field>
+      <field id="tgl_kirim">
+        <phrase id="fldcaption" value="tgl kirim" />
+      </field>
+      <field id="vendor_nama">
+        <phrase id="fldcaption" value="vendor nama" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="qty" />
+      </field>
+      <field id="satuan_nama">
+        <phrase id="fldcaption" value="satuan nama" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="harga" />
+      </field>
+      <field id="sub_total">
+        <phrase id="fldcaption" value="sub total" />
+      </field>
+      <field id="tgl_dp">
+        <phrase id="fldcaption" value="tgl dp" />
+      </field>
+      <field id="jml_dp">
+        <phrase id="fldcaption" value="jml dp" />
+      </field>
+      <field id="tgl_lunas">
+        <phrase id="fldcaption" value="tgl lunas" />
+      </field>
+      <field id="jml_lunas">
+        <phrase id="fldcaption" value="jml lunas" />
       </field>
     </table>
     <table id="v_02jual_laporan">
@@ -1171,40 +1261,28 @@
         <phrase id="fldcaption" value="bayar tgl" />
       </field>
     </table>
-    <table id="t_08item_saldo">
-      <phrase id="tblcaption" value="Saldo Awal" />
-      <field id="sld_id">
-        <phrase id="fldcaption" value="ID" />
-      </field>
-      <field id="item_id">
-        <phrase id="fldcaption" value="Item" />
-      </field>
-      <field id="tgl">
-        <phrase id="fldcaption" value="Tgl." />
-      </field>
-      <field id="qty">
-        <phrase id="fldcaption" value="Qty." />
-      </field>
-      <field id="harga">
-        <phrase id="fldcaption" value="Harga" />
-      </field>
-    </table>
-    <table id="t_99beli">
-      <phrase id="tblcaption" value="t 99beli" />
-      <field id="temp_beli_id">
-        <phrase id="fldcaption" value="temp beli id" />
-      </field>
-      <field id="beli_id">
-        <phrase id="fldcaption" value="beli id" />
-      </field>
+    <table id="v_12nilai_stok">
+      <phrase id="tblcaption" value="v 12nilai stok" />
       <field id="item_id">
         <phrase id="fldcaption" value="item id" />
       </field>
-      <field id="tgl_beli">
-        <phrase id="fldcaption" value="tgl beli" />
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
+      </field>
+      <field id="vendor_customer">
+        <phrase id="fldcaption" value="vendor customer" />
       </field>
       <field id="qty">
         <phrase id="fldcaption" value="qty" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="jenis" />
+      </field>
+      <field id="satuan_nama">
+        <phrase id="fldcaption" value="satuan nama" />
       </field>
       <field id="harga">
         <phrase id="fldcaption" value="harga" />
@@ -1212,9 +1290,6 @@
       <field id="sub_total">
         <phrase id="fldcaption" value="sub total" />
       </field>
-    </table>
-    <table id="cf_01hitung_nilai_stok_php">
-      <phrase id="tblcaption" value="Hitung Nilai Stok" />
     </table>
   </project>
 </ew-language>

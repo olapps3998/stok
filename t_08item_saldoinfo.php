@@ -56,7 +56,7 @@ class ct_08item_saldo extends cTable {
 		$this->fields['sld_id'] = &$this->sld_id;
 
 		// item_id
-		$this->item_id = new cField('t_08item_saldo', 't_08item_saldo', 'x_item_id', 'item_id', '`item_id`', '`item_id`', 3, -1, FALSE, '`EV__item_id`', TRUE, FALSE, TRUE, 'FORMATTED TEXT', 'TEXT');
+		$this->item_id = new cField('t_08item_saldo', 't_08item_saldo', 'x_item_id', 'item_id', '`item_id`', '`item_id`', 3, -1, FALSE, '`item_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->item_id->Sortable = TRUE; // Allow sort
 		$this->item_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['item_id'] = &$this->item_id;
@@ -109,31 +109,9 @@ class ct_08item_saldo extends cTable {
 			} else {
 				$this->setSessionOrderBy($sSortField . " " . $sThisSort); // Save to Session
 			}
-			$sSortFieldList = ($ofld->FldVirtualExpression <> "") ? $ofld->FldVirtualExpression : $sSortField;
-			if ($ctrl) {
-				$sOrderByList = $this->getSessionOrderByList();
-				if (strpos($sOrderByList, $sSortFieldList . " " . $sLastSort) !== FALSE) {
-					$sOrderByList = str_replace($sSortFieldList . " " . $sLastSort, $sSortFieldList . " " . $sThisSort, $sOrderByList);
-				} else {
-					if ($sOrderByList <> "") $sOrderByList .= ", ";
-					$sOrderByList .= $sSortFieldList . " " . $sThisSort;
-				}
-				$this->setSessionOrderByList($sOrderByList); // Save to Session
-			} else {
-				$this->setSessionOrderByList($sSortFieldList . " " . $sThisSort); // Save to Session
-			}
 		} else {
 			if (!$ctrl) $ofld->setSort("");
 		}
-	}
-
-	// Session ORDER BY for List page
-	function getSessionOrderByList() {
-		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST];
-	}
-
-	function setSessionOrderByList($v) {
-		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST] = $v;
 	}
 
 	// Table level SQL
@@ -162,23 +140,6 @@ class ct_08item_saldo extends cTable {
 
 	function setSqlSelect($v) {
 		$this->_SqlSelect = $v;
-	}
-	var $_SqlSelectList = "";
-
-	function getSqlSelectList() { // Select for List page
-		$select = "";
-		$select = "SELECT * FROM (" .
-			"SELECT *, (SELECT `item_nama` FROM `t_02item` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`item_id` = `t_08item_saldo`.`item_id` LIMIT 1) AS `EV__item_id` FROM `t_08item_saldo`" .
-			") `EW_TMP_TABLE`";
-		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
-	}
-
-	function SqlSelectList() { // For backward compatibility
-		return $this->getSqlSelectList();
-	}
-
-	function setSqlSelectList($v) {
-		$this->_SqlSelectList = $v;
 	}
 	var $_SqlWhere = "";
 
@@ -291,38 +252,15 @@ class ct_08item_saldo extends cTable {
 		ew_AddFilter($sFilter, $this->CurrentFilter);
 		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$this->Recordset_Selecting($sFilter);
-		if ($this->UseVirtualFields()) {
-			$sSort = $this->getSessionOrderByList();
-			return ew_BuildSelectSql($this->getSqlSelectList(), $this->getSqlWhere(), $this->getSqlGroupBy(),
-				$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
-		} else {
-			$sSort = $this->getSessionOrderBy();
-			return ew_BuildSelectSql($this->getSqlSelect(), $this->getSqlWhere(), $this->getSqlGroupBy(),
-				$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
-		}
+		$sSort = $this->getSessionOrderBy();
+		return ew_BuildSelectSql($this->getSqlSelect(), $this->getSqlWhere(), $this->getSqlGroupBy(),
+			$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
 	}
 
 	// Get ORDER BY clause
 	function GetOrderBy() {
-		$sSort = ($this->UseVirtualFields()) ? $this->getSessionOrderByList() : $this->getSessionOrderBy();
+		$sSort = $this->getSessionOrderBy();
 		return ew_BuildSelectSql("", "", "", "", $this->getSqlOrderBy(), "", $sSort);
-	}
-
-	// Check if virtual fields is used in SQL
-	function UseVirtualFields() {
-		$sWhere = $this->getSessionWhere();
-		$sOrderBy = $this->getSessionOrderByList();
-		if ($sWhere <> "")
-			$sWhere = " " . str_replace(array("(",")"), array("",""), $sWhere) . " ";
-		if ($sOrderBy <> "")
-			$sOrderBy = " " . str_replace(array("(",")"), array("",""), $sOrderBy) . " ";
-		if ($this->item_id->AdvancedSearch->SearchValue <> "" ||
-			$this->item_id->AdvancedSearch->SearchValue2 <> "" ||
-			strpos($sWhere, " " . $this->item_id->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		if (strpos($sOrderBy, " " . $this->item_id->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		return FALSE;
 	}
 
 	// Try to get record count
@@ -678,15 +616,12 @@ class ct_08item_saldo extends cTable {
 		$this->sld_id->ViewCustomAttributes = "";
 
 		// item_id
-		if ($this->item_id->VirtualValue <> "") {
-			$this->item_id->ViewValue = $this->item_id->VirtualValue;
-		} else {
-			$this->item_id->ViewValue = $this->item_id->CurrentValue;
+		$this->item_id->ViewValue = $this->item_id->CurrentValue;
 		if (strval($this->item_id->CurrentValue) <> "") {
 			$sFilterWrk = "`item_id`" . ew_SearchString("=", $this->item_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `item_id`, `item_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_02item`";
 		$sWhereWrk = "";
-		$this->item_id->LookupFilters = array();
+		$this->item_id->LookupFilters = array("dx1" => '`item_nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->item_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -701,7 +636,6 @@ class ct_08item_saldo extends cTable {
 			}
 		} else {
 			$this->item_id->ViewValue = NULL;
-		}
 		}
 		$this->item_id->ViewCustomAttributes = "";
 
@@ -768,7 +702,27 @@ class ct_08item_saldo extends cTable {
 		$this->item_id->EditAttrs["class"] = "form-control";
 		$this->item_id->EditCustomAttributes = "";
 		$this->item_id->EditValue = $this->item_id->CurrentValue;
-		$this->item_id->PlaceHolder = ew_RemoveHtml($this->item_id->FldCaption());
+		if (strval($this->item_id->CurrentValue) <> "") {
+			$sFilterWrk = "`item_id`" . ew_SearchString("=", $this->item_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `item_id`, `item_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_02item`";
+		$sWhereWrk = "";
+		$this->item_id->LookupFilters = array("dx1" => '`item_nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->item_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->item_id->EditValue = $this->item_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->item_id->EditValue = $this->item_id->CurrentValue;
+			}
+		} else {
+			$this->item_id->EditValue = NULL;
+		}
+		$this->item_id->ViewCustomAttributes = "";
 
 		// tgl
 		$this->tgl->EditAttrs["class"] = "form-control";

@@ -40,3 +40,6 @@ laporan piutang
   -- bayar_tgl
   -- bayar_jml
   
+8:36 PM 9/26/2017
+perlu dibuatkan modul MASTER > SALDO AWAL;
+
