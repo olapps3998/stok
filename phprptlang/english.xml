@@ -1132,6 +1132,9 @@
       <field id="saldo_sub_total">
         <phrase id="fldcaption" value="saldo sub total" />
       </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
     </table>
     <table id="v_12nilai_stok">
       <phrase id="tblcaption" value="v 12nilai stok" />
@@ -1170,6 +1173,9 @@
       </field>
       <field id="item_id">
         <phrase id="fldcaption" value="Item ID" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="Item Nama" />
       </field>
       <field id="tgl">
         <phrase id="fldcaption" value="Tgl." />

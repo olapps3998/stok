@@ -11,6 +11,7 @@ class crr_nilai_stok extends crTableBase {
 	var $ShowCompactSummaryFooter = TRUE;
 	var $id;
 	var $item_id;
+	var $item_nama;
 	var $tgl;
 	var $in_qty;
 	var $in_harga;
@@ -57,6 +58,20 @@ class crr_nilai_stok extends crTableBase {
 		$this->item_id->FldGroupByType = "";
 		$this->item_id->FldGroupInt = "0";
 		$this->item_id->FldGroupSql = "";
+
+		// item_nama
+		$this->item_nama = new crField('r_nilai_stok', 'r_nilai_stok', 'x_item_nama', 'item_nama', '`item_nama`', 200, EWR_DATATYPE_STRING, -1);
+		$this->item_nama->Sortable = TRUE; // Allow sort
+		$this->item_nama->GroupingFieldId = 2;
+		$this->item_nama->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
+		$this->item_nama->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
+		$this->fields['item_nama'] = &$this->item_nama;
+		$this->item_nama->DateFilter = "";
+		$this->item_nama->SqlSelect = "";
+		$this->item_nama->SqlOrderBy = "";
+		$this->item_nama->FldGroupByType = "";
+		$this->item_nama->FldGroupInt = "0";
+		$this->item_nama->FldGroupSql = "";
 
 		// tgl
 		$this->tgl = new crField('r_nilai_stok', 'r_nilai_stok', 'x_tgl', 'tgl', '`tgl`', 133, EWR_DATATYPE_DATE, 7);
@@ -294,7 +309,7 @@ class crr_nilai_stok extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`item_id` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`item_id` ASC, `item_nama` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -431,6 +446,19 @@ class crr_nilai_stok extends crTableBase {
 	function SetupLookupFilters($fld) {
 		global $gsLanguage;
 		switch ($fld->FldVar) {
+		case "x_item_nama":
+			$sSqlWrk = "";
+		$sSqlWrk = "SELECT DISTINCT `item_nama`, `item_nama` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `t_09nilai_stok`";
+		$sWhereWrk = "";
+		$this->item_nama->LookupFilters = array();
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "DB", "f0" => '`item_nama` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter));
+			$sSqlWrk = "";
+		$this->Lookup_Selecting($this->item_nama, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+		$sSqlWrk .= " ORDER BY `item_nama` ASC";
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 

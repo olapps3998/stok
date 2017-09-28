@@ -14,13 +14,14 @@ else {
 $q = "delete from t_09nilai_stok";
 $conn->Execute($q);
 
-$q = "select * from t_08item_saldo order by item_id";
+$q = "select a.*, b.item_nama from t_08item_saldo a left join t_02item b on a.item_id = b.item_id order by a.item_id";
 $r = $conn->Execute($q);
 
 while (!$r->EOF) {
 	
 	// ambil nilai dari tabel saldo awal
 	$item_id = $r->fields["item_id"];
+	$item_nama = $r->fields["item_nama"];
 	$tgl = $r->fields["tgl"];
 	$qty = $r->fields["qty"];
 	$harga = $r->fields["harga"];
@@ -30,8 +31,8 @@ while (!$r->EOF) {
 	$q = "
 		insert into 
 			t_09nilai_stok 
-				(item_id, tgl, saldo_qty, saldo_harga, saldo_sub_total) values 
-				(".$item_id.", '".$tgl."', ".$qty.", ".$harga.", ".$sub_total.")
+				(item_id, item_nama, tgl, saldo_qty, saldo_harga, saldo_sub_total) values 
+				(".$item_id.", '".$item_nama."', '".$tgl."', ".$qty.", ".$harga.", ".$sub_total.")
 		";
 	$conn->Execute($q);
 	
@@ -94,11 +95,11 @@ while (!$r->EOF) {
 			$q = "
 				insert into 
 					t_09nilai_stok 
-						(item_id, tgl, 
+						(item_id, item_nama, tgl, 
 						in_qty, in_harga, in_sub_total, 
 						out_qty, out_harga, out_sub_total, 
 						saldo_qty, saldo_harga, saldo_sub_total) values 
-						(".$item_id.", '".$tgl."', ".
+						(".$item_id.", '".$item_nama."', '".$tgl."', ".
 						$in_qty.", ".$in_harga.", ".$in_sub_total.", ".
 						$out_qty.", ".$out_harga.", ".$out_sub_total.", ".
 						$a_qty[0].", ".$a_harga[0].", ".$a_qty[0] * $a_harga[0].")
@@ -106,8 +107,8 @@ while (!$r->EOF) {
 			$conn->Execute($q);
 		
 			for ($i = 1; $i <= $a_index; $i++) {
-				$q = "insert into t_09nilai_stok (item_id, saldo_qty, saldo_harga, saldo_sub_total) values 
-				(".$item_id.", ".$a_qty[$i].", ".$a_harga[$i].", ".$a_qty[$i] * $a_harga[$i].")";
+				$q = "insert into t_09nilai_stok (item_id, item_nama, saldo_qty, saldo_harga, saldo_sub_total) values 
+				(".$item_id.", '".$item_nama."', ".$a_qty[$i].", ".$a_harga[$i].", ".$a_qty[$i] * $a_harga[$i].")";
 				$conn->Execute($q);
 			}
 			
@@ -157,10 +158,10 @@ while (!$r->EOF) {
 			$q = "
 				insert into 
 					t_09nilai_stok 
-						(item_id, tgl, 
+						(item_id, item_nama, tgl, 
 						out_qty, out_harga, out_sub_total, 
 						saldo_qty, saldo_harga, saldo_sub_total) values 
-						(".$item_id.", '".$tgl."', ".
+						(".$item_id.", '".$item_nama."', '".$tgl."', ".
 						$out_qty.", ".$out_harga.", ".$out_qty * $out_harga.", ".
 						$a_qty[0].", ".$a_harga[0].", ".$a_qty[0] * $a_harga[0].")
 				";
@@ -168,8 +169,8 @@ while (!$r->EOF) {
 		
 			if ($item_id == 19) {echo $a_index;}
 			for ($i = 1; $i <= $a_index; $i++) {
-				$q = "insert into t_09nilai_stok (item_id, saldo_qty, saldo_harga, saldo_sub_total) values 
-				(".$item_id.", ".$a_qty[$i].", ".$a_harga[$i].", ".$a_qty[$i] * $a_harga[$i].")"; 
+				$q = "insert into t_09nilai_stok (item_id, item_nama, saldo_qty, saldo_harga, saldo_sub_total) values 
+				(".$item_id.", '".$item_nama."', ".$a_qty[$i].", ".$a_harga[$i].", ".$a_qty[$i] * $a_harga[$i].")"; 
 				$conn->Execute($q);
 			}
 			

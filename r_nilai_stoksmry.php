@@ -382,12 +382,12 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		$item = &$this->SearchOptions->Add("searchtoggle");
 		$SearchToggleClass = $this->FilterApplied ? " active" : " active";
 		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $ReportLanguage->Phrase("SearchBtn", TRUE) . "\" data-caption=\"" . $ReportLanguage->Phrase("SearchBtn", TRUE) . "\" data-toggle=\"button\" data-form=\"fr_nilai_stoksummary\">" . $ReportLanguage->Phrase("SearchBtn") . "</button>";
-		$item->Visible = FALSE;
+		$item->Visible = TRUE;
 
 		// Reset filter
 		$item = &$this->SearchOptions->Add("resetfilter");
 		$item->Body = "<button type=\"button\" class=\"btn btn-default\" title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ResetAllFilter", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ResetAllFilter", TRUE)) . "\" onclick=\"location='" . ewr_CurrentPage() . "?cmd=reset'\">" . $ReportLanguage->Phrase("ResetAllFilter") . "</button>";
-		$item->Visible = FALSE && $this->FilterApplied;
+		$item->Visible = TRUE && $this->FilterApplied;
 
 		// Button group for reset filter
 		$this->SearchOptions->UseButtonGroup = TRUE;
@@ -526,7 +526,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		// 2nd dimension = no of fields
 
 		$nDtls = 11;
-		$nGrps = 2;
+		$nGrps = 3;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
 		$this->Smry = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -547,6 +547,12 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		if ($this->Export == "")
 			$this->SetupBreadcrumb();
 
+		// Check if search command
+		$this->SearchCommand = (@$_GET["cmd"] == "search");
+
+		// Load default filter values
+		$this->LoadDefaultFilters();
+
 		// Load custom filters
 		$this->Page_FilterLoad();
 
@@ -562,16 +568,21 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		// Extended filter
 		$sExtendedFilter = "";
 
+		// Restore filter list
+		$this->RestoreFilterList();
+
+		// Build extended filter
+		$sExtendedFilter = $this->GetExtendedFilter();
+		ewr_AddFilter($this->Filter, $sExtendedFilter);
+
 		// Build popup filter
 		$sPopupFilter = $this->GetPopupFilter();
 
 		//ewr_SetDebugMsg("popup filter: " . $sPopupFilter);
 		ewr_AddFilter($this->Filter, $sPopupFilter);
 
-		// No filter
-		$this->FilterApplied = FALSE;
-		$this->FilterOptions->GetItem("savecurrentfilter")->Visible = FALSE;
-		$this->FilterOptions->GetItem("deletefilter")->Visible = FALSE;
+		// Check if filter applied
+		$this->FilterApplied = $this->CheckFilter();
 
 		// Call Page Selecting event
 		$this->Page_Selecting($this->Filter);
@@ -632,11 +643,19 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		$cnt = 0;
 		foreach ($this->DetailRows as $row) {
 			$wrkitem_id = $row["item_id"];
+			$wrkitem_nama = $row["item_nama"];
 			if ($lvl >= 1) {
 				$val = $curValue ? $this->item_id->CurrentValue : $this->item_id->OldValue;
 				$grpval = $curValue ? $this->item_id->GroupValue() : $this->item_id->GroupOldValue();
 				if (is_null($val) && !is_null($wrkitem_id) || !is_null($val) && is_null($wrkitem_id) ||
 					$grpval <> $this->item_id->getGroupValueBase($wrkitem_id))
+				continue;
+			}
+			if ($lvl >= 2) {
+				$val = $curValue ? $this->item_nama->CurrentValue : $this->item_nama->OldValue;
+				$grpval = $curValue ? $this->item_nama->GroupValue() : $this->item_nama->GroupOldValue();
+				if (is_null($val) && !is_null($wrkitem_nama) || !is_null($val) && is_null($wrkitem_nama) ||
+					$grpval <> $this->item_nama->getGroupValueBase($wrkitem_nama))
 				continue;
 			}
 			$cnt++;
@@ -651,6 +670,10 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 				return (is_null($this->item_id->CurrentValue) && !is_null($this->item_id->OldValue)) ||
 					(!is_null($this->item_id->CurrentValue) && is_null($this->item_id->OldValue)) ||
 					($this->item_id->GroupValue() <> $this->item_id->GroupOldValue());
+			case 2:
+				return (is_null($this->item_nama->CurrentValue) && !is_null($this->item_nama->OldValue)) ||
+					(!is_null($this->item_nama->CurrentValue) && is_null($this->item_nama->OldValue)) ||
+					($this->item_nama->GroupValue() <> $this->item_nama->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
 		}
 	}
 
@@ -807,6 +830,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 				$this->FirstRowData = array();
 				$this->FirstRowData['id'] = ewr_Conv($rs->fields('id'), 3);
 				$this->FirstRowData['item_id'] = ewr_Conv($rs->fields('item_id'), 3);
+				$this->FirstRowData['item_nama'] = ewr_Conv($rs->fields('item_nama'), 200);
 				$this->FirstRowData['tgl'] = ewr_Conv($rs->fields('tgl'), 133);
 				$this->FirstRowData['in_qty'] = ewr_Conv($rs->fields('in_qty'), 4);
 				$this->FirstRowData['in_harga'] = ewr_Conv($rs->fields('in_harga'), 4);
@@ -829,6 +853,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 				else
 					$this->item_id->setDbValue(ewr_GroupValue($this->item_id, $rs->fields('item_id')));
 			}
+			$this->item_nama->setDbValue($rs->fields('item_nama'));
 			$this->tgl->setDbValue($rs->fields('tgl'));
 			$this->in_qty->setDbValue($rs->fields('in_qty'));
 			$this->in_harga->setDbValue($rs->fields('in_harga'));
@@ -852,6 +877,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		} else {
 			$this->id->setDbValue("");
 			$this->item_id->setDbValue("");
+			$this->item_nama->setDbValue("");
 			$this->tgl->setDbValue("");
 			$this->in_qty->setDbValue("");
 			$this->in_harga->setDbValue("");
@@ -950,6 +976,13 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 					$arValues = ewr_StripSlashes($_POST["sel_$sName"]);
 					if (trim($arValues[0]) == "") // Select all
 						$arValues = EWR_INIT_VALUE;
+					$this->PopupName = $sName;
+					if (ewr_IsAdvancedFilterValue($arValues) || $arValues == EWR_INIT_VALUE)
+						$this->PopupValue = $arValues;
+					if (!ewr_MatchedArray($arValues, $_SESSION["sel_$sName"])) {
+						if ($this->HasSessionFilterValues($sName))
+							$this->ClearExtFilter = $sName; // Clear extended filter for this field
+					}
 					$_SESSION["sel_$sName"] = $arValues;
 					$_SESSION["rf_$sName"] = ewr_StripSlashes(@$_POST["rf_$sName"]);
 					$_SESSION["rt_$sName"] = ewr_StripSlashes(@$_POST["rt_$sName"]);
@@ -1049,6 +1082,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		if ($this->RowType == EWR_ROWTYPE_TOTAL && !($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER)) { // Summary row
 			ewr_PrependClass($this->RowAttrs["class"], ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel); // Set up row class
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP) $this->RowAttrs["data-group"] = $this->item_id->GroupOldValue(); // Set up group attribute
+			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->item_nama->GroupOldValue(); // Set up group attribute 2
 
 			// item_id
 			$this->item_id->GroupViewValue = $this->item_id->GroupOldValue();
@@ -1058,8 +1092,19 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->item_id->GroupSummaryValue = $this->item_id->GroupViewValue;
 			$this->item_id->GroupSummaryViewValue = ($this->item_id->GroupSummaryOldValue <> $this->item_id->GroupSummaryValue) ? $this->item_id->GroupSummaryValue : "&nbsp;";
 
+			// item_nama
+			$this->item_nama->GroupViewValue = $this->item_nama->GroupOldValue();
+			$this->item_nama->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
+			$this->item_nama->GroupViewValue = ewr_DisplayGroupValue($this->item_nama, $this->item_nama->GroupViewValue);
+			$this->item_nama->GroupSummaryOldValue = $this->item_nama->GroupSummaryValue;
+			$this->item_nama->GroupSummaryValue = $this->item_nama->GroupViewValue;
+			$this->item_nama->GroupSummaryViewValue = ($this->item_nama->GroupSummaryOldValue <> $this->item_nama->GroupSummaryValue) ? $this->item_nama->GroupSummaryValue : "&nbsp;";
+
 			// item_id
 			$this->item_id->HrefValue = "";
+
+			// item_nama
+			$this->item_nama->HrefValue = "";
 
 			// tgl
 			$this->tgl->HrefValue = "";
@@ -1093,8 +1138,10 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
 			$this->RowAttrs["data-group"] = $this->item_id->GroupValue(); // Set up group attribute
+			if ($this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->item_nama->GroupValue(); // Set up group attribute 2
 			} else {
 			$this->RowAttrs["data-group"] = $this->item_id->GroupValue(); // Set up group attribute
+			$this->RowAttrs["data-group-2"] = $this->item_nama->GroupValue(); // Set up group attribute 2
 			}
 
 			// item_id
@@ -1103,6 +1150,13 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->item_id->GroupViewValue = ewr_DisplayGroupValue($this->item_id, $this->item_id->GroupViewValue);
 			if ($this->item_id->GroupValue() == $this->item_id->GroupOldValue() && !$this->ChkLvlBreak(1))
 				$this->item_id->GroupViewValue = "&nbsp;";
+
+			// item_nama
+			$this->item_nama->GroupViewValue = $this->item_nama->GroupValue();
+			$this->item_nama->CellAttrs["class"] = "ewRptGrpField2";
+			$this->item_nama->GroupViewValue = ewr_DisplayGroupValue($this->item_nama, $this->item_nama->GroupViewValue);
+			if ($this->item_nama->GroupValue() == $this->item_nama->GroupOldValue() && !$this->ChkLvlBreak(2))
+				$this->item_nama->GroupViewValue = "&nbsp;";
 
 			// tgl
 			$this->tgl->ViewValue = $this->tgl->CurrentValue;
@@ -1166,6 +1220,9 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			// item_id
 			$this->item_id->HrefValue = "";
 
+			// item_nama
+			$this->item_nama->HrefValue = "";
+
 			// tgl
 			$this->tgl->HrefValue = "";
 
@@ -1208,6 +1265,15 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$HrefValue = &$this->item_id->HrefValue;
 			$LinkAttrs = &$this->item_id->LinkAttrs;
 			$this->Cell_Rendered($this->item_id, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// item_nama
+			$CurrentValue = $this->item_nama->GroupViewValue;
+			$ViewValue = &$this->item_nama->GroupViewValue;
+			$ViewAttrs = &$this->item_nama->ViewAttrs;
+			$CellAttrs = &$this->item_nama->CellAttrs;
+			$HrefValue = &$this->item_nama->HrefValue;
+			$LinkAttrs = &$this->item_nama->LinkAttrs;
+			$this->Cell_Rendered($this->item_nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		} else {
 
 			// item_id
@@ -1218,6 +1284,15 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$HrefValue = &$this->item_id->HrefValue;
 			$LinkAttrs = &$this->item_id->LinkAttrs;
 			$this->Cell_Rendered($this->item_id, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// item_nama
+			$CurrentValue = $this->item_nama->GroupValue();
+			$ViewValue = &$this->item_nama->GroupViewValue;
+			$ViewAttrs = &$this->item_nama->ViewAttrs;
+			$CellAttrs = &$this->item_nama->CellAttrs;
+			$HrefValue = &$this->item_nama->HrefValue;
+			$LinkAttrs = &$this->item_nama->LinkAttrs;
+			$this->Cell_Rendered($this->item_nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// tgl
 			$CurrentValue = $this->tgl->CurrentValue;
@@ -1321,6 +1396,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		$this->SubGrpColumnCount = 0;
 		$this->DtlColumnCount = 0;
 		if ($this->item_id->Visible) $this->GrpColumnCount += 1;
+		if ($this->item_nama->Visible) { $this->GrpColumnCount += 1; $this->SubGrpColumnCount += 1; }
 		if ($this->tgl->Visible) $this->DtlColumnCount += 1;
 		if ($this->in_qty->Visible) $this->DtlColumnCount += 1;
 		if ($this->in_harga->Visible) $this->DtlColumnCount += 1;
@@ -1355,6 +1431,478 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		$ReportOptions["ReportTypes"] = $ReportTypes;
 	}
 
+	// Return extended filter
+	function GetExtendedFilter() {
+		global $gsFormError;
+		$sFilter = "";
+		if ($this->DrillDown)
+			return "";
+		$bPostBack = ewr_IsHttpPost();
+		$bRestoreSession = TRUE;
+		$bSetupFilter = FALSE;
+
+		// Reset extended filter if filter changed
+		if ($bPostBack) {
+
+		// Reset search command
+		} elseif (@$_GET["cmd"] == "reset") {
+
+			// Load default values
+			$this->SetSessionDropDownValue($this->item_nama->DropDownValue, $this->item_nama->SearchOperator, 'item_nama'); // Field item_nama
+
+			//$bSetupFilter = TRUE; // No need to set up, just use default
+		} else {
+			$bRestoreSession = !$this->SearchCommand;
+
+			// Field item_nama
+			if ($this->GetDropDownValue($this->item_nama)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->item_nama->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_r_nilai_stok_item_nama'])) {
+				$bSetupFilter = TRUE;
+			}
+			if (!$this->ValidateForm()) {
+				$this->setFailureMessage($gsFormError);
+				return $sFilter;
+			}
+		}
+
+		// Restore session
+		if ($bRestoreSession) {
+			$this->GetSessionDropDownValue($this->item_nama); // Field item_nama
+		}
+
+		// Call page filter validated event
+		$this->Page_FilterValidated();
+
+		// Build SQL
+		$this->BuildDropDownFilter($this->item_nama, $sFilter, $this->item_nama->SearchOperator, FALSE, TRUE); // Field item_nama
+
+		// Save parms to session
+		$this->SetSessionDropDownValue($this->item_nama->DropDownValue, $this->item_nama->SearchOperator, 'item_nama'); // Field item_nama
+
+		// Setup filter
+		if ($bSetupFilter) {
+		}
+
+		// Field item_nama
+		ewr_LoadDropDownList($this->item_nama->DropDownList, $this->item_nama->DropDownValue);
+		return $sFilter;
+	}
+
+	// Build dropdown filter
+	function BuildDropDownFilter(&$fld, &$FilterClause, $FldOpr, $Default = FALSE, $SaveFilter = FALSE) {
+		$FldVal = ($Default) ? $fld->DefaultDropDownValue : $fld->DropDownValue;
+		$sSql = "";
+		if (is_array($FldVal)) {
+			foreach ($FldVal as $val) {
+				$sWrk = $this->GetDropDownFilter($fld, $val, $FldOpr);
+
+				// Call Page Filtering event
+				if (substr($val, 0, 2) <> "@@") $this->Page_Filtering($fld, $sWrk, "dropdown", $FldOpr, $val);
+				if ($sWrk <> "") {
+					if ($sSql <> "")
+						$sSql .= " OR " . $sWrk;
+					else
+						$sSql = $sWrk;
+				}
+			}
+		} else {
+			$sSql = $this->GetDropDownFilter($fld, $FldVal, $FldOpr);
+
+			// Call Page Filtering event
+			if (substr($FldVal, 0, 2) <> "@@") $this->Page_Filtering($fld, $sSql, "dropdown", $FldOpr, $FldVal);
+		}
+		if ($sSql <> "") {
+			ewr_AddFilter($FilterClause, $sSql);
+			if ($SaveFilter) $fld->CurrentFilter = $sSql;
+		}
+	}
+
+	function GetDropDownFilter(&$fld, $FldVal, $FldOpr) {
+		$FldName = $fld->FldName;
+		$FldExpression = $fld->FldExpression;
+		$FldDataType = $fld->FldDataType;
+		$FldDelimiter = $fld->FldDelimiter;
+		$FldVal = strval($FldVal);
+		if ($FldOpr == "") $FldOpr = "=";
+		$sWrk = "";
+		if (ewr_SameStr($FldVal, EWR_NULL_VALUE)) {
+			$sWrk = $FldExpression . " IS NULL";
+		} elseif (ewr_SameStr($FldVal, EWR_NOT_NULL_VALUE)) {
+			$sWrk = $FldExpression . " IS NOT NULL";
+		} elseif (ewr_SameStr($FldVal, EWR_EMPTY_VALUE)) {
+			$sWrk = $FldExpression . " = ''";
+		} elseif (ewr_SameStr($FldVal, EWR_ALL_VALUE)) {
+			$sWrk = "1 = 1";
+		} else {
+			if (substr($FldVal, 0, 2) == "@@") {
+				$sWrk = $this->GetCustomFilter($fld, $FldVal, $this->DBID);
+			} elseif ($FldDelimiter <> "" && trim($FldVal) <> "" && ($FldDataType == EWR_DATATYPE_STRING || $FldDataType == EWR_DATATYPE_MEMO)) {
+				$sWrk = ewr_GetMultiSearchSql($FldExpression, trim($FldVal), $this->DBID);
+			} else {
+				if ($FldVal <> "" && $FldVal <> EWR_INIT_VALUE) {
+					if ($FldDataType == EWR_DATATYPE_DATE && $FldOpr <> "") {
+						$sWrk = ewr_DateFilterString($FldExpression, $FldOpr, $FldVal, $FldDataType, $this->DBID);
+					} else {
+						$sWrk = ewr_FilterString($FldOpr, $FldVal, $FldDataType, $this->DBID);
+						if ($sWrk <> "") $sWrk = $FldExpression . $sWrk;
+					}
+				}
+			}
+		}
+		return $sWrk;
+	}
+
+	// Get custom filter
+	function GetCustomFilter(&$fld, $FldVal, $dbid = 0) {
+		$sWrk = "";
+		if (is_array($fld->AdvancedFilters)) {
+			foreach ($fld->AdvancedFilters as $filter) {
+				if ($filter->ID == $FldVal && $filter->Enabled) {
+					$sFld = $fld->FldExpression;
+					$sFn = $filter->FunctionName;
+					$wrkid = (substr($filter->ID,0,2) == "@@") ? substr($filter->ID,2) : $filter->ID;
+					if ($sFn <> "")
+						$sWrk = $sFn($sFld, $dbid);
+					else
+						$sWrk = "";
+					$this->Page_Filtering($fld, $sWrk, "custom", $wrkid);
+					break;
+				}
+			}
+		}
+		return $sWrk;
+	}
+
+	// Build extended filter
+	function BuildExtendedFilter(&$fld, &$FilterClause, $Default = FALSE, $SaveFilter = FALSE) {
+		$sWrk = ewr_GetExtendedFilter($fld, $Default, $this->DBID);
+		if (!$Default)
+			$this->Page_Filtering($fld, $sWrk, "extended", $fld->SearchOperator, $fld->SearchValue, $fld->SearchCondition, $fld->SearchOperator2, $fld->SearchValue2);
+		if ($sWrk <> "") {
+			ewr_AddFilter($FilterClause, $sWrk);
+			if ($SaveFilter) $fld->CurrentFilter = $sWrk;
+		}
+	}
+
+	// Get drop down value from querystring
+	function GetDropDownValue(&$fld) {
+		$parm = substr($fld->FldVar, 2);
+		if (ewr_IsHttpPost())
+			return FALSE; // Skip post back
+		if (isset($_GET["so_$parm"]))
+			$fld->SearchOperator = ewr_StripSlashes(@$_GET["so_$parm"]);
+		if (isset($_GET["sv_$parm"])) {
+			$fld->DropDownValue = ewr_StripSlashes(@$_GET["sv_$parm"]);
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	// Get filter values from querystring
+	function GetFilterValues(&$fld) {
+		$parm = substr($fld->FldVar, 2);
+		if (ewr_IsHttpPost())
+			return; // Skip post back
+		$got = FALSE;
+		if (isset($_GET["sv_$parm"])) {
+			$fld->SearchValue = ewr_StripSlashes(@$_GET["sv_$parm"]);
+			$got = TRUE;
+		}
+		if (isset($_GET["so_$parm"])) {
+			$fld->SearchOperator = ewr_StripSlashes(@$_GET["so_$parm"]);
+			$got = TRUE;
+		}
+		if (isset($_GET["sc_$parm"])) {
+			$fld->SearchCondition = ewr_StripSlashes(@$_GET["sc_$parm"]);
+			$got = TRUE;
+		}
+		if (isset($_GET["sv2_$parm"])) {
+			$fld->SearchValue2 = ewr_StripSlashes(@$_GET["sv2_$parm"]);
+			$got = TRUE;
+		}
+		if (isset($_GET["so2_$parm"])) {
+			$fld->SearchOperator2 = ewr_StripSlashes($_GET["so2_$parm"]);
+			$got = TRUE;
+		}
+		return $got;
+	}
+
+	// Set default ext filter
+	function SetDefaultExtFilter(&$fld, $so1, $sv1, $sc, $so2, $sv2) {
+		$fld->DefaultSearchValue = $sv1; // Default ext filter value 1
+		$fld->DefaultSearchValue2 = $sv2; // Default ext filter value 2 (if operator 2 is enabled)
+		$fld->DefaultSearchOperator = $so1; // Default search operator 1
+		$fld->DefaultSearchOperator2 = $so2; // Default search operator 2 (if operator 2 is enabled)
+		$fld->DefaultSearchCondition = $sc; // Default search condition (if operator 2 is enabled)
+	}
+
+	// Apply default ext filter
+	function ApplyDefaultExtFilter(&$fld) {
+		$fld->SearchValue = $fld->DefaultSearchValue;
+		$fld->SearchValue2 = $fld->DefaultSearchValue2;
+		$fld->SearchOperator = $fld->DefaultSearchOperator;
+		$fld->SearchOperator2 = $fld->DefaultSearchOperator2;
+		$fld->SearchCondition = $fld->DefaultSearchCondition;
+	}
+
+	// Check if Text Filter applied
+	function TextFilterApplied(&$fld) {
+		return (strval($fld->SearchValue) <> strval($fld->DefaultSearchValue) ||
+			strval($fld->SearchValue2) <> strval($fld->DefaultSearchValue2) ||
+			(strval($fld->SearchValue) <> "" &&
+				strval($fld->SearchOperator) <> strval($fld->DefaultSearchOperator)) ||
+			(strval($fld->SearchValue2) <> "" &&
+				strval($fld->SearchOperator2) <> strval($fld->DefaultSearchOperator2)) ||
+			strval($fld->SearchCondition) <> strval($fld->DefaultSearchCondition));
+	}
+
+	// Check if Non-Text Filter applied
+	function NonTextFilterApplied(&$fld) {
+		if (is_array($fld->DropDownValue)) {
+			if (is_array($fld->DefaultDropDownValue)) {
+				if (count($fld->DefaultDropDownValue) <> count($fld->DropDownValue))
+					return TRUE;
+				else
+					return (count(array_diff($fld->DefaultDropDownValue, $fld->DropDownValue)) <> 0);
+			} else {
+				return TRUE;
+			}
+		} else {
+			if (is_array($fld->DefaultDropDownValue))
+				return TRUE;
+			else
+				$v1 = strval($fld->DefaultDropDownValue);
+			if ($v1 == EWR_INIT_VALUE)
+				$v1 = "";
+			$v2 = strval($fld->DropDownValue);
+			if ($v2 == EWR_INIT_VALUE || $v2 == EWR_ALL_VALUE)
+				$v2 = "";
+			return ($v1 <> $v2);
+		}
+	}
+
+	// Get dropdown value from session
+	function GetSessionDropDownValue(&$fld) {
+		$parm = substr($fld->FldVar, 2);
+		$this->GetSessionValue($fld->DropDownValue, 'sv_r_nilai_stok_' . $parm);
+		$this->GetSessionValue($fld->SearchOperator, 'so_r_nilai_stok_' . $parm);
+	}
+
+	// Get filter values from session
+	function GetSessionFilterValues(&$fld) {
+		$parm = substr($fld->FldVar, 2);
+		$this->GetSessionValue($fld->SearchValue, 'sv_r_nilai_stok_' . $parm);
+		$this->GetSessionValue($fld->SearchOperator, 'so_r_nilai_stok_' . $parm);
+		$this->GetSessionValue($fld->SearchCondition, 'sc_r_nilai_stok_' . $parm);
+		$this->GetSessionValue($fld->SearchValue2, 'sv2_r_nilai_stok_' . $parm);
+		$this->GetSessionValue($fld->SearchOperator2, 'so2_r_nilai_stok_' . $parm);
+	}
+
+	// Get value from session
+	function GetSessionValue(&$sv, $sn) {
+		if (array_key_exists($sn, $_SESSION))
+			$sv = $_SESSION[$sn];
+	}
+
+	// Set dropdown value to session
+	function SetSessionDropDownValue($sv, $so, $parm) {
+		$_SESSION['sv_r_nilai_stok_' . $parm] = $sv;
+		$_SESSION['so_r_nilai_stok_' . $parm] = $so;
+	}
+
+	// Set filter values to session
+	function SetSessionFilterValues($sv1, $so1, $sc, $sv2, $so2, $parm) {
+		$_SESSION['sv_r_nilai_stok_' . $parm] = $sv1;
+		$_SESSION['so_r_nilai_stok_' . $parm] = $so1;
+		$_SESSION['sc_r_nilai_stok_' . $parm] = $sc;
+		$_SESSION['sv2_r_nilai_stok_' . $parm] = $sv2;
+		$_SESSION['so2_r_nilai_stok_' . $parm] = $so2;
+	}
+
+	// Check if has Session filter values
+	function HasSessionFilterValues($parm) {
+		return ((@$_SESSION['sv_' . $parm] <> "" && @$_SESSION['sv_' . $parm] <> EWR_INIT_VALUE) ||
+			(@$_SESSION['sv_' . $parm] <> "" && @$_SESSION['sv_' . $parm] <> EWR_INIT_VALUE) ||
+			(@$_SESSION['sv2_' . $parm] <> "" && @$_SESSION['sv2_' . $parm] <> EWR_INIT_VALUE));
+	}
+
+	// Dropdown filter exist
+	function DropDownFilterExist(&$fld, $FldOpr) {
+		$sWrk = "";
+		$this->BuildDropDownFilter($fld, $sWrk, $FldOpr);
+		return ($sWrk <> "");
+	}
+
+	// Extended filter exist
+	function ExtendedFilterExist(&$fld) {
+		$sExtWrk = "";
+		$this->BuildExtendedFilter($fld, $sExtWrk);
+		return ($sExtWrk <> "");
+	}
+
+	// Validate form
+	function ValidateForm() {
+		global $ReportLanguage, $gsFormError;
+
+		// Initialize form error message
+		$gsFormError = "";
+
+		// Check if validation required
+		if (!EWR_SERVER_VALIDATE)
+			return ($gsFormError == "");
+
+		// Return validate result
+		$ValidateForm = ($gsFormError == "");
+
+		// Call Form_CustomValidate event
+		$sFormCustomError = "";
+		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
+		if ($sFormCustomError <> "") {
+			$gsFormError .= ($gsFormError <> "") ? "<p>&nbsp;</p>" : "";
+			$gsFormError .= $sFormCustomError;
+		}
+		return $ValidateForm;
+	}
+
+	// Clear selection stored in session
+	function ClearSessionSelection($parm) {
+		$_SESSION["sel_r_nilai_stok_$parm"] = "";
+		$_SESSION["rf_r_nilai_stok_$parm"] = "";
+		$_SESSION["rt_r_nilai_stok_$parm"] = "";
+	}
+
+	// Load selection from session
+	function LoadSelectionFromSession($parm) {
+		$fld = &$this->FieldByParm($parm);
+		$fld->SelectionList = @$_SESSION["sel_r_nilai_stok_$parm"];
+		$fld->RangeFrom = @$_SESSION["rf_r_nilai_stok_$parm"];
+		$fld->RangeTo = @$_SESSION["rt_r_nilai_stok_$parm"];
+	}
+
+	// Load default value for filters
+	function LoadDefaultFilters() {
+		/**
+		* Set up default values for non Text filters
+		*/
+
+		// Field item_nama
+		$this->item_nama->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->item_nama->DropDownValue = $this->item_nama->DefaultDropDownValue;
+		/**
+		* Set up default values for extended filters
+		* function SetDefaultExtFilter(&$fld, $so1, $sv1, $sc, $so2, $sv2)
+		* Parameters:
+		* $fld - Field object
+		* $so1 - Default search operator 1
+		* $sv1 - Default ext filter value 1
+		* $sc - Default search condition (if operator 2 is enabled)
+		* $so2 - Default search operator 2 (if operator 2 is enabled)
+		* $sv2 - Default ext filter value 2 (if operator 2 is enabled)
+		*/
+		/**
+		* Set up default values for popup filters
+		*/
+	}
+
+	// Check if filter applied
+	function CheckFilter() {
+
+		// Check item_nama extended filter
+		if ($this->NonTextFilterApplied($this->item_nama))
+			return TRUE;
+		return FALSE;
+	}
+
+	// Show list of filters
+	function ShowFilterList($showDate = FALSE) {
+		global $ReportLanguage;
+
+		// Initialize
+		$sFilterList = "";
+
+		// Field item_nama
+		$sExtWrk = "";
+		$sWrk = "";
+		$this->BuildDropDownFilter($this->item_nama, $sExtWrk, $this->item_nama->SearchOperator);
+		$sFilter = "";
+		if ($sExtWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
+		elseif ($sWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sWrk</span>";
+		if ($sFilter <> "")
+			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->item_nama->FldCaption() . "</span>" . $sFilter . "</div>";
+		$divstyle = "";
+		$divdataclass = "";
+
+		// Show Filters
+		if ($sFilterList <> "" || $showDate) {
+			$sMessage = "<div" . $divstyle . $divdataclass . "><div id=\"ewrFilterList\" class=\"alert alert-info ewDisplayTable\">";
+			if ($showDate)
+				$sMessage .= "<div id=\"ewrCurrentDate\">" . $ReportLanguage->Phrase("ReportGeneratedDate") . ewr_FormatDateTime(date("Y-m-d H:i:s"), 1) . "</div>";
+			if ($sFilterList <> "")
+				$sMessage .= "<div id=\"ewrCurrentFilters\">" . $ReportLanguage->Phrase("CurrentFilters") . "</div>" . $sFilterList;
+			$sMessage .= "</div></div>";
+			$this->Message_Showing($sMessage, "");
+			echo $sMessage;
+		}
+	}
+
+	// Get list of filters
+	function GetFilterList() {
+
+		// Initialize
+		$sFilterList = "";
+
+		// Field item_nama
+		$sWrk = "";
+		$sWrk = ($this->item_nama->DropDownValue <> EWR_INIT_VALUE) ? $this->item_nama->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_item_nama\":\"" . ewr_JsEncode2($sWrk) . "\"";
+		if ($sWrk <> "") {
+			if ($sFilterList <> "") $sFilterList .= ",";
+			$sFilterList .= $sWrk;
+		}
+
+		// Return filter list in json
+		if ($sFilterList <> "")
+			return "{" . $sFilterList . "}";
+		else
+			return "null";
+	}
+
+	// Restore list of filters
+	function RestoreFilterList() {
+
+		// Return if not reset filter
+		if (@$_POST["cmd"] <> "resetfilter")
+			return FALSE;
+		$filter = json_decode(ewr_StripSlashes(@$_POST["filter"]), TRUE);
+		return $this->SetupFilterList($filter);
+	}
+
+	// Setup list of filters
+	function SetupFilterList($filter) {
+		if (!is_array($filter))
+			return FALSE;
+
+		// Field item_nama
+		$bRestoreFilter = FALSE;
+		if (array_key_exists("sv_item_nama", $filter)) {
+			$sWrk = $filter["sv_item_nama"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_item_nama"], "item_nama");
+			$bRestoreFilter = TRUE;
+		}
+		if (!$bRestoreFilter) { // Clear filter
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "item_nama");
+		}
+		return TRUE;
+	}
+
 	// Return popup filter
 	function GetPopupFilter() {
 		$sWrk = "";
@@ -1382,6 +1930,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->setOrderBy("");
 			$this->setStartGroup(1);
 			$this->item_id->setSort("");
+			$this->item_nama->setSort("");
 			$this->tgl->setSort("");
 			$this->in_qty->setSort("");
 			$this->in_harga->setSort("");
@@ -1398,6 +1947,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->CurrentOrder = $orderBy;
 			$this->CurrentOrderType = $orderType;
 			$this->UpdateSort($this->item_id, $bCtrl); // item_id
+			$this->UpdateSort($this->item_nama, $bCtrl); // item_nama
 			$this->UpdateSort($this->tgl, $bCtrl); // tgl
 			$this->UpdateSort($this->in_qty, $bCtrl); // in_qty
 			$this->UpdateSort($this->in_harga, $bCtrl); // in_harga
@@ -1726,6 +2276,39 @@ r_nilai_stok_summary.Chart_Rendered =
 </script>
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
+<script type="text/javascript">
+
+// Form object
+var CurrentForm = fr_nilai_stoksummary = new ewr_Form("fr_nilai_stoksummary");
+
+// Validate method
+fr_nilai_stoksummary.Validate = function() {
+	if (!this.ValidateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
+
+	// Call Form Custom Validate event
+	if (!this.Form_CustomValidate(fobj))
+		return false;
+	return true;
+}
+
+// Form_CustomValidate method
+fr_nilai_stoksummary.Form_CustomValidate = 
+ function(fobj) { // DO NOT CHANGE THIS LINE!
+
+ 	// Your custom validation code here, return false if invalid.
+ 	return true;
+ }
+<?php if (EWR_CLIENT_VALIDATE) { ?>
+fr_nilai_stoksummary.ValidateRequired = true; // Uses JavaScript validation
+<?php } else { ?>
+fr_nilai_stoksummary.ValidateRequired = false; // No JavaScript validation
+<?php } ?>
+
+// Use Ajax
+fr_nilai_stoksummary.Lists["sv_item_nama"] = {"LinkField":"sv_item_nama","Ajax":true,"DisplayFields":["sv_item_nama","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
+</script>
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
 <script type="text/javascript">
@@ -1781,6 +2364,59 @@ if (!$Page->DrillDownInPanel) {
 <?php if ($Page->Export <> "pdf") { ?>
 <div id="report_summary">
 <?php } ?>
+<?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
+<!-- Search form (begin) -->
+<form name="fr_nilai_stoksummary" id="fr_nilai_stoksummary" class="form-inline ewForm ewExtFilterForm" action="<?php echo ewr_CurrentPage() ?>">
+<?php $SearchPanelClass = ($Page->Filter <> "") ? " in" : " in"; ?>
+<div id="fr_nilai_stoksummary_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
+<input type="hidden" name="cmd" value="search">
+<div id="r_1" class="ewRow">
+<div id="c_item_nama" class="ewCell form-group">
+	<label for="sv_item_nama" class="ewSearchCaption ewLabel"><?php echo $Page->item_nama->FldCaption() ?></label>
+	<span class="ewSearchField">
+<?php $Page->item_nama->EditAttrs["onchange"] = "ewrForms(this).Submit(); " . @$Page->item_nama->EditAttrs["onchange"]; ?>
+<?php ewr_PrependClass($Page->item_nama->EditAttrs["class"], "form-control"); ?>
+<select data-table="r_nilai_stok" data-field="x_item_nama" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->item_nama->DisplayValueSeparator) ? json_encode($Page->item_nama->DisplayValueSeparator) : $Page->item_nama->DisplayValueSeparator) ?>" id="sv_item_nama" name="sv_item_nama"<?php echo $Page->item_nama->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->item_nama->AdvancedFilters) ? count($Page->item_nama->AdvancedFilters) : 0;
+	$cntd = is_array($Page->item_nama->DropDownList) ? count($Page->item_nama->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->item_nama->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->item_nama->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->item_nama->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->item_nama->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_item_nama" id="s_sv_item_nama" value="<?php echo $Page->item_nama->LookupFilterQuery() ?>"></span>
+</div>
+</div>
+</div>
+</form>
+<script type="text/javascript">
+fr_nilai_stoksummary.Init();
+fr_nilai_stoksummary.FilterList = <?php echo $Page->GetFilterList() ?>;
+</script>
+<!-- Search form (end) -->
+<?php } ?>
+<?php if ($Page->ShowCurrentFilter) { ?>
+<?php $Page->ShowFilterList() ?>
+<?php } ?>
 <?php
 
 // Set the last group to display if not export all
@@ -1799,6 +2435,7 @@ $Page->RecIndex = 0;
 // Get first row
 if ($Page->TotalGrps > 0) {
 	$Page->GetGrpRow(1);
+	$Page->GrpCounter[0] = 1;
 	$Page->GrpCount = 1;
 }
 $Page->GrpIdx = ewr_InitArray($Page->StopGrp - $Page->StartGrp + 1, -1);
@@ -1865,6 +2502,28 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<div class="ewTableHeaderBtn ewPointer r_nilai_stok_item_id" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->item_id) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->item_id->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->item_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->item_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+	<?php } ?>
+<?php } ?>
+<?php if ($Page->item_nama->Visible) { ?>
+	<?php if ($Page->item_nama->ShowGroupHeaderAsRow) { ?>
+	<td data-field="item_nama">&nbsp;</td>
+	<?php } else { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="item_nama"><div class="r_nilai_stok_item_nama"><span class="ewTableHeaderCaption"><?php echo $Page->item_nama->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="item_nama">
+<?php if ($Page->SortUrl($Page->item_nama) == "") { ?>
+		<div class="ewTableHeaderBtn r_nilai_stok_item_nama">
+			<span class="ewTableHeaderCaption"><?php echo $Page->item_nama->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r_nilai_stok_item_nama" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->item_nama) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->item_nama->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->item_nama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->item_nama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
 <?php } ?>
 	</td>
@@ -2070,7 +2729,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	$rsdtlcnt = ($rs) ? $rs->RecordCount() : 0;
 	if ($rsdtlcnt > 0)
 		$Page->GetRow(1);
-	$Page->GrpIdx[$Page->GrpCount] = $rsdtlcnt;
+	$Page->GrpIdx[$Page->GrpCount] = array(-1);
 	while ($rs && !$rs->EOF) { // Loop detail records
 		$Page->RecCount++;
 		$Page->RecIndex++;
@@ -2112,6 +2771,46 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		</td>
 	</tr>
 <?php } ?>
+<?php if ($Page->item_nama->Visible && $Page->ChkLvlBreak(2) && $Page->item_nama->ShowGroupHeaderAsRow) { ?>
+<?php
+
+		// Render header row
+		$Page->ResetAttrs();
+		$Page->RowType = EWR_ROWTYPE_TOTAL;
+		$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+		$Page->RowTotalSubType = EWR_ROWTOTAL_HEADER;
+		$Page->RowGroupLevel = 2;
+		$Page->item_nama->Count = $Page->GetSummaryCount(2);
+		$Page->RenderRow();
+?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->item_id->Visible) { ?>
+		<td data-field="item_id"<?php echo $Page->item_id->CellAttributes(); ?>></td>
+<?php } ?>
+<?php if ($Page->item_nama->Visible) { ?>
+		<td data-field="item_nama"<?php echo $Page->item_nama->CellAttributes(); ?>><span class="ewGroupToggle icon-collapse"></span></td>
+<?php } ?>
+		<td data-field="item_nama" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 2) ?>"<?php echo $Page->item_nama->CellAttributes() ?>>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+		<span class="ewSummaryCaption r_nilai_stok_item_nama"><span class="ewTableHeaderCaption"><?php echo $Page->item_nama->FldCaption() ?></span></span>
+<?php } else { ?>
+	<?php if ($Page->SortUrl($Page->item_nama) == "") { ?>
+		<span class="ewSummaryCaption r_nilai_stok_item_nama">
+			<span class="ewTableHeaderCaption"><?php echo $Page->item_nama->FldCaption() ?></span>
+		</span>
+	<?php } else { ?>
+		<span class="ewTableHeaderBtn ewPointer ewSummaryCaption r_nilai_stok_item_nama" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->item_nama) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->item_nama->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->item_nama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->item_nama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</span>
+	<?php } ?>
+<?php } ?>
+		<?php echo $ReportLanguage->Phrase("SummaryColon") ?>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_nilai_stok_item_nama"<?php echo $Page->item_nama->ViewAttributes() ?>><?php echo $Page->item_nama->GroupViewValue ?></span>
+		<span class="ewSummaryCount">(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->item_nama->Count,0,-2,-2,-2) ?></span>)</span>
+		</td>
+	</tr>
+<?php } ?>
 <?php
 
 		// Render detail row
@@ -2128,45 +2827,53 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <span data-class="tpx<?php echo $Page->GrpCount ?>_r_nilai_stok_item_id"<?php echo $Page->item_id->ViewAttributes() ?>><?php echo $Page->item_id->GroupViewValue ?></span></td>
 	<?php } ?>
 <?php } ?>
+<?php if ($Page->item_nama->Visible) { ?>
+	<?php if ($Page->item_nama->ShowGroupHeaderAsRow) { ?>
+		<td data-field="item_nama"<?php echo $Page->item_nama->CellAttributes(); ?>>&nbsp;</td>
+	<?php } else { ?>
+		<td data-field="item_nama"<?php echo $Page->item_nama->CellAttributes(); ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_nilai_stok_item_nama"<?php echo $Page->item_nama->ViewAttributes() ?>><?php echo $Page->item_nama->GroupViewValue ?></span></td>
+	<?php } ?>
+<?php } ?>
 <?php if ($Page->tgl->Visible) { ?>
 		<td data-field="tgl"<?php echo $Page->tgl->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_tgl"<?php echo $Page->tgl->ViewAttributes() ?>><?php echo $Page->tgl->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_tgl"<?php echo $Page->tgl->ViewAttributes() ?>><?php echo $Page->tgl->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->in_qty->Visible) { ?>
 		<td data-field="in_qty"<?php echo $Page->in_qty->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_in_qty"<?php echo $Page->in_qty->ViewAttributes() ?>><?php echo $Page->in_qty->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_in_qty"<?php echo $Page->in_qty->ViewAttributes() ?>><?php echo $Page->in_qty->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->in_harga->Visible) { ?>
 		<td data-field="in_harga"<?php echo $Page->in_harga->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_in_harga"<?php echo $Page->in_harga->ViewAttributes() ?>><?php echo $Page->in_harga->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_in_harga"<?php echo $Page->in_harga->ViewAttributes() ?>><?php echo $Page->in_harga->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->in_sub_total->Visible) { ?>
 		<td data-field="in_sub_total"<?php echo $Page->in_sub_total->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_in_sub_total"<?php echo $Page->in_sub_total->ViewAttributes() ?>><?php echo $Page->in_sub_total->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_in_sub_total"<?php echo $Page->in_sub_total->ViewAttributes() ?>><?php echo $Page->in_sub_total->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->out_qty->Visible) { ?>
 		<td data-field="out_qty"<?php echo $Page->out_qty->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_out_qty"<?php echo $Page->out_qty->ViewAttributes() ?>><?php echo $Page->out_qty->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_out_qty"<?php echo $Page->out_qty->ViewAttributes() ?>><?php echo $Page->out_qty->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->out_harga->Visible) { ?>
 		<td data-field="out_harga"<?php echo $Page->out_harga->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_out_harga"<?php echo $Page->out_harga->ViewAttributes() ?>><?php echo $Page->out_harga->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_out_harga"<?php echo $Page->out_harga->ViewAttributes() ?>><?php echo $Page->out_harga->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->out_sub_total->Visible) { ?>
 		<td data-field="out_sub_total"<?php echo $Page->out_sub_total->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_out_sub_total"<?php echo $Page->out_sub_total->ViewAttributes() ?>><?php echo $Page->out_sub_total->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_out_sub_total"<?php echo $Page->out_sub_total->ViewAttributes() ?>><?php echo $Page->out_sub_total->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->saldo_qty->Visible) { ?>
 		<td data-field="saldo_qty"<?php echo $Page->saldo_qty->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_saldo_qty"<?php echo $Page->saldo_qty->ViewAttributes() ?>><?php echo $Page->saldo_qty->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_saldo_qty"<?php echo $Page->saldo_qty->ViewAttributes() ?>><?php echo $Page->saldo_qty->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->saldo_harga->Visible) { ?>
 		<td data-field="saldo_harga"<?php echo $Page->saldo_harga->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_saldo_harga"<?php echo $Page->saldo_harga->ViewAttributes() ?>><?php echo $Page->saldo_harga->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_saldo_harga"<?php echo $Page->saldo_harga->ViewAttributes() ?>><?php echo $Page->saldo_harga->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->saldo_sub_total->Visible) { ?>
 		<td data-field="saldo_sub_total"<?php echo $Page->saldo_sub_total->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_saldo_sub_total"<?php echo $Page->saldo_sub_total->ViewAttributes() ?>><?php echo $Page->saldo_sub_total->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_saldo_sub_total"<?php echo $Page->saldo_sub_total->ViewAttributes() ?>><?php echo $Page->saldo_sub_total->ListViewValue() ?></span></td>
 <?php } ?>
 	</tr>
 <?php
@@ -2183,6 +2890,89 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	} // End detail records loop
 ?>
 <?php
+		if ($Page->item_id->Visible) {
+?>
+<?php
+			$Page->item_id->Count = $Page->GetSummaryCount(1, FALSE);
+			$Page->item_nama->Count = $Page->GetSummaryCount(2, FALSE);
+			$Page->ResetAttrs();
+			$Page->RowType = EWR_ROWTYPE_TOTAL;
+			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
+			$Page->RowGroupLevel = 1;
+			$Page->RenderRow();
+?>
+<?php if ($Page->item_id->ShowCompactSummaryFooter) { ?>
+	<?php if (!$Page->item_id->ShowGroupHeaderAsRow) { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->item_id->Visible) { ?>
+		<td data-field="item_id"<?php echo $Page->item_id->CellAttributes() ?>>
+	<?php if ($Page->item_id->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->item_id->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->item_nama->Visible) { ?>
+		<td data-field="item_nama"<?php echo $Page->item_id->CellAttributes() ?>>
+	<?php if ($Page->item_nama->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->item_nama->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->tgl->Visible) { ?>
+		<td data-field="tgl"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->in_qty->Visible) { ?>
+		<td data-field="in_qty"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->in_harga->Visible) { ?>
+		<td data-field="in_harga"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->in_sub_total->Visible) { ?>
+		<td data-field="in_sub_total"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->out_qty->Visible) { ?>
+		<td data-field="out_qty"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->out_harga->Visible) { ?>
+		<td data-field="out_harga"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->out_sub_total->Visible) { ?>
+		<td data-field="out_sub_total"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->saldo_qty->Visible) { ?>
+		<td data-field="saldo_qty"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->saldo_harga->Visible) { ?>
+		<td data-field="saldo_harga"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->saldo_sub_total->Visible) { ?>
+		<td data-field="saldo_sub_total"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
+	</tr>
+	<?php } ?>
+<?php } else { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->GrpColumnCount + $Page->DtlColumnCount > 0) { ?>
+		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->saldo_sub_total->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->item_id->GroupViewValue, $Page->item_id->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+<?php } ?>
+	</tr>
+<?php } ?>
+<?php
+
+			// Reset level 1 summary
+			$Page->ResetLevelSummary(1);
+		} // End show footer check
+?>
+<?php
 
 	// Next group
 	$Page->GetGrpRow(2);
@@ -2195,6 +2985,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	if ($Page->ShowHeader)
 		$Page->Page_Breaking($Page->ShowHeader, $Page->PageBreakContent);
 	$Page->GrpCount++;
+	$Page->GrpCounter[0] = 1;
 
 	// Handle EOF
 	if (!$rsgrp || $rsgrp->EOF)
