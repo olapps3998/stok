@@ -179,4 +179,5 @@ while (!$r->EOF) {
 	}
 	$r->MoveNext();
 }
+header("location: r_nilai_stoksmry.php?pageno=1&t=r_nilai_stok&grpperpage=ALL");
 ?>
