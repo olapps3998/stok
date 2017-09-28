@@ -999,6 +999,9 @@
       <field id="saldo_sub_total">
         <phrase id="fldcaption" value="saldo sub total" />
       </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
     </table>
     <table id="t_99beli">
       <phrase id="tblcaption" value="t 99beli" />
