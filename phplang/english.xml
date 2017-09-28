@@ -770,7 +770,7 @@
       <phrase id="tblcaption" value="Home" />
     </table>
     <table id="cf_01hitung_nilai_stok_php">
-      <phrase id="tblcaption" value="Hitung Nilai Stok" />
+      <phrase id="tblcaption" value="Nilai Stok" />
     </table>
     <table id="t_00audit_trail">
       <phrase id="tblcaption" value="t 00audit trail" />

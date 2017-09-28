@@ -287,7 +287,7 @@ Page_Rendering();
 </div>
 <?php } ?>
 <form id="myform" name="myform" class="form-horizontal" method="post" action="cf_01hitung_nilai_stok1.php">
-	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit">Proses</button>
+	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit">Hitung Nilai Stok</button>
 </form>
 <?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
 <?php include_once "footer.php" ?>
