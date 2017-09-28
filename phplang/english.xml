@@ -583,6 +583,21 @@
   <project>
     <phrase id="bodytitle" value="STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="10104">
+      <phrase id="menutext" value="t 09nilai stok" />
+    </menu>
+    <menu id="10105">
+      <phrase id="menutext" value="v 04keluar" />
+    </menu>
+    <menu id="10106">
+      <phrase id="menutext" value="v 06transaksi" />
+    </menu>
+    <menu id="10107">
+      <phrase id="menutext" value="v 07mutasi" />
+    </menu>
+    <menu id="10108">
+      <phrase id="menutext" value="v 12nilai stok" />
+    </menu>
     <menu id="10047">
       <phrase id="menutext" value="t 99beli" />
     </menu>
@@ -622,12 +637,6 @@
     <menu id="10044">
       <phrase id="menutext" value="v 02jual laporan" />
     </menu>
-    <menu id="10101">
-      <phrase id="menutext" value="Proses" />
-    </menu>
-    <menu id="10048">
-      <phrase id="menutext" value="Hitung Nilai Stok" />
-    </menu>
     <menu id="9">
       <phrase id="menutext" value="Laporan" />
     </menu>
@@ -642,6 +651,9 @@
     </menu>
     <menu id="10015">
       <phrase id="menutext" value="Stok" />
+    </menu>
+    <menu id="10048">
+      <phrase id="menutext" value="Nilai Stok" />
     </menu>
     <menu id="10036">
       <phrase id="menutext" value="Nilai Stok" />
