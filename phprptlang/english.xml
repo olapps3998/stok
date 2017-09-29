@@ -348,7 +348,7 @@
     <phrase id="thisyear" value="This year" />
   </global>
   <project>
-    <phrase id="bodytitle" value="STOK" />
+    <phrase id="bodytitle" value="L.A.B. STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
     <menu id="32">
       <phrase id="menutext" value="t 08item saldo" />
@@ -1169,7 +1169,7 @@
     <table id="r_nilai_stok">
       <phrase id="tblcaption" value="Nilai Stok" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="Rec. Idx" />
       </field>
       <field id="item_id">
         <phrase id="fldcaption" value="Item ID" />

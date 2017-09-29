@@ -1,8 +1,5 @@
 <?php
 if ($_SERVER["HTTP_HOST"] == "stok.aimpglobal.com") {
-	//include "adodb5/adodb.inc.php";
-	//$conn = ADONewConnection('mysql');
-	//$conn->Connect('mysql.idhostinger.com','u197022578_stok','M457r1P 81','u197022578_stok');
 	include "conn_adodb.php";
 }
 else {
@@ -11,7 +8,7 @@ else {
 	$conn =& DbHelper();
 }
 
-$q = "delete from t_09nilai_stok";
+$q = "truncate t_09nilai_stok";
 $conn->Execute($q);
 
 $q = "select a.*, b.item_nama from t_08item_saldo a left join t_02item b on a.item_id = b.item_id order by a.item_id";
@@ -37,6 +34,8 @@ while (!$r->EOF) {
 	$conn->Execute($q);
 	
 	// ambil data qty dan harga dan simpan di array
+	$a_qty = array();
+	$a_harga = array();
 	$a_qty[0] = $qty;
 	$a_harga[0] = $harga;
 	$a_index = 0;
@@ -69,14 +68,12 @@ while (!$r->EOF) {
 				$a_qty[$a_index] += $qty;
 				$saldo_qty = $a_qty[$a_index];
 				$saldo_harga = $a_harga[$a_index];
-				//$saldo_sub_total = $saldo_qty * $saldo_harga;
 				$harga_ = "sama"; //echo $qty;
 			}
 			else { // harga beda
 				if ($a_qty[$a_index] == 0) { // jika saldo_qty 0
 					$saldo_qty = $qty;
 					$saldo_harga = $harga;
-					//$saldo_sub_total = $saldo_qty * $saldo_harga;
 					$harga_ = "sama";
 					$a_qty[$a_index] = $qty;
 					$a_harga[$a_index] = $harga;
@@ -84,7 +81,6 @@ while (!$r->EOF) {
 				else {
 					$saldo_qty = $a_qty[$a_index];
 					$saldo_harga = $a_harga[$a_index];
-					//$saldo_sub_total = $saldo_qty * $saldo_harga;
 					$harga_ = "beda";
 					$a_index++;
 					$a_qty[$a_index] = $qty;
@@ -119,60 +115,138 @@ while (!$r->EOF) {
 			$out_qty = $qty; $out_harga = $harga; $out_sub_total = $qty * $harga;
 			
 			$saldo_qty = 0;
+			$a_out_qty = array();
+			$a_out_harga = array();
+			$pernah_kurang = "belum";
+			
 			for ($i = 0; $i <= $a_index; $i++) {
 				$saldo_qty += $a_qty[$i];
 				if ($saldo_qty < $out_qty) { // check lebih besar mana antara saldo dan keluar
-					
+					$a_out_qty[$i] = $a_qty[$i];
+					$a_out_harga[$i] = $a_harga[$i];
+					$pernah_kurang = "pernah";
 				}
 				else {
-					$saldo_qty -= $out_qty;
-					$saldo_harga = $a_harga[$i];
-					$out_harga = $a_harga[$i];
-					/*
-					$a_qty[0] = 10;
-					$a_qty[1] = 20;
-					$a_qty[2] = 30;
-					$a_qty[3] = 40;
 					
-					$out = 35;
-					*/
-					if ($i > 0) {
-						//if (count($a_qty) ) {}
-						//$ma_qty = 0;
-						for ($j = 0; $j < $i; $j++) {
-							//$ma_qty += $a_qty[0];
-							array_splice($a_qty, 0, 1);
-							array_splice($a_harga, 0, 1);
-							$a_qty[0] = $saldo_qty;
+					if ($pernah_kurang == "pernah") {
+						
+						$a_out_qty[$i] = $out_qty - array_sum($a_out_qty);
+						$a_out_harga[$i] = $a_harga[$i];
+						
+						$k = 0; // array index baru untuk menampilkan data saldo
+						for ($j = $i; $j <= $a_index; $j++) {
+							if ($k == 0) {
+								$a_saldo_qty[$k] = $saldo_qty - $out_qty;
+								$a_saldo_harga[$k] = $a_harga[$j];
+							}
+							else {
+								$a_saldo_qty[$k] = $a_qty[$j];
+								$a_saldo_harga[$k] = $a_harga[$j];
+							}
+							$k++;
 						}
-						$a_index = $i;
-						if ($item_id == 19) {print_r($a_qty); print_r($a_harga);}
+						
+						// array saldo qty dan array saldo harga disetting ulang
+						$a_qty = $a_saldo_qty;
+						$a_harga = $a_saldo_harga;
+						
+						// simpan data
+						$q = "insert into t_09nilai_stok 
+							(item_id, item_nama, tgl, 
+							out_qty, out_harga, out_sub_total,
+							saldo_qty, saldo_harga, saldo_sub_total) values 
+							(".$item_id.", '".$item_nama."', '".$tgl."', ".
+							$a_out_qty[0].", ".$a_out_harga[0].", ".$a_out_qty[0] * $a_out_harga[0].", ".
+							$a_saldo_qty[0].", ".$a_saldo_harga[0].", ".$a_saldo_qty[0] * $a_saldo_harga[0]."
+							)";
+						$conn->Execute($q);
+						
+						$i_counter = 1; $k_counter = 1;
+						while ($i_counter <= $i or $k_counter <= $k-1) {
+							
+							$out_qty = 0; $out_harga = 0;
+							if ($i_counter <= $i) {
+								$out_qty = $a_out_qty[$i_counter];
+								$out_harga = $a_out_harga[$i_counter];
+								$i_counter++;
+							}
+							
+							$saldo_qty = 0; $saldo_harga = 0;
+							if ($k_counter <= $k-1) {
+								$saldo_qty = $a_qty[$k_counter];
+								$saldo_harga = $a_harga[$k_counter];
+								$k_counter++;
+							}
+							
+							$q = "insert into t_09nilai_stok 
+								(item_id, item_nama, 
+								out_qty, out_harga, out_sub_total,
+								saldo_qty, saldo_harga, saldo_sub_total) values 
+								(".$item_id.", '".$item_nama."', ".
+								$out_qty.", ".$out_harga.", ".$out_qty * $out_harga.", ".
+								$saldo_qty.", ".$saldo_harga.", ".$saldo_qty * $saldo_harga."
+								)";
+							$conn->Execute($q);
+						}
+						
+						break;
+						
 					}
 					else {
-						$a_qty[$i] = $saldo_qty;
+						
+						$a_qty_out[$i] = $a_qty[$i];
+						$a_harga_out[$i] = $a_harga[$i];
+						
+						$saldo_qty -= $out_qty;
+						$saldo_harga = $a_harga[$i];
+						$out_harga = $a_harga[$i];
+						/*
+						$a_qty[0] = 10;
+						$a_qty[1] = 20;
+						$a_qty[2] = 30;
+						$a_qty[3] = 40;
+						
+						$out = 35;
+						*/
+						if ($i > 0) {
+							for ($j = 0; $j < $i; $j++) {
+								array_splice($a_qty, 0, 1);
+								array_splice($a_harga, 0, 1);
+								$a_qty[0] = $saldo_qty;
+							}
+							$a_index = $i;
+							//if ($item_id == 19) {print_r($a_qty); print_r($a_harga);}
+						}
+						else {
+							$a_qty[$i] = $saldo_qty;
+						}
+						
+						$q = "
+							insert into 
+								t_09nilai_stok 
+									(item_id, item_nama, tgl, 
+									out_qty, out_harga, out_sub_total, 
+									saldo_qty, saldo_harga, saldo_sub_total) values 
+									(".$item_id.", '".$item_nama."', '".$tgl."', ".
+									$out_qty.", ".$out_harga.", ".$out_qty * $out_harga.", ".
+									$a_qty[0].", ".$a_harga[0].", ".$a_qty[0] * $a_harga[0].")
+							";
+						$conn->Execute($q);
+					
+						//if ($item_id == 19) {echo $a_index;}
+						for ($i = 1; $i <= $a_index; $i++) {
+							$q = "insert into t_09nilai_stok (item_id, item_nama, saldo_qty, saldo_harga, saldo_sub_total) values 
+							(".$item_id.", '".$item_nama."', ".$a_qty[$i].", ".$a_harga[$i].", ".$a_qty[$i] * $a_harga[$i].")"; 
+							$conn->Execute($q);
+						}
+						
+						break;
 					}
-					break;
+					
 				}
 			}
 			
-			$q = "
-				insert into 
-					t_09nilai_stok 
-						(item_id, item_nama, tgl, 
-						out_qty, out_harga, out_sub_total, 
-						saldo_qty, saldo_harga, saldo_sub_total) values 
-						(".$item_id.", '".$item_nama."', '".$tgl."', ".
-						$out_qty.", ".$out_harga.", ".$out_qty * $out_harga.", ".
-						$a_qty[0].", ".$a_harga[0].", ".$a_qty[0] * $a_harga[0].")
-				";
-			$conn->Execute($q);
-		
-			if ($item_id == 19) {echo $a_index;}
-			for ($i = 1; $i <= $a_index; $i++) {
-				$q = "insert into t_09nilai_stok (item_id, item_nama, saldo_qty, saldo_harga, saldo_sub_total) values 
-				(".$item_id.", '".$item_nama."', ".$a_qty[$i].", ".$a_harga[$i].", ".$a_qty[$i] * $a_harga[$i].")"; 
-				$conn->Execute($q);
-			}
+			
 			
 		}
 		
