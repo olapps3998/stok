@@ -294,7 +294,7 @@ Page_Rendering();
   <div class="panel-body">
   	oct 2, 2017:</br>
   	<ul>
-  		<li>hpp (harga pokok penjualan) <a href="http://localhost/stok/cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
+  		<li>hpp (harga pokok penjualan) <a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
   	</ul>
   </div>
 
