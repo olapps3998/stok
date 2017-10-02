@@ -481,9 +481,40 @@ function Row_Inserted($rsold, &$rsnew) {
 	ew_Execute($q);
 }
 ]]></CustomScript>
-  <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="cf_01hitung_nilai_stok.php" ScriptL2Key=""><![CDATA[<form id="myform" name="myform" class="form-horizontal" method="post" action="cf_01hitung_nilai_stok1.php">
-	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit">Hitung Nilai Stok</button>
-</form>
+  <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="cf_01hitung_nilai_stok.php" ScriptL2Key=""><![CDATA[<div class="panel panel-default">
+
+  <div class="panel-heading">
+  	<b>on progress</b>
+  </div>
+  <div class="panel-body">
+  	oct 2, 2017:</br>
+  	<ul>
+  		<li>hpp (harga pokok penjualan) => <a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
+  	</ul>
+  </div>
+
+  <div class="panel-heading">
+  	<b>to do</b>
+  </div>
+  <div class="panel-body">
+  	sep 28, 2017:</br>
+  	<ul>
+  		<li>dead stock</li>
+  		<li>retur</li>
+  		<li>invoice</li>
+  		<li>backup</li>
+  		<li>restore</li>
+  		<li>closing</li>
+  		<li>alias item nama</li>
+  		<li>fifo</li>
+  		<li>stock opname</li>
+  		<li>margin :: total per month, perlu menyertakan quantity</li>
+  		<li>konversi satuan</li>
+  		<li>hak akses</li>
+  	</ul>
+  </div>
+
+</div>
 ]]></CustomScript>
   <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="cf_00home.php" ScriptL2Key=""><![CDATA[<div class="panel panel-default">
 
@@ -493,7 +524,7 @@ function Row_Inserted($rsold, &$rsnew) {
   <div class="panel-body">
   	oct 2, 2017:</br>
   	<ul>
-  		<li>hpp (harga pokok penjualan) <a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
+  		<li>hpp (harga pokok penjualan) => <a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
   	</ul>
   </div>
 
