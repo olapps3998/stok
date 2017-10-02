@@ -294,6 +294,16 @@ Page_Rendering();
   <div class="panel-body">
   	oct 2, 2017:</br>
   	<ul>
+  		<li>alias item nama</li>
+  	</ul>
+  </div>
+
+  <div class="panel-heading">
+  	<b>pending</b>
+  </div>
+  <div class="panel-body">
+  	oct 2, 2017:</br>
+  	<ul>
   		<li>hpp (harga pokok penjualan) => <a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
   	</ul>
   </div>
@@ -310,8 +320,6 @@ Page_Rendering();
   		<li>backup</li>
   		<li>restore</li>
   		<li>closing</li>
-  		<li>alias item nama</li>
-  		<li>fifo</li>
   		<li>stock opname</li>
   		<li>margin :: total per month, perlu menyertakan quantity</li>
   		<li>konversi satuan</li>
