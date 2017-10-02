@@ -41,7 +41,7 @@ while (!$r->EOF) {
 	$a_index = 0;
 	
 	// ambil data dari v_12nilai_stok sesuai item_id yang aktif
-	$q1 = "select * from v_12nilai_stok where item_id = ".$item_id." order by tgl";
+	$q1 = "select * from v_12nilai_stok where item_id = ".$item_id." order by tgl, detail_id";
 	$r1 = $conn->Execute($q1);
 	while (!$r1->EOF) {
 		
