@@ -13,9 +13,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$cf_00home_php = NULL; // Initialize page object first
+$cf_02news_php = NULL; // Initialize page object first
 
-class ccf_00home_php {
+class ccf_02news_php {
 
 	// Page ID
 	var $PageID = 'custom';
@@ -24,10 +24,10 @@ class ccf_00home_php {
 	var $ProjectID = "{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}";
 
 	// Table name
-	var $TableName = 'cf_00home.php';
+	var $TableName = 'cf_02news.php';
 
 	// Page object name
-	var $PageObjName = 'cf_00home_php';
+	var $PageObjName = 'cf_02news_php';
 
 	// Page name
 	function PageName() {
@@ -193,7 +193,7 @@ class ccf_00home_php {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'cf_00home.php', TRUE);
+			define("EW_TABLE_NAME", 'cf_02news.php', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -259,7 +259,7 @@ class ccf_00home_php {
 		global $Breadcrumb;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("custom", "cf_00home_php", $url, "", "cf_00home_php", TRUE);
+		$Breadcrumb->Add("custom", "cf_02news_php", $url, "", "cf_02news_php", TRUE);
 	}
 }
 ?>
@@ -267,13 +267,13 @@ class ccf_00home_php {
 <?php
 
 // Create page object
-if (!isset($cf_00home_php)) $cf_00home_php = new ccf_00home_php();
+if (!isset($cf_02news_php)) $cf_02news_php = new ccf_02news_php();
 
 // Page init
-$cf_00home_php->Page_Init();
+$cf_02news_php->Page_Init();
 
 // Page main
-$cf_00home_php->Page_Main();
+$cf_02news_php->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
@@ -287,40 +287,14 @@ Page_Rendering();
 </div>
 <?php } ?>
 <div class="panel panel-default">
-  <div class="panel-heading">
-  	to do
-  </div>
+  <div class="panel-heading">Latest news</div>
   <div class="panel-body">
-  	sep 28, 2017:</br>
-  	<ul>
-  		<li>dead stock</li>
-  		<li>retur</li>
-  		<li>invoice</li>
-  		<li>backup</li>
-  		<li>restore</li>
-  		<li>closing</li>
-  		<li>alias item nama</li>
-  		<li>fifo</li>
-  		<li>stock opname</li>
-  		<li>margin :: total per month, perlu menyertakan quantity</li>
-  		<li>konversi satuan</li>
-  		<li>hak akses</li>
-  		<li>hpp (harga pokok penjualan)</li>
-  	</ul>
-  </div>
-
-  <div class="panel-heading">
-  	on progress
-  </div>
-  <div class="panel-body">
-  	oct 2, 2017:</br>
-  	<ul>
-  		<li>hpp (harga pokok penjualan) <a href="http://localhost/stok/cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
-  	</ul>
+<p>Jul 25, 2017: PHPMaker 2018.0 is released</p>
   </div>
 </div>
+
 <?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
 <?php include_once "footer.php" ?>
 <?php
-$cf_00home_php->Page_Terminate();
+$cf_02news_php->Page_Terminate();
 ?>

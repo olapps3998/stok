@@ -586,32 +586,11 @@
     <menu id="10109">
       <phrase id="menutext" value="v 13beli" />
     </menu>
-    <menu id="10110">
-      <phrase id="menutext" value="v 14jual detail" />
-    </menu>
-    <menu id="10104">
-      <phrase id="menutext" value="t 09nilai stok" />
-    </menu>
-    <menu id="10105">
-      <phrase id="menutext" value="v 04keluar" />
-    </menu>
-    <menu id="10106">
-      <phrase id="menutext" value="v 06transaksi" />
-    </menu>
-    <menu id="10107">
-      <phrase id="menutext" value="v 07mutasi" />
-    </menu>
-    <menu id="10108">
-      <phrase id="menutext" value="v 12nilai stok" />
-    </menu>
-    <menu id="10047">
-      <phrase id="menutext" value="t 99beli" />
-    </menu>
     <menu id="6">
       <phrase id="menutext" value="Home" />
     </menu>
-    <menu id="10043">
-      <phrase id="menutext" value="Detail Penjualan" />
+    <menu id="10110">
+      <phrase id="menutext" value="v 14jual detail" />
     </menu>
     <menu id="7">
       <phrase id="menutext" value="Master" />
@@ -631,6 +610,9 @@
     <menu id="10018">
       <phrase id="menutext" value="Customer" />
     </menu>
+    <menu id="10104">
+      <phrase id="menutext" value="t 09nilai stok" />
+    </menu>
     <menu id="10016">
       <phrase id="menutext" value="Transaksi" />
     </menu>
@@ -640,8 +622,8 @@
     <menu id="10019">
       <phrase id="menutext" value="Penjualan" />
     </menu>
-    <menu id="10044">
-      <phrase id="menutext" value="v 02jual laporan" />
+    <menu id="10105">
+      <phrase id="menutext" value="v 04keluar" />
     </menu>
     <menu id="9">
       <phrase id="menutext" value="Laporan" />
@@ -675,6 +657,24 @@
     </menu>
     <menu id="10031">
       <phrase id="menutext" value="Piutang" />
+    </menu>
+    <menu id="10106">
+      <phrase id="menutext" value="v 06transaksi" />
+    </menu>
+    <menu id="10107">
+      <phrase id="menutext" value="v 07mutasi" />
+    </menu>
+    <menu id="10108">
+      <phrase id="menutext" value="v 12nilai stok" />
+    </menu>
+    <menu id="10047">
+      <phrase id="menutext" value="t 99beli" />
+    </menu>
+    <menu id="10043">
+      <phrase id="menutext" value="Detail Penjualan" />
+    </menu>
+    <menu id="10044">
+      <phrase id="menutext" value="v 02jual laporan" />
     </menu>
     <menu id="10045">
       <phrase id="menutext" value="v 11piutang" />
