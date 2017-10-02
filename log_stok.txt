@@ -43,3 +43,6 @@ laporan piutang
 8:36 PM 9/26/2017
 perlu dibuatkan modul MASTER > SALDO AWAL;
 
+10:44 AM 9/29/2017
+perlu ditambahi beli_id dan jual_detail_id untuk menjamin data benar2 urut sesuai urutan;
+

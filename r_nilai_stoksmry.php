@@ -510,7 +510,6 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		global $ReportLanguage;
 
 		// Set field visibility for detail fields
-		$this->id->SetVisibility();
 		$this->tgl->SetVisibility();
 		$this->in_qty->SetVisibility();
 		$this->in_harga->SetVisibility();
@@ -526,7 +525,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 12;
+		$nDtls = 11;
 		$nGrps = 3;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -539,7 +538,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -865,17 +864,16 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->saldo_qty->setDbValue($rs->fields('saldo_qty'));
 			$this->saldo_harga->setDbValue($rs->fields('saldo_harga'));
 			$this->saldo_sub_total->setDbValue($rs->fields('saldo_sub_total'));
-			$this->Val[1] = $this->id->CurrentValue;
-			$this->Val[2] = $this->tgl->CurrentValue;
-			$this->Val[3] = $this->in_qty->CurrentValue;
-			$this->Val[4] = $this->in_harga->CurrentValue;
-			$this->Val[5] = $this->in_sub_total->CurrentValue;
-			$this->Val[6] = $this->out_qty->CurrentValue;
-			$this->Val[7] = $this->out_harga->CurrentValue;
-			$this->Val[8] = $this->out_sub_total->CurrentValue;
-			$this->Val[9] = $this->saldo_qty->CurrentValue;
-			$this->Val[10] = $this->saldo_harga->CurrentValue;
-			$this->Val[11] = $this->saldo_sub_total->CurrentValue;
+			$this->Val[1] = $this->tgl->CurrentValue;
+			$this->Val[2] = $this->in_qty->CurrentValue;
+			$this->Val[3] = $this->in_harga->CurrentValue;
+			$this->Val[4] = $this->in_sub_total->CurrentValue;
+			$this->Val[5] = $this->out_qty->CurrentValue;
+			$this->Val[6] = $this->out_harga->CurrentValue;
+			$this->Val[7] = $this->out_sub_total->CurrentValue;
+			$this->Val[8] = $this->saldo_qty->CurrentValue;
+			$this->Val[9] = $this->saldo_harga->CurrentValue;
+			$this->Val[10] = $this->saldo_sub_total->CurrentValue;
 		} else {
 			$this->id->setDbValue("");
 			$this->item_id->setDbValue("");
@@ -1108,9 +1106,6 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			// item_nama
 			$this->item_nama->HrefValue = "";
 
-			// id
-			$this->id->HrefValue = "";
-
 			// tgl
 			$this->tgl->HrefValue = "";
 
@@ -1162,10 +1157,6 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->item_nama->GroupViewValue = ewr_DisplayGroupValue($this->item_nama, $this->item_nama->GroupViewValue);
 			if ($this->item_nama->GroupValue() == $this->item_nama->GroupOldValue() && !$this->ChkLvlBreak(2))
 				$this->item_nama->GroupViewValue = "&nbsp;";
-
-			// id
-			$this->id->ViewValue = $this->id->CurrentValue;
-			$this->id->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
 			// tgl
 			$this->tgl->ViewValue = $this->tgl->CurrentValue;
@@ -1231,9 +1222,6 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 
 			// item_nama
 			$this->item_nama->HrefValue = "";
-
-			// id
-			$this->id->HrefValue = "";
 
 			// tgl
 			$this->tgl->HrefValue = "";
@@ -1305,15 +1293,6 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$HrefValue = &$this->item_nama->HrefValue;
 			$LinkAttrs = &$this->item_nama->LinkAttrs;
 			$this->Cell_Rendered($this->item_nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
-
-			// id
-			$CurrentValue = $this->id->CurrentValue;
-			$ViewValue = &$this->id->ViewValue;
-			$ViewAttrs = &$this->id->ViewAttrs;
-			$CellAttrs = &$this->id->CellAttrs;
-			$HrefValue = &$this->id->HrefValue;
-			$LinkAttrs = &$this->id->LinkAttrs;
-			$this->Cell_Rendered($this->id, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// tgl
 			$CurrentValue = $this->tgl->CurrentValue;
@@ -1418,7 +1397,6 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		$this->DtlColumnCount = 0;
 		if ($this->item_id->Visible) $this->GrpColumnCount += 1;
 		if ($this->item_nama->Visible) { $this->GrpColumnCount += 1; $this->SubGrpColumnCount += 1; }
-		if ($this->id->Visible) $this->DtlColumnCount += 1;
 		if ($this->tgl->Visible) $this->DtlColumnCount += 1;
 		if ($this->in_qty->Visible) $this->DtlColumnCount += 1;
 		if ($this->in_harga->Visible) $this->DtlColumnCount += 1;
@@ -1939,7 +1917,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 	// - Variables setup: Session[EWR_TABLE_SESSION_ORDER_BY], Session["sort_Table_Field"]
 	function GetSort($options = array()) {
 		if ($this->DrillDown)
-			return "`id` ASC";
+			return "";
 		$bResetSort = @$options["resetsort"] == "1" || @$_GET["cmd"] == "resetsort";
 		$orderBy = (@$options["order"] <> "") ? @$options["order"] : ewr_StripSlashes(@$_GET["order"]);
 		$orderType = (@$options["ordertype"] <> "") ? @$options["ordertype"] : ewr_StripSlashes(@$_GET["ordertype"]);
@@ -1953,7 +1931,6 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->setStartGroup(1);
 			$this->item_id->setSort("");
 			$this->item_nama->setSort("");
-			$this->id->setSort("");
 			$this->tgl->setSort("");
 			$this->in_qty->setSort("");
 			$this->in_harga->setSort("");
@@ -1971,7 +1948,6 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->CurrentOrderType = $orderType;
 			$this->UpdateSort($this->item_id, $bCtrl); // item_id
 			$this->UpdateSort($this->item_nama, $bCtrl); // item_nama
-			$this->UpdateSort($this->id, $bCtrl); // id
 			$this->UpdateSort($this->tgl, $bCtrl); // tgl
 			$this->UpdateSort($this->in_qty, $bCtrl); // in_qty
 			$this->UpdateSort($this->in_harga, $bCtrl); // in_harga
@@ -1985,12 +1961,6 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
 			$this->setStartGroup(1);
-		}
-
-		// Set up default sort
-		if ($this->getOrderBy() == "") {
-			$this->setOrderBy("`id` ASC");
-			$this->id->setSort("ASC");
 		}
 		return $this->getOrderBy();
 	}
@@ -2560,24 +2530,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 	<?php } ?>
 <?php } ?>
-<?php if ($Page->id->Visible) { ?>
-<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="id"><div class="r_nilai_stok_id"><span class="ewTableHeaderCaption"><?php echo $Page->id->FldCaption() ?></span></div></td>
-<?php } else { ?>
-	<td data-field="id">
-<?php if ($Page->SortUrl($Page->id) == "") { ?>
-		<div class="ewTableHeaderBtn r_nilai_stok_id">
-			<span class="ewTableHeaderCaption"><?php echo $Page->id->FldCaption() ?></span>
-		</div>
-<?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer r_nilai_stok_id" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->id) ?>',2);">
-			<span class="ewTableHeaderCaption"><?php echo $Page->id->FldCaption() ?></span>
-			<span class="ewTableHeaderSort"><?php if ($Page->id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
-		</div>
-<?php } ?>
-	</td>
-<?php } ?>
-<?php } ?>
 <?php if ($Page->tgl->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 	<td data-field="tgl"><div class="r_nilai_stok_tgl"><span class="ewTableHeaderCaption"><?php echo $Page->tgl->FldCaption() ?></span></div></td>
@@ -2883,10 +2835,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_nilai_stok_item_nama"<?php echo $Page->item_nama->ViewAttributes() ?>><?php echo $Page->item_nama->GroupViewValue ?></span></td>
 	<?php } ?>
 <?php } ?>
-<?php if ($Page->id->Visible) { ?>
-		<td data-field="id"<?php echo $Page->id->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_id"<?php echo $Page->id->ViewAttributes() ?>><?php echo $Page->id->ListViewValue() ?></span></td>
-<?php } ?>
 <?php if ($Page->tgl->Visible) { ?>
 		<td data-field="tgl"<?php echo $Page->tgl->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_tgl"<?php echo $Page->tgl->ViewAttributes() ?>><?php echo $Page->tgl->ListViewValue() ?></span></td>
@@ -2978,9 +2926,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->item_nama->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
 		</td>
-<?php } ?>
-<?php if ($Page->id->Visible) { ?>
-		<td data-field="id"<?php echo $Page->item_id->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->tgl->Visible) { ?>
 		<td data-field="tgl"<?php echo $Page->item_id->CellAttributes() ?>></td>
