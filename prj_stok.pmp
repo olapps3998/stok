@@ -486,8 +486,19 @@ function Row_Inserted($rsold, &$rsnew) {
 </form>
 ]]></CustomScript>
   <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="cf_00home.php" ScriptL2Key=""><![CDATA[<div class="panel panel-default">
+
   <div class="panel-heading">
-  	to do
+  	<b>on progress</b>
+  </div>
+  <div class="panel-body">
+  	oct 2, 2017:</br>
+  	<ul>
+  		<li>hpp (harga pokok penjualan) <a href="http://localhost/stok/cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
+  	</ul>
+  </div>
+
+  <div class="panel-heading">
+  	<b>to do</b>
   </div>
   <div class="panel-body">
   	sep 28, 2017:</br>
@@ -504,19 +515,9 @@ function Row_Inserted($rsold, &$rsnew) {
   		<li>margin :: total per month, perlu menyertakan quantity</li>
   		<li>konversi satuan</li>
   		<li>hak akses</li>
-  		<li>hpp (harga pokok penjualan)</li>
   	</ul>
   </div>
 
-  <div class="panel-heading">
-  	on progress
-  </div>
-  <div class="panel-body">
-  	oct 2, 2017:</br>
-  	<ul>
-  		<li>hpp (harga pokok penjualan) <a href="http://localhost/stok/cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
-  	</ul>
-  </div>
 </div>
 ]]></CustomScript>
   <Menu MenuID="10109" MenuText="v 13beli" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="v_13beli" MenuCustomUrl="0" MenuLevel="0" MenuShow="0" MenuDisplayOrder="100" />

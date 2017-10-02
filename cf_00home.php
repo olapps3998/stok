@@ -287,8 +287,19 @@ Page_Rendering();
 </div>
 <?php } ?>
 <div class="panel panel-default">
+
   <div class="panel-heading">
-  	to do
+  	<b>on progress</b>
+  </div>
+  <div class="panel-body">
+  	oct 2, 2017:</br>
+  	<ul>
+  		<li>hpp (harga pokok penjualan) <a href="http://localhost/stok/cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
+  	</ul>
+  </div>
+
+  <div class="panel-heading">
+  	<b>to do</b>
   </div>
   <div class="panel-body">
   	sep 28, 2017:</br>
@@ -305,19 +316,9 @@ Page_Rendering();
   		<li>margin :: total per month, perlu menyertakan quantity</li>
   		<li>konversi satuan</li>
   		<li>hak akses</li>
-  		<li>hpp (harga pokok penjualan)</li>
   	</ul>
   </div>
 
-  <div class="panel-heading">
-  	on progress
-  </div>
-  <div class="panel-body">
-  	oct 2, 2017:</br>
-  	<ul>
-  		<li>hpp (harga pokok penjualan) <a href="http://localhost/stok/cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
-  	</ul>
-  </div>
 </div>
 <?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
 <?php include_once "footer.php" ?>
