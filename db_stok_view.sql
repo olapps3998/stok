@@ -61,6 +61,35 @@ From ((t_02item a
   Left Join t_08item_saldo d On a.item_id = d.item_id
 Order By item_id;
 
+create view v_13beli as
+Select t_04beli.beli_id As beli_id,
+  t_04beli.tgl_beli As tgl_beli,
+  t_04beli.tgl_kirim As tgl_kirim,
+  t_04beli.vendor_id As vendor_id,
+  t_04beli.item_id As item_id,
+  t_04beli.qty As qty,
+  t_04beli.satuan_id As satuan_id,
+  t_04beli.harga As harga,
+  t_04beli.sub_total As sub_total,
+  t_04beli.tgl_dp As tgl_dp,
+  t_04beli.jml_dp As jml_dp,
+  t_04beli.tgl_lunas As tgl_lunas,
+  t_04beli.jml_lunas As jml_lunas
+From t_04beli
+Order By beli_id;
+
+create view v_14jual_detail as
+Select t_07jual_detail.jual_detail_id As jual_detail_id,
+  t_07jual_detail.jual_id As jual_id,
+  t_07jual_detail.tgl_kirim As tgl_kirim,
+  t_07jual_detail.item_id As item_id,
+  t_07jual_detail.qty As qty,
+  t_07jual_detail.satuan_id As satuan_id,
+  t_07jual_detail.harga As harga,
+  t_07jual_detail.sub_total As sub_total
+From t_07jual_detail
+Order By jual_detail_id;
+
 create view v_06transaksi as
 Select a.item_id As item_id,
   a.item_nama As item_nama,
@@ -72,7 +101,7 @@ Select a.item_id As item_id,
   b.harga As harga,
   b.sub_total As sub_total
 From ((t_02item a
-  Left Join t_04beli b On a.item_id = b.item_id)
+  Left Join v_13beli b On a.item_id = b.item_id)
   Left Join t_01vendor y On b.vendor_id = y.vendor_id)
   Left Join t_03satuan z On b.satuan_id = z.satuan_id
 union All
@@ -86,7 +115,7 @@ Select a.item_id As item_id,
   b.harga As harga,
   b.sub_total As sub_total
 From (((t_02item a
-  Left Join t_07jual_detail b On a.item_id = b.item_id)
+  Left Join v_14jual_detail b On a.item_id = b.item_id)
   Left Join t_06jual c On b.jual_id = c.jual_id)
   Left Join t_05customer y On c.customer_id = y.customer_id)
   Left Join t_03satuan z On b.satuan_id = z.satuan_id
@@ -166,35 +195,6 @@ Select a.no_po As no_po,
 From t_06jual a
   Left Join t_05customer b On a.customer_id = b.customer_id
 Where (Case When isnull(a.bayar_jml) Then 0 Else a.bayar_jml End) < a.total;
-
-create view v_13beli as
-Select t_04beli.beli_id As beli_id,
-  t_04beli.tgl_beli As tgl_beli,
-  t_04beli.tgl_kirim As tgl_kirim,
-  t_04beli.vendor_id As vendor_id,
-  t_04beli.item_id As item_id,
-  t_04beli.qty As qty,
-  t_04beli.satuan_id As satuan_id,
-  t_04beli.harga As harga,
-  t_04beli.sub_total As sub_total,
-  t_04beli.tgl_dp As tgl_dp,
-  t_04beli.jml_dp As jml_dp,
-  t_04beli.tgl_lunas As tgl_lunas,
-  t_04beli.jml_lunas As jml_lunas
-From t_04beli
-Order By beli_id;
-
-create view v_14jual_detail as
-Select t_07jual_detail.jual_detail_id As jual_detail_id,
-  t_07jual_detail.jual_id As jual_id,
-  t_07jual_detail.tgl_kirim As tgl_kirim,
-  t_07jual_detail.item_id As item_id,
-  t_07jual_detail.qty As qty,
-  t_07jual_detail.satuan_id As satuan_id,
-  t_07jual_detail.harga As harga,
-  t_07jual_detail.sub_total As sub_total
-From t_07jual_detail
-Order By jual_detail_id;
 
 create view v_12nilai_stok as
 Select a.item_id As item_id,
