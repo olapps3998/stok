@@ -315,6 +315,10 @@ Page_Rendering();
   				<ul>
   					<li>by default : Customer menggunakan pilihan Nama Item urutan pertama, kecuali ada perubahan</li>
   				<ul>
+  			<li><a href="t_02itemlist.php">Master - Item</a></li>
+  				<ul>
+  					<li>pemisahan urutan : dengan tanda koma</li>
+  				<ul>
   		</ul>
   	</div>
   </div>
