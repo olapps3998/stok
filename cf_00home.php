@@ -314,11 +314,11 @@ Page_Rendering();
   			<li><a href="t_05customerlist.php">Master - Customer</a></li>
   				<ul>
   					<li>by default : Customer menggunakan pilihan Nama Item urutan pertama, kecuali ada perubahan</li>
-  				<ul>
+  				</ul>
   			<li><a href="t_02itemlist.php">Master - Item</a></li>
   				<ul>
   					<li>pemisahan urutan : dengan tanda koma</li>
-  				<ul>
+  				</ul>
   		</ul>
   	</div>
   </div>
