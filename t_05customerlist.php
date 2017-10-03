@@ -386,6 +386,7 @@ class ct_05customer_list extends ct_05customer {
 		// Setup export options
 		$this->SetupExportOptions();
 		$this->customer_nama->SetVisibility();
+		$this->item_nama_index->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -1116,6 +1117,8 @@ class ct_05customer_list extends ct_05customer {
 		global $objForm;
 		if ($objForm->HasValue("x_customer_nama") && $objForm->HasValue("o_customer_nama") && $this->customer_nama->CurrentValue <> $this->customer_nama->OldValue)
 			return FALSE;
+		if ($objForm->HasValue("x_item_nama_index") && $objForm->HasValue("o_item_nama_index") && $this->item_nama_index->CurrentValue <> $this->item_nama_index->OldValue)
+			return FALSE;
 		return TRUE;
 	}
 
@@ -1202,6 +1205,7 @@ class ct_05customer_list extends ct_05customer {
 		$sFilterList = "";
 		$sFilterList = ew_Concat($sFilterList, $this->customer_id->AdvancedSearch->ToJSON(), ","); // Field customer_id
 		$sFilterList = ew_Concat($sFilterList, $this->customer_nama->AdvancedSearch->ToJSON(), ","); // Field customer_nama
+		$sFilterList = ew_Concat($sFilterList, $this->item_nama_index->AdvancedSearch->ToJSON(), ","); // Field item_nama_index
 		if ($this->BasicSearch->Keyword <> "") {
 			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
 			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
@@ -1261,6 +1265,14 @@ class ct_05customer_list extends ct_05customer {
 		$this->customer_nama->AdvancedSearch->SearchValue2 = @$filter["y_customer_nama"];
 		$this->customer_nama->AdvancedSearch->SearchOperator2 = @$filter["w_customer_nama"];
 		$this->customer_nama->AdvancedSearch->Save();
+
+		// Field item_nama_index
+		$this->item_nama_index->AdvancedSearch->SearchValue = @$filter["x_item_nama_index"];
+		$this->item_nama_index->AdvancedSearch->SearchOperator = @$filter["z_item_nama_index"];
+		$this->item_nama_index->AdvancedSearch->SearchCondition = @$filter["v_item_nama_index"];
+		$this->item_nama_index->AdvancedSearch->SearchValue2 = @$filter["y_item_nama_index"];
+		$this->item_nama_index->AdvancedSearch->SearchOperator2 = @$filter["w_item_nama_index"];
+		$this->item_nama_index->AdvancedSearch->Save();
 		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
 		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
 	}
@@ -1437,6 +1449,7 @@ class ct_05customer_list extends ct_05customer {
 			$this->CurrentOrder = ew_StripSlashes(@$_GET["order"]);
 			$this->CurrentOrderType = @$_GET["ordertype"];
 			$this->UpdateSort($this->customer_nama, $bCtrl); // customer_nama
+			$this->UpdateSort($this->item_nama_index, $bCtrl); // item_nama_index
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -1470,6 +1483,7 @@ class ct_05customer_list extends ct_05customer {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
 				$this->customer_nama->setSort("");
+				$this->item_nama_index->setSort("");
 			}
 
 			// Reset start position
@@ -1988,6 +2002,8 @@ class ct_05customer_list extends ct_05customer {
 	function LoadDefaultValues() {
 		$this->customer_nama->CurrentValue = NULL;
 		$this->customer_nama->OldValue = $this->customer_nama->CurrentValue;
+		$this->item_nama_index->CurrentValue = 1;
+		$this->item_nama_index->OldValue = $this->item_nama_index->CurrentValue;
 	}
 
 	// Load basic search values
@@ -2006,6 +2022,10 @@ class ct_05customer_list extends ct_05customer {
 			$this->customer_nama->setFormValue($objForm->GetValue("x_customer_nama"));
 		}
 		$this->customer_nama->setOldValue($objForm->GetValue("o_customer_nama"));
+		if (!$this->item_nama_index->FldIsDetailKey) {
+			$this->item_nama_index->setFormValue($objForm->GetValue("x_item_nama_index"));
+		}
+		$this->item_nama_index->setOldValue($objForm->GetValue("o_item_nama_index"));
 		if (!$this->customer_id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
 			$this->customer_id->setFormValue($objForm->GetValue("x_customer_id"));
 	}
@@ -2016,6 +2036,7 @@ class ct_05customer_list extends ct_05customer {
 		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
 			$this->customer_id->CurrentValue = $this->customer_id->FormValue;
 		$this->customer_nama->CurrentValue = $this->customer_nama->FormValue;
+		$this->item_nama_index->CurrentValue = $this->item_nama_index->FormValue;
 	}
 
 	// Load recordset
@@ -2075,6 +2096,7 @@ class ct_05customer_list extends ct_05customer {
 		$this->Row_Selected($row);
 		$this->customer_id->setDbValue($rs->fields('customer_id'));
 		$this->customer_nama->setDbValue($rs->fields('customer_nama'));
+		$this->item_nama_index->setDbValue($rs->fields('item_nama_index'));
 	}
 
 	// Load DbValue from recordset
@@ -2083,6 +2105,7 @@ class ct_05customer_list extends ct_05customer {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->customer_id->DbValue = $row['customer_id'];
 		$this->customer_nama->DbValue = $row['customer_nama'];
+		$this->item_nama_index->DbValue = $row['item_nama_index'];
 	}
 
 	// Load old record
@@ -2126,6 +2149,7 @@ class ct_05customer_list extends ct_05customer {
 		// Common render codes for all row types
 		// customer_id
 		// customer_nama
+		// item_nama_index
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -2137,10 +2161,19 @@ class ct_05customer_list extends ct_05customer {
 		$this->customer_nama->ViewValue = $this->customer_nama->CurrentValue;
 		$this->customer_nama->ViewCustomAttributes = "";
 
+		// item_nama_index
+		$this->item_nama_index->ViewValue = $this->item_nama_index->CurrentValue;
+		$this->item_nama_index->ViewCustomAttributes = "";
+
 			// customer_nama
 			$this->customer_nama->LinkCustomAttributes = "";
 			$this->customer_nama->HrefValue = "";
 			$this->customer_nama->TooltipValue = "";
+
+			// item_nama_index
+			$this->item_nama_index->LinkCustomAttributes = "";
+			$this->item_nama_index->HrefValue = "";
+			$this->item_nama_index->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
 			// customer_nama
@@ -2149,11 +2182,21 @@ class ct_05customer_list extends ct_05customer {
 			$this->customer_nama->EditValue = ew_HtmlEncode($this->customer_nama->CurrentValue);
 			$this->customer_nama->PlaceHolder = ew_RemoveHtml($this->customer_nama->FldCaption());
 
+			// item_nama_index
+			$this->item_nama_index->EditAttrs["class"] = "form-control";
+			$this->item_nama_index->EditCustomAttributes = "";
+			$this->item_nama_index->EditValue = ew_HtmlEncode($this->item_nama_index->CurrentValue);
+			$this->item_nama_index->PlaceHolder = ew_RemoveHtml($this->item_nama_index->FldCaption());
+
 			// Add refer script
 			// customer_nama
 
 			$this->customer_nama->LinkCustomAttributes = "";
 			$this->customer_nama->HrefValue = "";
+
+			// item_nama_index
+			$this->item_nama_index->LinkCustomAttributes = "";
+			$this->item_nama_index->HrefValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// customer_nama
@@ -2162,11 +2205,21 @@ class ct_05customer_list extends ct_05customer {
 			$this->customer_nama->EditValue = ew_HtmlEncode($this->customer_nama->CurrentValue);
 			$this->customer_nama->PlaceHolder = ew_RemoveHtml($this->customer_nama->FldCaption());
 
+			// item_nama_index
+			$this->item_nama_index->EditAttrs["class"] = "form-control";
+			$this->item_nama_index->EditCustomAttributes = "";
+			$this->item_nama_index->EditValue = ew_HtmlEncode($this->item_nama_index->CurrentValue);
+			$this->item_nama_index->PlaceHolder = ew_RemoveHtml($this->item_nama_index->FldCaption());
+
 			// Edit refer script
 			// customer_nama
 
 			$this->customer_nama->LinkCustomAttributes = "";
 			$this->customer_nama->HrefValue = "";
+
+			// item_nama_index
+			$this->item_nama_index->LinkCustomAttributes = "";
+			$this->item_nama_index->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -2191,6 +2244,9 @@ class ct_05customer_list extends ct_05customer {
 			return ($gsFormError == "");
 		if (!$this->customer_nama->FldIsDetailKey && !is_null($this->customer_nama->FormValue) && $this->customer_nama->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->customer_nama->FldCaption(), $this->customer_nama->ReqErrMsg));
+		}
+		if (!ew_CheckInteger($this->item_nama_index->FormValue)) {
+			ew_AddMessage($gsFormError, $this->item_nama_index->FldErrMsg());
 		}
 
 		// Return validate result
@@ -2328,6 +2384,9 @@ class ct_05customer_list extends ct_05customer {
 			// customer_nama
 			$this->customer_nama->SetDbValueDef($rsnew, $this->customer_nama->CurrentValue, "", $this->customer_nama->ReadOnly);
 
+			// item_nama_index
+			$this->item_nama_index->SetDbValueDef($rsnew, $this->item_nama_index->CurrentValue, 0, $this->item_nama_index->ReadOnly);
+
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
 			if ($bUpdateRow) {
@@ -2384,6 +2443,9 @@ class ct_05customer_list extends ct_05customer {
 
 		// customer_nama
 		$this->customer_nama->SetDbValueDef($rsnew, $this->customer_nama->CurrentValue, "", FALSE);
+
+		// item_nama_index
+		$this->item_nama_index->SetDbValueDef($rsnew, $this->item_nama_index->CurrentValue, 0, strval($this->item_nama_index->CurrentValue) == "");
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -2882,6 +2944,9 @@ ft_05customerlist.Validate = function() {
 			elm = this.GetElements("x" + infix + "_customer_nama");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_05customer->customer_nama->FldCaption(), $t_05customer->customer_nama->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_item_nama_index");
+			if (elm && !ew_CheckInteger(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_05customer->item_nama_index->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -2899,6 +2964,7 @@ ft_05customerlist.Validate = function() {
 ft_05customerlist.EmptyRow = function(infix) {
 	var fobj = this.Form;
 	if (ew_ValueChanged(fobj, infix, "customer_nama", false)) return false;
+	if (ew_ValueChanged(fobj, infix, "item_nama_index", false)) return false;
 	return true;
 }
 
@@ -3123,6 +3189,15 @@ $t_05customer_list->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
+<?php if ($t_05customer->item_nama_index->Visible) { // item_nama_index ?>
+	<?php if ($t_05customer->SortUrl($t_05customer->item_nama_index) == "") { ?>
+		<th data-name="item_nama_index"><div id="elh_t_05customer_item_nama_index" class="t_05customer_item_nama_index"><div class="ewTableHeaderCaption"><?php echo $t_05customer->item_nama_index->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="item_nama_index"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t_05customer->SortUrl($t_05customer->item_nama_index) ?>',2);"><div id="elh_t_05customer_item_nama_index" class="t_05customer_item_nama_index">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t_05customer->item_nama_index->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t_05customer->item_nama_index->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t_05customer->item_nama_index->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
 <?php
 
 // Render list options (header, right)
@@ -3166,6 +3241,14 @@ $t_05customer_list->ListOptions->Render("body", "left", $t_05customer_list->RowC
 <input type="text" data-table="t_05customer" data-field="x_customer_nama" name="x<?php echo $t_05customer_list->RowIndex ?>_customer_nama" id="x<?php echo $t_05customer_list->RowIndex ?>_customer_nama" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t_05customer->customer_nama->getPlaceHolder()) ?>" value="<?php echo $t_05customer->customer_nama->EditValue ?>"<?php echo $t_05customer->customer_nama->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_05customer" data-field="x_customer_nama" name="o<?php echo $t_05customer_list->RowIndex ?>_customer_nama" id="o<?php echo $t_05customer_list->RowIndex ?>_customer_nama" value="<?php echo ew_HtmlEncode($t_05customer->customer_nama->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_05customer->item_nama_index->Visible) { // item_nama_index ?>
+		<td data-name="item_nama_index">
+<span id="el<?php echo $t_05customer_list->RowCnt ?>_t_05customer_item_nama_index" class="form-group t_05customer_item_nama_index">
+<input type="text" data-table="t_05customer" data-field="x_item_nama_index" name="x<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" id="x<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" size="30" placeholder="<?php echo ew_HtmlEncode($t_05customer->item_nama_index->getPlaceHolder()) ?>" value="<?php echo $t_05customer->item_nama_index->EditValue ?>"<?php echo $t_05customer->item_nama_index->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_05customer" data-field="x_item_nama_index" name="o<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" id="o<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" value="<?php echo ew_HtmlEncode($t_05customer->item_nama_index->OldValue) ?>">
 </td>
 	<?php } ?>
 <?php
@@ -3321,6 +3404,27 @@ $t_05customer_list->ListOptions->Render("body", "left", $t_05customer_list->RowC
 <?php if ($t_05customer->RowType == EW_ROWTYPE_EDIT || $t_05customer->CurrentMode == "edit") { ?>
 <input type="hidden" data-table="t_05customer" data-field="x_customer_id" name="x<?php echo $t_05customer_list->RowIndex ?>_customer_id" id="x<?php echo $t_05customer_list->RowIndex ?>_customer_id" value="<?php echo ew_HtmlEncode($t_05customer->customer_id->CurrentValue) ?>">
 <?php } ?>
+	<?php if ($t_05customer->item_nama_index->Visible) { // item_nama_index ?>
+		<td data-name="item_nama_index"<?php echo $t_05customer->item_nama_index->CellAttributes() ?>>
+<?php if ($t_05customer->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $t_05customer_list->RowCnt ?>_t_05customer_item_nama_index" class="form-group t_05customer_item_nama_index">
+<input type="text" data-table="t_05customer" data-field="x_item_nama_index" name="x<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" id="x<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" size="30" placeholder="<?php echo ew_HtmlEncode($t_05customer->item_nama_index->getPlaceHolder()) ?>" value="<?php echo $t_05customer->item_nama_index->EditValue ?>"<?php echo $t_05customer->item_nama_index->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_05customer" data-field="x_item_nama_index" name="o<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" id="o<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" value="<?php echo ew_HtmlEncode($t_05customer->item_nama_index->OldValue) ?>">
+<?php } ?>
+<?php if ($t_05customer->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t_05customer_list->RowCnt ?>_t_05customer_item_nama_index" class="form-group t_05customer_item_nama_index">
+<input type="text" data-table="t_05customer" data-field="x_item_nama_index" name="x<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" id="x<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" size="30" placeholder="<?php echo ew_HtmlEncode($t_05customer->item_nama_index->getPlaceHolder()) ?>" value="<?php echo $t_05customer->item_nama_index->EditValue ?>"<?php echo $t_05customer->item_nama_index->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php if ($t_05customer->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t_05customer_list->RowCnt ?>_t_05customer_item_nama_index" class="t_05customer_item_nama_index">
+<span<?php echo $t_05customer->item_nama_index->ViewAttributes() ?>>
+<?php echo $t_05customer->item_nama_index->ListViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+	<?php } ?>
 <?php
 
 // Render list options (body, right)
@@ -3369,6 +3473,14 @@ $t_05customer_list->ListOptions->Render("body", "left", $t_05customer_list->RowI
 <input type="text" data-table="t_05customer" data-field="x_customer_nama" name="x<?php echo $t_05customer_list->RowIndex ?>_customer_nama" id="x<?php echo $t_05customer_list->RowIndex ?>_customer_nama" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t_05customer->customer_nama->getPlaceHolder()) ?>" value="<?php echo $t_05customer->customer_nama->EditValue ?>"<?php echo $t_05customer->customer_nama->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_05customer" data-field="x_customer_nama" name="o<?php echo $t_05customer_list->RowIndex ?>_customer_nama" id="o<?php echo $t_05customer_list->RowIndex ?>_customer_nama" value="<?php echo ew_HtmlEncode($t_05customer->customer_nama->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t_05customer->item_nama_index->Visible) { // item_nama_index ?>
+		<td data-name="item_nama_index">
+<span id="el$rowindex$_t_05customer_item_nama_index" class="form-group t_05customer_item_nama_index">
+<input type="text" data-table="t_05customer" data-field="x_item_nama_index" name="x<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" id="x<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" size="30" placeholder="<?php echo ew_HtmlEncode($t_05customer->item_nama_index->getPlaceHolder()) ?>" value="<?php echo $t_05customer->item_nama_index->EditValue ?>"<?php echo $t_05customer->item_nama_index->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_05customer" data-field="x_item_nama_index" name="o<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" id="o<?php echo $t_05customer_list->RowIndex ?>_item_nama_index" value="<?php echo ew_HtmlEncode($t_05customer->item_nama_index->OldValue) ?>">
 </td>
 	<?php } ?>
 <?php

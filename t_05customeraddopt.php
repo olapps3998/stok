@@ -255,6 +255,7 @@ class ct_05customer_addopt extends ct_05customer {
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 		$this->customer_nama->SetVisibility();
+		$this->item_nama_index->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -365,6 +366,7 @@ class ct_05customer_addopt extends ct_05customer {
 					$row = array();
 					$row["x_customer_id"] = $this->customer_id->DbValue;
 					$row["x_customer_nama"] = $this->customer_nama->DbValue;
+					$row["x_item_nama_index"] = $this->item_nama_index->DbValue;
 					if (!EW_DEBUG_ENABLED && ob_get_length())
 						ob_end_clean();
 					echo ew_ArrayToJson(array($row));
@@ -392,6 +394,7 @@ class ct_05customer_addopt extends ct_05customer {
 	function LoadDefaultValues() {
 		$this->customer_nama->CurrentValue = NULL;
 		$this->customer_nama->OldValue = $this->customer_nama->CurrentValue;
+		$this->item_nama_index->CurrentValue = 1;
 	}
 
 	// Load form values
@@ -402,12 +405,16 @@ class ct_05customer_addopt extends ct_05customer {
 		if (!$this->customer_nama->FldIsDetailKey) {
 			$this->customer_nama->setFormValue(ew_ConvertFromUtf8($objForm->GetValue("x_customer_nama")));
 		}
+		if (!$this->item_nama_index->FldIsDetailKey) {
+			$this->item_nama_index->setFormValue(ew_ConvertFromUtf8($objForm->GetValue("x_item_nama_index")));
+		}
 	}
 
 	// Restore form values
 	function RestoreFormValues() {
 		global $objForm;
 		$this->customer_nama->CurrentValue = ew_ConvertToUtf8($this->customer_nama->FormValue);
+		$this->item_nama_index->CurrentValue = ew_ConvertToUtf8($this->item_nama_index->FormValue);
 	}
 
 	// Load row based on key values
@@ -441,6 +448,7 @@ class ct_05customer_addopt extends ct_05customer {
 		$this->Row_Selected($row);
 		$this->customer_id->setDbValue($rs->fields('customer_id'));
 		$this->customer_nama->setDbValue($rs->fields('customer_nama'));
+		$this->item_nama_index->setDbValue($rs->fields('item_nama_index'));
 	}
 
 	// Load DbValue from recordset
@@ -449,6 +457,7 @@ class ct_05customer_addopt extends ct_05customer {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->customer_id->DbValue = $row['customer_id'];
 		$this->customer_nama->DbValue = $row['customer_nama'];
+		$this->item_nama_index->DbValue = $row['item_nama_index'];
 	}
 
 	// Render row values based on field settings
@@ -463,6 +472,7 @@ class ct_05customer_addopt extends ct_05customer {
 		// Common render codes for all row types
 		// customer_id
 		// customer_nama
+		// item_nama_index
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -474,10 +484,19 @@ class ct_05customer_addopt extends ct_05customer {
 		$this->customer_nama->ViewValue = $this->customer_nama->CurrentValue;
 		$this->customer_nama->ViewCustomAttributes = "";
 
+		// item_nama_index
+		$this->item_nama_index->ViewValue = $this->item_nama_index->CurrentValue;
+		$this->item_nama_index->ViewCustomAttributes = "";
+
 			// customer_nama
 			$this->customer_nama->LinkCustomAttributes = "";
 			$this->customer_nama->HrefValue = "";
 			$this->customer_nama->TooltipValue = "";
+
+			// item_nama_index
+			$this->item_nama_index->LinkCustomAttributes = "";
+			$this->item_nama_index->HrefValue = "";
+			$this->item_nama_index->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
 			// customer_nama
@@ -486,11 +505,21 @@ class ct_05customer_addopt extends ct_05customer {
 			$this->customer_nama->EditValue = ew_HtmlEncode($this->customer_nama->CurrentValue);
 			$this->customer_nama->PlaceHolder = ew_RemoveHtml($this->customer_nama->FldCaption());
 
+			// item_nama_index
+			$this->item_nama_index->EditAttrs["class"] = "form-control";
+			$this->item_nama_index->EditCustomAttributes = "";
+			$this->item_nama_index->EditValue = ew_HtmlEncode($this->item_nama_index->CurrentValue);
+			$this->item_nama_index->PlaceHolder = ew_RemoveHtml($this->item_nama_index->FldCaption());
+
 			// Add refer script
 			// customer_nama
 
 			$this->customer_nama->LinkCustomAttributes = "";
 			$this->customer_nama->HrefValue = "";
+
+			// item_nama_index
+			$this->item_nama_index->LinkCustomAttributes = "";
+			$this->item_nama_index->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -515,6 +544,9 @@ class ct_05customer_addopt extends ct_05customer {
 			return ($gsFormError == "");
 		if (!$this->customer_nama->FldIsDetailKey && !is_null($this->customer_nama->FormValue) && $this->customer_nama->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->customer_nama->FldCaption(), $this->customer_nama->ReqErrMsg));
+		}
+		if (!ew_CheckInteger($this->item_nama_index->FormValue)) {
+			ew_AddMessage($gsFormError, $this->item_nama_index->FldErrMsg());
 		}
 
 		// Return validate result
@@ -553,6 +585,9 @@ class ct_05customer_addopt extends ct_05customer {
 
 		// customer_nama
 		$this->customer_nama->SetDbValueDef($rsnew, $this->customer_nama->CurrentValue, "", FALSE);
+
+		// item_nama_index
+		$this->item_nama_index->SetDbValueDef($rsnew, $this->item_nama_index->CurrentValue, 0, strval($this->item_nama_index->CurrentValue) == "");
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -721,6 +756,9 @@ ft_05customeraddopt.Validate = function() {
 			elm = this.GetElements("x" + infix + "_customer_nama");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_05customer->customer_nama->FldCaption(), $t_05customer->customer_nama->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_item_nama_index");
+			if (elm && !ew_CheckInteger(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_05customer->item_nama_index->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -766,6 +804,14 @@ $t_05customer_addopt->ShowMessage();
 		<label class="col-sm-3 control-label ewLabel" for="x_customer_nama"><?php echo $t_05customer->customer_nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="col-sm-9">
 <input type="text" data-table="t_05customer" data-field="x_customer_nama" name="x_customer_nama" id="x_customer_nama" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t_05customer->customer_nama->getPlaceHolder()) ?>" value="<?php echo $t_05customer->customer_nama->EditValue ?>"<?php echo $t_05customer->customer_nama->EditAttributes() ?>>
+</div>
+	</div>
+<?php } ?>	
+<?php if ($t_05customer->item_nama_index->Visible) { // item_nama_index ?>
+	<div class="form-group">
+		<label class="col-sm-3 control-label ewLabel" for="x_item_nama_index"><?php echo $t_05customer->item_nama_index->FldCaption() ?></label>
+		<div class="col-sm-9">
+<input type="text" data-table="t_05customer" data-field="x_item_nama_index" name="x_item_nama_index" id="x_item_nama_index" size="30" placeholder="<?php echo ew_HtmlEncode($t_05customer->item_nama_index->getPlaceHolder()) ?>" value="<?php echo $t_05customer->item_nama_index->EditValue ?>"<?php echo $t_05customer->item_nama_index->EditAttributes() ?>>
 </div>
 	</div>
 <?php } ?>	

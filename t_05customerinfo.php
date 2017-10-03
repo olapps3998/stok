@@ -15,6 +15,7 @@ class ct_05customer extends cTable {
 	var $AuditTrailOnSearch = FALSE;
 	var $customer_id;
 	var $customer_nama;
+	var $item_nama_index;
 
 	//
 	// Table class constructor
@@ -56,6 +57,12 @@ class ct_05customer extends cTable {
 		$this->customer_nama = new cField('t_05customer', 't_05customer', 'x_customer_nama', 'customer_nama', '`customer_nama`', '`customer_nama`', 200, -1, FALSE, '`customer_nama`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->customer_nama->Sortable = TRUE; // Allow sort
 		$this->fields['customer_nama'] = &$this->customer_nama;
+
+		// item_nama_index
+		$this->item_nama_index = new cField('t_05customer', 't_05customer', 'x_item_nama_index', 'item_nama_index', '`item_nama_index`', '`item_nama_index`', 3, -1, FALSE, '`item_nama_index`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->item_nama_index->Sortable = TRUE; // Allow sort
+		$this->item_nama_index->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['item_nama_index'] = &$this->item_nama_index;
 	}
 
 	// Set Field Visibility
@@ -570,6 +577,7 @@ class ct_05customer extends cTable {
 	function LoadListRowValues(&$rs) {
 		$this->customer_id->setDbValue($rs->fields('customer_id'));
 		$this->customer_nama->setDbValue($rs->fields('customer_nama'));
+		$this->item_nama_index->setDbValue($rs->fields('item_nama_index'));
 	}
 
 	// Render list row values
@@ -582,6 +590,7 @@ class ct_05customer extends cTable {
    // Common render codes
 		// customer_id
 		// customer_nama
+		// item_nama_index
 		// customer_id
 
 		$this->customer_id->ViewValue = $this->customer_id->CurrentValue;
@@ -590,6 +599,10 @@ class ct_05customer extends cTable {
 		// customer_nama
 		$this->customer_nama->ViewValue = $this->customer_nama->CurrentValue;
 		$this->customer_nama->ViewCustomAttributes = "";
+
+		// item_nama_index
+		$this->item_nama_index->ViewValue = $this->item_nama_index->CurrentValue;
+		$this->item_nama_index->ViewCustomAttributes = "";
 
 		// customer_id
 		$this->customer_id->LinkCustomAttributes = "";
@@ -600,6 +613,11 @@ class ct_05customer extends cTable {
 		$this->customer_nama->LinkCustomAttributes = "";
 		$this->customer_nama->HrefValue = "";
 		$this->customer_nama->TooltipValue = "";
+
+		// item_nama_index
+		$this->item_nama_index->LinkCustomAttributes = "";
+		$this->item_nama_index->HrefValue = "";
+		$this->item_nama_index->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -623,6 +641,12 @@ class ct_05customer extends cTable {
 		$this->customer_nama->EditCustomAttributes = "";
 		$this->customer_nama->EditValue = $this->customer_nama->CurrentValue;
 		$this->customer_nama->PlaceHolder = ew_RemoveHtml($this->customer_nama->FldCaption());
+
+		// item_nama_index
+		$this->item_nama_index->EditAttrs["class"] = "form-control";
+		$this->item_nama_index->EditCustomAttributes = "";
+		$this->item_nama_index->EditValue = $this->item_nama_index->CurrentValue;
+		$this->item_nama_index->PlaceHolder = ew_RemoveHtml($this->item_nama_index->FldCaption());
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -652,9 +676,11 @@ class ct_05customer extends cTable {
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
 					if ($this->customer_nama->Exportable) $Doc->ExportCaption($this->customer_nama);
+					if ($this->item_nama_index->Exportable) $Doc->ExportCaption($this->item_nama_index);
 				} else {
 					if ($this->customer_id->Exportable) $Doc->ExportCaption($this->customer_id);
 					if ($this->customer_nama->Exportable) $Doc->ExportCaption($this->customer_nama);
+					if ($this->item_nama_index->Exportable) $Doc->ExportCaption($this->item_nama_index);
 				}
 				$Doc->EndExportRow();
 			}
@@ -687,9 +713,11 @@ class ct_05customer extends cTable {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
 						if ($this->customer_nama->Exportable) $Doc->ExportField($this->customer_nama);
+						if ($this->item_nama_index->Exportable) $Doc->ExportField($this->item_nama_index);
 					} else {
 						if ($this->customer_id->Exportable) $Doc->ExportField($this->customer_id);
 						if ($this->customer_nama->Exportable) $Doc->ExportField($this->customer_nama);
+						if ($this->item_nama_index->Exportable) $Doc->ExportField($this->item_nama_index);
 					}
 					$Doc->EndExportRow();
 				}

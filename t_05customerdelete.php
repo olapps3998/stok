@@ -252,6 +252,7 @@ class ct_05customer_delete extends ct_05customer {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 		$this->customer_nama->SetVisibility();
+		$this->item_nama_index->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -428,6 +429,7 @@ class ct_05customer_delete extends ct_05customer {
 		$this->Row_Selected($row);
 		$this->customer_id->setDbValue($rs->fields('customer_id'));
 		$this->customer_nama->setDbValue($rs->fields('customer_nama'));
+		$this->item_nama_index->setDbValue($rs->fields('item_nama_index'));
 	}
 
 	// Load DbValue from recordset
@@ -436,6 +438,7 @@ class ct_05customer_delete extends ct_05customer {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->customer_id->DbValue = $row['customer_id'];
 		$this->customer_nama->DbValue = $row['customer_nama'];
+		$this->item_nama_index->DbValue = $row['item_nama_index'];
 	}
 
 	// Render row values based on field settings
@@ -450,6 +453,7 @@ class ct_05customer_delete extends ct_05customer {
 		// Common render codes for all row types
 		// customer_id
 		// customer_nama
+		// item_nama_index
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -461,10 +465,19 @@ class ct_05customer_delete extends ct_05customer {
 		$this->customer_nama->ViewValue = $this->customer_nama->CurrentValue;
 		$this->customer_nama->ViewCustomAttributes = "";
 
+		// item_nama_index
+		$this->item_nama_index->ViewValue = $this->item_nama_index->CurrentValue;
+		$this->item_nama_index->ViewCustomAttributes = "";
+
 			// customer_nama
 			$this->customer_nama->LinkCustomAttributes = "";
 			$this->customer_nama->HrefValue = "";
 			$this->customer_nama->TooltipValue = "";
+
+			// item_nama_index
+			$this->item_nama_index->LinkCustomAttributes = "";
+			$this->item_nama_index->HrefValue = "";
+			$this->item_nama_index->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -717,6 +730,9 @@ $t_05customer_delete->ShowMessage();
 <?php if ($t_05customer->customer_nama->Visible) { // customer_nama ?>
 		<th><span id="elh_t_05customer_customer_nama" class="t_05customer_customer_nama"><?php echo $t_05customer->customer_nama->FldCaption() ?></span></th>
 <?php } ?>
+<?php if ($t_05customer->item_nama_index->Visible) { // item_nama_index ?>
+		<th><span id="elh_t_05customer_item_nama_index" class="t_05customer_item_nama_index"><?php echo $t_05customer->item_nama_index->FldCaption() ?></span></th>
+<?php } ?>
 	</tr>
 	</thead>
 	<tbody>
@@ -743,6 +759,14 @@ while (!$t_05customer_delete->Recordset->EOF) {
 <span id="el<?php echo $t_05customer_delete->RowCnt ?>_t_05customer_customer_nama" class="t_05customer_customer_nama">
 <span<?php echo $t_05customer->customer_nama->ViewAttributes() ?>>
 <?php echo $t_05customer->customer_nama->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($t_05customer->item_nama_index->Visible) { // item_nama_index ?>
+		<td<?php echo $t_05customer->item_nama_index->CellAttributes() ?>>
+<span id="el<?php echo $t_05customer_delete->RowCnt ?>_t_05customer_item_nama_index" class="t_05customer_item_nama_index">
+<span<?php echo $t_05customer->item_nama_index->ViewAttributes() ?>>
+<?php echo $t_05customer->item_nama_index->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -888,6 +888,9 @@
       <field id="customer_nama">
         <phrase id="fldcaption" value="Nama" />
       </field>
+      <field id="item_nama_index">
+        <phrase id="fldcaption" value="Urutan Nama Item yang digunakan" />
+      </field>
     </table>
     <table id="t_06jual">
       <phrase id="tblcaption" value="Penjualan" />
