@@ -289,32 +289,37 @@ Page_Rendering();
 <div class="panel panel-default">
 
   <div class="panel-heading">
-  	<b>on progress</b>
+	<b><a data-toggle="collapse" href="#collapse1">on progress</a></b>
   </div>
-  <div class="panel-body">
-  	oct 3, 2017:</br>
-  	<ul>
-  		<li>alias item nama : </li>
-  			<ul>
-  				<li>nama item urutan pertama => untuk internal, urutan selanjutnya untuk eksternal</li>
-  				<li>antar-urutan dipisahkan dengan tanda koma</li>
-  			<ul>
-  	</ul>
+  <div id="collapse1" class="panel-collapse collapse in">
+  	<div class="panel-body">
+  		oct 3, 2017:</br>
+  		<ul>
+  			<li>alias item nama : </li>
+  				<ul>
+  					<li>nama item urutan pertama => untuk internal, urutan selanjutnya untuk eksternal</li>
+  					<li>antar-urutan dipisahkan dengan tanda koma</li>
+  				<ul>
+  		</ul>
+  	</div>
   </div>
 
   <div class="panel-heading">
-  	<b>pending</b>
+  	<b><a data-toggle="collapse" href="#collapse2">pending</a></b>
   </div>
+  <div id="collapse2" class="panel-collapse collapse">
   <div class="panel-body">
   	oct 2, 2017:</br>
   	<ul>
   		<li>hpp (harga pokok penjualan) => <a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
   	</ul>
   </div>
+  </div>
 
   <div class="panel-heading">
-  	<b>to do</b>
+  	<b><a data-toggle="collapse" href="#collapse3">to do</a></b>
   </div>
+  <div id="collapse3" class="panel-collapse collapse">
   <div class="panel-body">
   	sep 28, 2017:</br>
   	<ul>
@@ -329,6 +334,7 @@ Page_Rendering();
   		<li>konversi satuan</li>
   		<li>hak akses</li>
   	</ul>
+  </div>
   </div>
 
 </div>
