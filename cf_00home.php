@@ -294,7 +294,7 @@ Page_Rendering();
   <div class="panel-body">
   	oct 3, 2017:</br>
   	<ul>
-  		<li>alias item nama</li>
+  		<li>alias item nama : nama item urutan pertama => untuk internal, urutan selanjutnya untuk eksternal</li>
   	</ul>
   </div>
 
