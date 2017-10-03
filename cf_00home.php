@@ -292,7 +292,7 @@ Page_Rendering();
   	<b>on progress</b>
   </div>
   <div class="panel-body">
-  	oct 2, 2017:</br>
+  	oct 3, 2017:</br>
   	<ul>
   		<li>alias item nama</li>
   	</ul>
