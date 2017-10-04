@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <configuration date="2017/10/03" author="e.World Technology Ltd.">
-  <project id="{060B3204-5918-44AF-94F8-5E569EA4DD7D}" file="D:\xampp3\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="10.0" datetime="2017/10/03 20:25:54" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;">
+  <project id="{060B3204-5918-44AF-94F8-5E569EA4DD7D}" file="D:\xampp3\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="10.0" datetime="2017/10/03 23:34:03" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;">
     <table id="t_00audit_trail" name="t_00audit_trail" caption="t 00audit trail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t_01vendor" name="t_01vendor" caption="t 01vendor" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t_02item" name="t_02item" caption="t 02item" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
