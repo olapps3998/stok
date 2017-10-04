@@ -22,6 +22,8 @@ class crr_nilai_stok extends crTableBase {
 	var $saldo_qty;
 	var $saldo_harga;
 	var $saldo_sub_total;
+	var $jenis;
+	var $detail_id;
 
 	//
 	// Table class constructor
@@ -74,7 +76,7 @@ class crr_nilai_stok extends crTableBase {
 		$this->item_nama->FldGroupSql = "";
 
 		// tgl
-		$this->tgl = new crField('r_nilai_stok', 'r_nilai_stok', 'x_tgl', 'tgl', '`tgl`', 133, EWR_DATATYPE_DATE, 7);
+		$this->tgl = new crField('r_nilai_stok', 'r_nilai_stok', 'x_tgl', 'tgl', '`tgl`', 200, EWR_DATATYPE_STRING, 7);
 		$this->tgl->Sortable = TRUE; // Allow sort
 		$this->tgl->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectField");
 		$this->fields['tgl'] = &$this->tgl;
@@ -162,6 +164,23 @@ class crr_nilai_stok extends crTableBase {
 		$this->saldo_sub_total->DateFilter = "";
 		$this->saldo_sub_total->SqlSelect = "";
 		$this->saldo_sub_total->SqlOrderBy = "";
+
+		// jenis
+		$this->jenis = new crField('r_nilai_stok', 'r_nilai_stok', 'x_jenis', 'jenis', '`jenis`', 200, EWR_DATATYPE_STRING, -1);
+		$this->jenis->Sortable = TRUE; // Allow sort
+		$this->fields['jenis'] = &$this->jenis;
+		$this->jenis->DateFilter = "";
+		$this->jenis->SqlSelect = "";
+		$this->jenis->SqlOrderBy = "";
+
+		// detail_id
+		$this->detail_id = new crField('r_nilai_stok', 'r_nilai_stok', 'x_detail_id', 'detail_id', '`detail_id`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->detail_id->Sortable = TRUE; // Allow sort
+		$this->detail_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['detail_id'] = &$this->detail_id;
+		$this->detail_id->DateFilter = "";
+		$this->detail_id->SqlSelect = "";
+		$this->detail_id->SqlOrderBy = "";
 	}
 
 	// Set Field Visibility

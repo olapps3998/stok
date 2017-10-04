@@ -520,12 +520,14 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		$this->saldo_qty->SetVisibility();
 		$this->saldo_harga->SetVisibility();
 		$this->saldo_sub_total->SetVisibility();
+		$this->jenis->SetVisibility();
+		$this->detail_id->SetVisibility();
 
 		// Aggregate variables
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 11;
+		$nDtls = 13;
 		$nGrps = 3;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -538,7 +540,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -831,7 +833,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 				$this->FirstRowData['id'] = ewr_Conv($rs->fields('id'), 3);
 				$this->FirstRowData['item_id'] = ewr_Conv($rs->fields('item_id'), 3);
 				$this->FirstRowData['item_nama'] = ewr_Conv($rs->fields('item_nama'), 200);
-				$this->FirstRowData['tgl'] = ewr_Conv($rs->fields('tgl'), 133);
+				$this->FirstRowData['tgl'] = ewr_Conv($rs->fields('tgl'), 200);
 				$this->FirstRowData['in_qty'] = ewr_Conv($rs->fields('in_qty'), 4);
 				$this->FirstRowData['in_harga'] = ewr_Conv($rs->fields('in_harga'), 4);
 				$this->FirstRowData['in_sub_total'] = ewr_Conv($rs->fields('in_sub_total'), 4);
@@ -841,6 +843,8 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 				$this->FirstRowData['saldo_qty'] = ewr_Conv($rs->fields('saldo_qty'), 4);
 				$this->FirstRowData['saldo_harga'] = ewr_Conv($rs->fields('saldo_harga'), 4);
 				$this->FirstRowData['saldo_sub_total'] = ewr_Conv($rs->fields('saldo_sub_total'), 4);
+				$this->FirstRowData['jenis'] = ewr_Conv($rs->fields('jenis'), 200);
+				$this->FirstRowData['detail_id'] = ewr_Conv($rs->fields('detail_id'), 3);
 			}
 		} else { // Get next row
 			$rs->MoveNext();
@@ -864,6 +868,8 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->saldo_qty->setDbValue($rs->fields('saldo_qty'));
 			$this->saldo_harga->setDbValue($rs->fields('saldo_harga'));
 			$this->saldo_sub_total->setDbValue($rs->fields('saldo_sub_total'));
+			$this->jenis->setDbValue($rs->fields('jenis'));
+			$this->detail_id->setDbValue($rs->fields('detail_id'));
 			$this->Val[1] = $this->tgl->CurrentValue;
 			$this->Val[2] = $this->in_qty->CurrentValue;
 			$this->Val[3] = $this->in_harga->CurrentValue;
@@ -874,6 +880,8 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->Val[8] = $this->saldo_qty->CurrentValue;
 			$this->Val[9] = $this->saldo_harga->CurrentValue;
 			$this->Val[10] = $this->saldo_sub_total->CurrentValue;
+			$this->Val[11] = $this->jenis->CurrentValue;
+			$this->Val[12] = $this->detail_id->CurrentValue;
 		} else {
 			$this->id->setDbValue("");
 			$this->item_id->setDbValue("");
@@ -888,6 +896,8 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->saldo_qty->setDbValue("");
 			$this->saldo_harga->setDbValue("");
 			$this->saldo_sub_total->setDbValue("");
+			$this->jenis->setDbValue("");
+			$this->detail_id->setDbValue("");
 		}
 	}
 
@@ -1135,6 +1145,12 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 
 			// saldo_sub_total
 			$this->saldo_sub_total->HrefValue = "";
+
+			// jenis
+			$this->jenis->HrefValue = "";
+
+			// detail_id
+			$this->detail_id->HrefValue = "";
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
 			$this->RowAttrs["data-group"] = $this->item_id->GroupValue(); // Set up group attribute
@@ -1217,6 +1233,14 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->saldo_sub_total->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 			$this->saldo_sub_total->CellAttrs["style"] = "text-align:right;";
 
+			// jenis
+			$this->jenis->ViewValue = $this->jenis->CurrentValue;
+			$this->jenis->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
+			// detail_id
+			$this->detail_id->ViewValue = $this->detail_id->CurrentValue;
+			$this->detail_id->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
 			// item_id
 			$this->item_id->HrefValue = "";
 
@@ -1252,6 +1276,12 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 
 			// saldo_sub_total
 			$this->saldo_sub_total->HrefValue = "";
+
+			// jenis
+			$this->jenis->HrefValue = "";
+
+			// detail_id
+			$this->detail_id->HrefValue = "";
 		}
 
 		// Call Cell_Rendered event
@@ -1383,6 +1413,24 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$HrefValue = &$this->saldo_sub_total->HrefValue;
 			$LinkAttrs = &$this->saldo_sub_total->LinkAttrs;
 			$this->Cell_Rendered($this->saldo_sub_total, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// jenis
+			$CurrentValue = $this->jenis->CurrentValue;
+			$ViewValue = &$this->jenis->ViewValue;
+			$ViewAttrs = &$this->jenis->ViewAttrs;
+			$CellAttrs = &$this->jenis->CellAttrs;
+			$HrefValue = &$this->jenis->HrefValue;
+			$LinkAttrs = &$this->jenis->LinkAttrs;
+			$this->Cell_Rendered($this->jenis, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// detail_id
+			$CurrentValue = $this->detail_id->CurrentValue;
+			$ViewValue = &$this->detail_id->ViewValue;
+			$ViewAttrs = &$this->detail_id->ViewAttrs;
+			$CellAttrs = &$this->detail_id->CellAttrs;
+			$HrefValue = &$this->detail_id->HrefValue;
+			$LinkAttrs = &$this->detail_id->LinkAttrs;
+			$this->Cell_Rendered($this->detail_id, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		}
 
 		// Call Row_Rendered event
@@ -1407,6 +1455,8 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 		if ($this->saldo_qty->Visible) $this->DtlColumnCount += 1;
 		if ($this->saldo_harga->Visible) $this->DtlColumnCount += 1;
 		if ($this->saldo_sub_total->Visible) $this->DtlColumnCount += 1;
+		if ($this->jenis->Visible) $this->DtlColumnCount += 1;
+		if ($this->detail_id->Visible) $this->DtlColumnCount += 1;
 	}
 
 	// Set up Breadcrumb
@@ -1917,7 +1967,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 	// - Variables setup: Session[EWR_TABLE_SESSION_ORDER_BY], Session["sort_Table_Field"]
 	function GetSort($options = array()) {
 		if ($this->DrillDown)
-			return "`tgl` ASC";
+			return "`detail_id` ASC, `tgl` ASC";
 		$bResetSort = @$options["resetsort"] == "1" || @$_GET["cmd"] == "resetsort";
 		$orderBy = (@$options["order"] <> "") ? @$options["order"] : ewr_StripSlashes(@$_GET["order"]);
 		$orderType = (@$options["ordertype"] <> "") ? @$options["ordertype"] : ewr_StripSlashes(@$_GET["ordertype"]);
@@ -1941,6 +1991,8 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->saldo_qty->setSort("");
 			$this->saldo_harga->setSort("");
 			$this->saldo_sub_total->setSort("");
+			$this->jenis->setSort("");
+			$this->detail_id->setSort("");
 
 		// Check for an Order parameter
 		} elseif ($orderBy <> "") {
@@ -1958,6 +2010,8 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 			$this->UpdateSort($this->saldo_qty, $bCtrl); // saldo_qty
 			$this->UpdateSort($this->saldo_harga, $bCtrl); // saldo_harga
 			$this->UpdateSort($this->saldo_sub_total, $bCtrl); // saldo_sub_total
+			$this->UpdateSort($this->jenis, $bCtrl); // jenis
+			$this->UpdateSort($this->detail_id, $bCtrl); // detail_id
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
 			$this->setStartGroup(1);
@@ -1965,7 +2019,8 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 
 		// Set up default sort
 		if ($this->getOrderBy() == "") {
-			$this->setOrderBy("`tgl` ASC");
+			$this->setOrderBy("`detail_id` ASC, `tgl` ASC");
+			$this->detail_id->setSort("ASC");
 			$this->tgl->setSort("ASC");
 		}
 		return $this->getOrderBy();
@@ -2716,6 +2771,42 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	</td>
 <?php } ?>
 <?php } ?>
+<?php if ($Page->jenis->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="jenis"><div class="r_nilai_stok_jenis"><span class="ewTableHeaderCaption"><?php echo $Page->jenis->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="jenis">
+<?php if ($Page->SortUrl($Page->jenis) == "") { ?>
+		<div class="ewTableHeaderBtn r_nilai_stok_jenis">
+			<span class="ewTableHeaderCaption"><?php echo $Page->jenis->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r_nilai_stok_jenis" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->jenis) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->jenis->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->jenis->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->jenis->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->detail_id->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="detail_id"><div class="r_nilai_stok_detail_id"><span class="ewTableHeaderCaption"><?php echo $Page->detail_id->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="detail_id">
+<?php if ($Page->SortUrl($Page->detail_id) == "") { ?>
+		<div class="ewTableHeaderBtn r_nilai_stok_detail_id">
+			<span class="ewTableHeaderCaption"><?php echo $Page->detail_id->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r_nilai_stok_detail_id" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->detail_id) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->detail_id->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->detail_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->detail_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 	</tr>
 </thead>
 <tbody>
@@ -2881,6 +2972,14 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="saldo_sub_total"<?php echo $Page->saldo_sub_total->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_saldo_sub_total"<?php echo $Page->saldo_sub_total->ViewAttributes() ?>><?php echo $Page->saldo_sub_total->ListViewValue() ?></span></td>
 <?php } ?>
+<?php if ($Page->jenis->Visible) { ?>
+		<td data-field="jenis"<?php echo $Page->jenis->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_jenis"<?php echo $Page->jenis->ViewAttributes() ?>><?php echo $Page->jenis->ListViewValue() ?></span></td>
+<?php } ?>
+<?php if ($Page->detail_id->Visible) { ?>
+		<td data-field="detail_id"<?php echo $Page->detail_id->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_nilai_stok_detail_id"<?php echo $Page->detail_id->ViewAttributes() ?>><?php echo $Page->detail_id->ListViewValue() ?></span></td>
+<?php } ?>
 	</tr>
 <?php
 
@@ -2963,12 +3062,18 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->saldo_sub_total->Visible) { ?>
 		<td data-field="saldo_sub_total"<?php echo $Page->item_id->CellAttributes() ?>></td>
 <?php } ?>
+<?php if ($Page->jenis->Visible) { ?>
+		<td data-field="jenis"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->detail_id->Visible) { ?>
+		<td data-field="detail_id"<?php echo $Page->item_id->CellAttributes() ?>></td>
+<?php } ?>
 	</tr>
 	<?php } ?>
 <?php } else { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->GrpColumnCount + $Page->DtlColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->saldo_sub_total->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->item_id->GroupViewValue, $Page->item_id->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->detail_id->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->item_id->GroupViewValue, $Page->item_id->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
 <?php } ?>
 	</tr>
 <?php } ?>
