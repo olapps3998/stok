@@ -1176,6 +1176,9 @@
       <field id="sub_total">
         <phrase id="fldcaption" value="sub total" />
       </field>
+      <field id="detail_id">
+        <phrase id="fldcaption" value="detail id" />
+      </field>
     </table>
     <table id="v_07mutasi">
       <phrase id="tblcaption" value="v 07mutasi" />
@@ -1196,6 +1199,12 @@
       </field>
       <field id="saldo">
         <phrase id="fldcaption" value="saldo" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="jenis" />
+      </field>
+      <field id="detail_id">
+        <phrase id="fldcaption" value="detail id" />
       </field>
     </table>
     <table id="v_08harga_jual_terakhir">

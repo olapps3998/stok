@@ -15,6 +15,8 @@ class crr_mutasi extends crTableBase {
 	var $masuk;
 	var $keluar;
 	var $saldo;
+	var $jenis;
+	var $detail_id;
 
 	//
 	// Table class constructor
@@ -86,12 +88,29 @@ class crr_mutasi extends crTableBase {
 
 		// saldo
 		$this->saldo = new crField('r_mutasi', 'r_mutasi', 'x_saldo', 'saldo', '`saldo`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->saldo->Sortable = TRUE; // Allow sort
+		$this->saldo->Sortable = FALSE; // Allow sort
 		$this->saldo->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['saldo'] = &$this->saldo;
 		$this->saldo->DateFilter = "";
 		$this->saldo->SqlSelect = "";
 		$this->saldo->SqlOrderBy = "";
+
+		// jenis
+		$this->jenis = new crField('r_mutasi', 'r_mutasi', 'x_jenis', 'jenis', '`jenis`', 200, EWR_DATATYPE_STRING, -1);
+		$this->jenis->Sortable = FALSE; // Allow sort
+		$this->fields['jenis'] = &$this->jenis;
+		$this->jenis->DateFilter = "";
+		$this->jenis->SqlSelect = "";
+		$this->jenis->SqlOrderBy = "";
+
+		// detail_id
+		$this->detail_id = new crField('r_mutasi', 'r_mutasi', 'x_detail_id', 'detail_id', '`detail_id`', 20, EWR_DATATYPE_NUMBER, -1);
+		$this->detail_id->Sortable = FALSE; // Allow sort
+		$this->detail_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['detail_id'] = &$this->detail_id;
+		$this->detail_id->DateFilter = "";
+		$this->detail_id->SqlSelect = "";
+		$this->detail_id->SqlOrderBy = "";
 	}
 
 	// Set Field Visibility

@@ -11,7 +11,7 @@ else {
 $q = "truncate t_09nilai_stok";
 $conn->Execute($q);
 
-$q = "select a.*, b.item_nama from t_08item_saldo a left join t_02item b on a.item_id = b.item_id order by a.item_id";
+$q = "select a.*, b.item_nama from t_08item_saldo a left join t_02item b on a.item_id = b.item_id order by a.item_id"; echo $q; exit;
 $r = $conn->Execute($q);
 
 while (!$r->EOF) {

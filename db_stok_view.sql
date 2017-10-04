@@ -1,38 +1,38 @@
 create view v_01beli_laporan as
-SELECT t_04beli.beli_id AS beli_id,
-  t_04beli.tgl_beli AS tgl_beli,
-  t_04beli.tgl_kirim AS tgl_kirim,
-  t_01vendor.vendor_nama AS vendor_nama,
-  t_02item.item_nama AS item_nama,
-  t_04beli.qty AS qty,
-  t_03satuan.satuan_nama AS satuan_nama,
-  t_04beli.harga AS harga,
-  t_04beli.sub_total AS sub_total,
-  t_04beli.tgl_dp AS tgl_dp,
-  t_04beli.jml_dp AS jml_dp,
-  t_04beli.tgl_lunas AS tgl_lunas,
-  t_04beli.jml_lunas AS jml_lunas
-FROM ((t_04beli
-  JOIN t_01vendor ON t_04beli.vendor_id = t_01vendor.vendor_id)
-  JOIN t_02item ON t_04beli.item_id = t_02item.item_id)
-  JOIN t_03satuan ON t_04beli.satuan_id = t_03satuan.satuan_id;
-  
-create view v_02jual_laporan as
-SELECT t_06jual.no_po AS no_po,
-  t_06jual.tgl AS tgl,
-  t_05customer.customer_nama AS customer_nama,
-  t_06jual.total AS total,
-  t_07jual_detail.tgl_kirim AS tgl_kirim,
-  t_02item.item_nama AS item_nama,
-  t_07jual_detail.qty AS qty,
-  t_03satuan.satuan_nama AS satuan_nama,
-  t_07jual_detail.harga AS harga,
-  t_07jual_detail.sub_total AS sub_total
-FROM (((t_06jual
-  JOIN t_07jual_detail ON t_06jual.jual_id = t_07jual_detail.jual_id)
-  JOIN t_05customer ON t_06jual.customer_id = t_05customer.customer_id)
-  JOIN t_02item ON t_07jual_detail.item_id = t_02item.item_id)
-  JOIN t_03satuan ON t_07jual_detail.satuan_id = t_03satuan.satuan_id;
+Select t_04beli.beli_id As beli_id,
+  t_04beli.tgl_beli As tgl_beli,
+  t_04beli.tgl_kirim As tgl_kirim,
+  t_01vendor.vendor_nama As vendor_nama,
+  t_02item.item_nama As item_nama,
+  t_04beli.qty As qty,
+  t_03satuan.satuan_nama As satuan_nama,
+  t_04beli.harga As harga,
+  t_04beli.sub_total As sub_total,
+  t_04beli.tgl_dp As tgl_dp,
+  t_04beli.jml_dp As jml_dp,
+  t_04beli.tgl_lunas As tgl_lunas,
+  t_04beli.jml_lunas As jml_lunas
+From ((t_04beli
+  Join t_01vendor On t_04beli.vendor_id = t_01vendor.vendor_id)
+  Join t_02item On t_04beli.item_id = t_02item.item_id)
+  Join t_03satuan On t_04beli.satuan_id = t_03satuan.satuan_id;
+
+create view v_02jual_laporan as  
+Select t_06jual.no_po As no_po,
+  t_06jual.tgl As tgl,
+  t_05customer.customer_nama As customer_nama,
+  t_06jual.total As total,
+  t_07jual_detail.tgl_kirim As tgl_kirim,
+  t_02item.item_nama As item_nama,
+  t_07jual_detail.qty As qty,
+  t_03satuan.satuan_nama As satuan_nama,
+  t_07jual_detail.harga As harga,
+  t_07jual_detail.sub_total As sub_total
+From (((t_06jual
+  Join t_07jual_detail On t_06jual.jual_id = t_07jual_detail.jual_id)
+  Join t_05customer On t_06jual.customer_id = t_05customer.customer_id)
+  Join t_02item On t_07jual_detail.item_id = t_02item.item_id)
+  Join t_03satuan On t_07jual_detail.satuan_id = t_03satuan.satuan_id;
   
 create view v_03masuk as
 Select t_04beli.item_id As item_id,
@@ -99,7 +99,8 @@ Select a.item_id As item_id,
   'M' As jenis,
   z.satuan_nama As satuan_nama,
   b.harga As harga,
-  b.sub_total As sub_total
+  b.sub_total As sub_total,
+  b.beli_id As detail_id
 From ((t_02item a
   Left Join v_13beli b On a.item_id = b.item_id)
   Left Join t_01vendor y On b.vendor_id = y.vendor_id)
@@ -113,15 +114,19 @@ Select a.item_id As item_id,
   'K' As K,
   z.satuan_nama As satuan_nama,
   b.harga As harga,
-  b.sub_total As sub_total
+  b.sub_total As sub_total,
+  b.jual_detail_id As jual_detail_id
 From (((t_02item a
   Left Join v_14jual_detail b On a.item_id = b.item_id)
   Left Join t_06jual c On b.jual_id = c.jual_id)
   Left Join t_05customer y On c.customer_id = y.customer_id)
   Left Join t_03satuan z On b.satuan_id = z.satuan_id
-Order By item_id;
+Order By item_id,
+  tgl,
+  jenis Desc,
+  detail_id;
 
-create view v_07mutasi as
+create view v_07mutasi as  
 Select v_06transaksi.item_id As item_id,
   v_06transaksi.item_nama As item_nama,
   v_06transaksi.tgl As tgl,
@@ -129,7 +134,9 @@ Select v_06transaksi.item_id As item_id,
   End) As masuk,
   (Case v_06transaksi.jenis When 'K' Then v_06transaksi.qty Else 0
   End) As keluar,
-  v_06transaksi.qty As saldo
+  v_06transaksi.qty As saldo,
+  v_06transaksi.jenis As jenis,
+  v_06transaksi.detail_id As detail_id
 From v_06transaksi
 union All
 Select a.item_id As item_id,
@@ -137,12 +144,16 @@ Select a.item_id As item_id,
   a.tgl As tgl,
   a.qty As qty,
   0 As `0`,
-  a.qty As qty
+  a.qty As qty,
+  'M' As M,
+  0 As `0`
 From t_08item_saldo a
   Left Join t_02item b On a.item_id = b.item_id
 Order By item_id,
-  tgl;
-
+  tgl,
+  jenis Desc,
+  detail_id;
+  
 create view v_08harga_jual_terakhir as
 Select Max(t_07jual_detail.tgl_kirim) As tgl_kirim_terakhir,
   t_07jual_detail.item_id As item_id,
