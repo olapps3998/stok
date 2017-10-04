@@ -295,7 +295,6 @@ Page_Rendering();
   	<div class="panel-body">
   		oct 4, 2017:</br>
   		<ul>
-  			<li><a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a> masih belum benar</li>
   			<li>alias item nama : </li>
   				<ul>
   					<li>nama item urutan pertama => untuk internal, urutan selanjutnya untuk eksternal</li>
