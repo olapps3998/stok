@@ -310,6 +310,11 @@ Page_Rendering();
   </div>
   <div id="collapse4" class="panel-collapse collapse in">
   	<div class="panel-body">
+  		oct 4, 2017:</br>
+  		<ul>
+  			<li><a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a> sudah benar</li>
+  		</ul>
+  		</br>
   		oct 3, 2017:</br>
   		<ul>
   			<li><a href="t_05customerlist.php">Master - Customer</a></li>
