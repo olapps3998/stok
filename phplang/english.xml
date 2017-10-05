@@ -583,6 +583,33 @@
   <project>
     <phrase id="bodytitle" value="L.A.B. STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="10117">
+      <phrase id="menutext" value="v 03masuk" />
+    </menu>
+    <menu id="10118">
+      <phrase id="menutext" value="v 05stok" />
+    </menu>
+    <menu id="10119">
+      <phrase id="menutext" value="v 10hutang" />
+    </menu>
+    <menu id="10111">
+      <phrase id="menutext" value="v 01beli laporan" />
+    </menu>
+    <menu id="10112">
+      <phrase id="menutext" value="v 08harga jual terakhir" />
+    </menu>
+    <menu id="10113">
+      <phrase id="menutext" value="v 09margin" />
+    </menu>
+    <menu id="10114">
+      <phrase id="menutext" value="t 10sap" />
+    </menu>
+    <menu id="10115">
+      <phrase id="menutext" value="v 15penjualan" />
+    </menu>
+    <menu id="10116">
+      <phrase id="menutext" value="v 16hpp" />
+    </menu>
     <menu id="10109">
       <phrase id="menutext" value="v 13beli" />
     </menu>
@@ -643,11 +670,11 @@
     <menu id="10048">
       <phrase id="menutext" value="Nilai Stok" />
     </menu>
-    <menu id="10039">
-      <phrase id="menutext" value="Laba Kotor" />
-    </menu>
     <menu id="10017">
       <phrase id="menutext" value="Mutasi" />
+    </menu>
+    <menu id="10042">
+      <phrase id="menutext" value="Laba / Rugi Kotor" />
     </menu>
     <menu id="10027">
       <phrase id="menutext" value="Margin" />
@@ -679,26 +706,20 @@
     <menu id="10045">
       <phrase id="menutext" value="v 11piutang" />
     </menu>
-    <menu id="10040">
-      <phrase id="menutext" value="v 03masuk" />
-    </menu>
-    <menu id="10041">
-      <phrase id="menutext" value="v 05stok" />
-    </menu>
-    <menu id="10042">
-      <phrase id="menutext" value="v 10hutang" />
-    </menu>
     <menu id="10024">
       <phrase id="menutext" value="v 04stok" />
     </menu>
     <menu id="10014">
       <phrase id="menutext" value="Transaksi" />
     </menu>
-    <menu id="10049">
-      <phrase id="menutext" value="v 03masuk" />
+    <menu id="10039">
+      <phrase id="menutext" value="v 15penjualan" />
     </menu>
-    <menu id="10050">
-      <phrase id="menutext" value="v 04keluar" />
+    <menu id="10040">
+      <phrase id="menutext" value="v 16hpp" />
+    </menu>
+    <menu id="10041">
+      <phrase id="menutext" value="t 10sap" />
     </menu>
     <menu id="10037">
       <phrase id="menutext" value="v 13beli" />
@@ -738,6 +759,12 @@
     </menu>
     <menu id="10023">
       <phrase id="menutext" value="v 07mutasi" />
+    </menu>
+    <menu id="10049">
+      <phrase id="menutext" value="v 03masuk" />
+    </menu>
+    <menu id="10050">
+      <phrase id="menutext" value="v 04keluar" />
     </menu>
     <menu id="10020">
       <phrase id="menutext" value="v 05stok" />
@@ -1400,6 +1427,48 @@
       </field>
       <field id="sub_total">
         <phrase id="fldcaption" value="sub total" />
+      </field>
+    </table>
+    <table id="t_10sap">
+      <phrase id="tblcaption" value="t 10sap" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="sap">
+        <phrase id="fldcaption" value="sap" />
+      </field>
+    </table>
+    <table id="v_15penjualan">
+      <phrase id="tblcaption" value="v 15penjualan" />
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="penjualan">
+        <phrase id="fldcaption" value="penjualan" />
+      </field>
+    </table>
+    <table id="v_16hpp">
+      <phrase id="tblcaption" value="v 16hpp" />
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="sap">
+        <phrase id="fldcaption" value="sap" />
+      </field>
+      <field id="hpp">
+        <phrase id="fldcaption" value="hpp" />
+      </field>
+      <field id="penjualan">
+        <phrase id="fldcaption" value="penjualan" />
+      </field>
+      <field id="lr_kotor">
+        <phrase id="fldcaption" value="lr kotor" />
       </field>
     </table>
   </project>

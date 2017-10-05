@@ -15,6 +15,9 @@ else {
 $q = "truncate t_09nilai_stok";
 $conn->Execute($q);
 
+$q = "truncate t_10sap";
+$conn->Execute($q);
+
 $q = "select a.*, b.item_nama from t_08item_saldo a left join t_02item b on a.item_id = b.item_id order by a.item_id";
 $r = $conn->Execute($q);
 
@@ -227,6 +230,13 @@ while (!$r->EOF) {
 		}
 		$r1->MoveNext();
 	}
+	$tot_saldo = 0;
+	for ($i = 0; $i < count($a_qty); $i++) {
+		$tot_saldo += $a_qty[$i] * $a_harga[$i];
+	}
+	//echo $item_id." - ".$item_nama." - ".$tot_saldo."</br>";
+	$q = "insert into t_10sap values (null, ".$item_id.", ".$tot_saldo.")";
+	$conn->Execute($q);
 	$r->MoveNext();
 }
 header("location: r_nilai_stoksmry.php?pageno=1&t=r_nilai_stok&grpperpage=ALL");

@@ -293,13 +293,9 @@ Page_Rendering();
   </div>
   <div id="collapse1" class="panel-collapse collapse in">
   	<div class="panel-body">
-  		oct 4, 2017:</br>
+  		oct 5, 2017:</br>
   		<ul>
-  			<li>alias nama item : </li>
-  				<ul>
-  					<li>nama item urutan pertama => untuk internal, urutan selanjutnya untuk eksternal</li>
-  					<li>antar-urutan dipisahkan dengan tanda koma</li>
-  				</ul>
+  			<li><a href="r_lrsmry.php">Laporan - Laba / Rugi Kotor</a></li>
   		</ul>
   	</div>
   </div>
@@ -312,8 +308,13 @@ Page_Rendering();
   		oct 4, 2017:</br>
   		<ul>
   			<li><a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a> sudah benar</li>
+  			<li>alias nama item : </li>
+  				<ul>
+  					<li>nama item urutan pertama => untuk internal, urutan selanjutnya untuk eksternal</li>
+  					<li>antar-urutan dipisahkan dengan tanda koma</li>
+  				</ul>
   		</ul>
-  		</br>
+  		<br>
   		oct 3, 2017:</br>
   		<ul>
   			<li><a href="t_05customerlist.php">Master - Customer</a></li>

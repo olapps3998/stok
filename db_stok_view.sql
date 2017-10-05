@@ -242,3 +242,21 @@ Order By item_id,
   tgl,
   jenis Desc,
   detail_id;
+
+create view v_15penjualan as  
+Select t_07jual_detail.item_id As item_id,
+  Sum((t_07jual_detail.qty * t_07jual_detail.harga)) As penjualan
+From t_07jual_detail
+Group By t_07jual_detail.item_id;
+
+create view v_16hpp as
+Select a.item_id As item_id,
+  a.item_nama As item_nama,
+  b.sap As sap,
+  Sum(a.out_sub_total) As hpp,
+  c.penjualan As penjualan,
+  (c.penjualan - Sum(a.out_sub_total)) As lr_kotor
+From (t_09nilai_stok a
+  Left Join t_10sap b On a.item_id = b.item_id)
+  Left Join v_15penjualan c On a.item_id = c.item_id
+Group By a.item_id;

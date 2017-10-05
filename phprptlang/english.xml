@@ -350,6 +350,18 @@
   <project>
     <phrase id="bodytitle" value="L.A.B. STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="39">
+      <phrase id="menutext" value="v 15penjualan" />
+    </menu>
+    <menu id="40">
+      <phrase id="menutext" value="v 16hpp" />
+    </menu>
+    <menu id="41">
+      <phrase id="menutext" value="t 10sap" />
+    </menu>
+    <menu id="42">
+      <phrase id="menutext" value="Laba / Rugi Kotor" />
+    </menu>
     <menu id="37">
       <phrase id="menutext" value="v 13beli" />
     </menu>
@@ -1314,6 +1326,69 @@
       </field>
       <field id="sub_total">
         <phrase id="fldcaption" value="sub total" />
+      </field>
+    </table>
+    <table id="t_10sap">
+      <phrase id="tblcaption" value="t 10sap" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="sap">
+        <phrase id="fldcaption" value="sap" />
+      </field>
+    </table>
+    <table id="v_15penjualan">
+      <phrase id="tblcaption" value="v 15penjualan" />
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="penjualan">
+        <phrase id="fldcaption" value="penjualan" />
+      </field>
+    </table>
+    <table id="v_16hpp">
+      <phrase id="tblcaption" value="v 16hpp" />
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="sap">
+        <phrase id="fldcaption" value="sap" />
+      </field>
+      <field id="hpp">
+        <phrase id="fldcaption" value="hpp" />
+      </field>
+      <field id="penjualan">
+        <phrase id="fldcaption" value="penjualan" />
+      </field>
+      <field id="lr_kotor">
+        <phrase id="fldcaption" value="lr kotor" />
+      </field>
+    </table>
+    <table id="r_lr">
+      <phrase id="tblcaption" value="Laba / Rugi Kotor" />
+      <field id="item_id">
+        <phrase id="fldcaption" value="Item ID" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="Nama Item" />
+      </field>
+      <field id="sap">
+        <phrase id="fldcaption" value="Saldo Akhir Persediaan" />
+      </field>
+      <field id="hpp">
+        <phrase id="fldcaption" value="Harga Pokok Penjualan" />
+      </field>
+      <field id="penjualan">
+        <phrase id="fldcaption" value="Penjualan" />
+      </field>
+      <field id="lr_kotor">
+        <phrase id="fldcaption" value="Laba / Rugi Kotor" />
       </field>
     </table>
   </project>

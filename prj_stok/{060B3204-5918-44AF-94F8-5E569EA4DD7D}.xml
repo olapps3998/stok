@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <configuration date="2017/10/05" author="e.World Technology Ltd.">
-  <project id="{060B3204-5918-44AF-94F8-5E569EA4DD7D}" file="D:\xampp3\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="10.0" datetime="2017/10/05 09:56:16" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;">
+  <project id="{060B3204-5918-44AF-94F8-5E569EA4DD7D}" file="D:\xampp3\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="10.0" datetime="2017/10/05 14:27:28" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;">
     <table id="t_00audit_trail" name="t_00audit_trail" caption="t 00audit trail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t_01vendor" name="t_01vendor" caption="t 01vendor" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t_02item" name="t_02item" caption="t 02item" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
@@ -34,5 +34,9 @@
     <table id="r_nilai_stok" name="r_nilai_stok" caption="Nilai Stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="v_13beli" name="v_13beli" caption="v 13beli" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="v_14jual_detail" name="v_14jual_detail" caption="v 14jual detail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t_10sap" name="t_10sap" caption="t 10sap" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="v_15penjualan" name="v_15penjualan" caption="v 15penjualan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="v_16hpp" name="v_16hpp" caption="v 16hpp" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="r_lr" name="r_lr" caption="Laba / Rugi Kotor" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
   </project>
 </configuration>

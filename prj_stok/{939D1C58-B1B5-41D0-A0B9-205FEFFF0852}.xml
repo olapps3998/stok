@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <configuration date="2017/10/05" author="e.World Technology Ltd.">
-  <project id="{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}" file="D:\xampp3\htdocs\stok\prj_stok.pmp" name="prj_stok" product="PHPMaker" version="13.0" datetime="2017/10/05 10:00:07" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;">
+  <project id="{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}" file="D:\xampp3\htdocs\stok\prj_stok.pmp" name="prj_stok" product="PHPMaker" version="13.0" datetime="2017/10/05 14:38:51" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;">
     <table id="cf_00home_php" name="cf_00home.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="cf_01hitung_nilai_stok_php" name="cf_01hitung_nilai_stok.php" caption="Nilai Stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t_00audit_trail" name="t_00audit_trail" caption="t 00audit trail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
@@ -28,5 +28,8 @@
     <table id="v_12nilai_stok" name="v_12nilai_stok" caption="v 12nilai stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="v_13beli" name="v_13beli" caption="v 13beli" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="v_14jual_detail" name="v_14jual_detail" caption="v 14jual detail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t_10sap" name="t_10sap" caption="t 10sap" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="v_15penjualan" name="v_15penjualan" caption="v 15penjualan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="v_16hpp" name="v_16hpp" caption="v 16hpp" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
   </project>
 </configuration>
