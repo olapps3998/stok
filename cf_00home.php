@@ -289,14 +289,26 @@ Page_Rendering();
 <div class="panel panel-default">
 
   <div class="panel-heading">
-	<b><a data-toggle="collapse" href="#collapse1">on progress</a></b>
+	<b><a data-toggle="collapse" href="#collapse5">what's new</a></b>
   </div>
-  <div id="collapse1" class="panel-collapse collapse in">
+  <div id="collapse5" class="panel-collapse collapse in">
   	<div class="panel-body">
   		oct 5, 2017:</br>
   		<ul>
   			<li><a href="r_lrsmry.php">Laporan - Laba / Rugi Kotor</a></li>
   		</ul>
+  	</div>
+  </div>
+
+  <div class="panel-heading">
+	<b><a data-toggle="collapse" href="#collapse1">on progress</a></b>
+  </div>
+  <div id="collapse1" class="panel-collapse collapse in">
+  	<div class="panel-body">
+  		-</br>
+  		<!--<ul>
+  			<li><a href="#">-</a></li>
+  		</ul>-->
   	</div>
   </div>
 
@@ -334,10 +346,10 @@ Page_Rendering();
   </div>
   <div id="collapse2" class="panel-collapse collapse">
   	<div class="panel-body">
-  		oct 2, 2017:</br>
-  		<ul>
+  		-</br>
+  		<!--<ul>
   			<li>hpp (harga pokok penjualan) => <a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
-  		</ul>
+  		</ul>-->
   	</div>
   </div>
 

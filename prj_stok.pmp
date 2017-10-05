@@ -527,10 +527,10 @@ function Row_Inserted($rsold, &$rsnew) {
   </div>
   <div id="collapse1" class="panel-collapse collapse in">
   	<div class="panel-body">
-  		oct 5, 2017:</br>
-  		<ul>
+  		-</br>
+  		<!--<ul>
   			<li><a href="#">-</a></li>
-  		</ul>
+  		</ul>-->
   	</div>
   </div>
 
@@ -568,10 +568,10 @@ function Row_Inserted($rsold, &$rsnew) {
   </div>
   <div id="collapse2" class="panel-collapse collapse">
   	<div class="panel-body">
-  		oct 2, 2017:</br>
-  		<ul>
+  		-</br>
+  		<!--<ul>
   			<li>hpp (harga pokok penjualan) => <a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
-  		</ul>
+  		</ul>-->
   	</div>
   </div>
 
