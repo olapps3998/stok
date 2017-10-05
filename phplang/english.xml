@@ -589,35 +589,11 @@
     <menu id="10118">
       <phrase id="menutext" value="v 05stok" />
     </menu>
-    <menu id="10119">
-      <phrase id="menutext" value="v 10hutang" />
-    </menu>
-    <menu id="10111">
-      <phrase id="menutext" value="v 01beli laporan" />
-    </menu>
-    <menu id="10112">
-      <phrase id="menutext" value="v 08harga jual terakhir" />
-    </menu>
-    <menu id="10113">
-      <phrase id="menutext" value="v 09margin" />
-    </menu>
-    <menu id="10114">
-      <phrase id="menutext" value="t 10sap" />
-    </menu>
-    <menu id="10115">
-      <phrase id="menutext" value="v 15penjualan" />
-    </menu>
-    <menu id="10116">
-      <phrase id="menutext" value="v 16hpp" />
-    </menu>
-    <menu id="10109">
-      <phrase id="menutext" value="v 13beli" />
-    </menu>
     <menu id="6">
       <phrase id="menutext" value="Home" />
     </menu>
-    <menu id="10110">
-      <phrase id="menutext" value="v 14jual detail" />
+    <menu id="10119">
+      <phrase id="menutext" value="v 10hutang" />
     </menu>
     <menu id="7">
       <phrase id="menutext" value="Master" />
@@ -637,9 +613,6 @@
     <menu id="10018">
       <phrase id="menutext" value="Customer" />
     </menu>
-    <menu id="10104">
-      <phrase id="menutext" value="t 09nilai stok" />
-    </menu>
     <menu id="10016">
       <phrase id="menutext" value="Transaksi" />
     </menu>
@@ -649,8 +622,8 @@
     <menu id="10019">
       <phrase id="menutext" value="Penjualan" />
     </menu>
-    <menu id="10105">
-      <phrase id="menutext" value="v 04keluar" />
+    <menu id="10111">
+      <phrase id="menutext" value="v 01beli laporan" />
     </menu>
     <menu id="9">
       <phrase id="menutext" value="Laporan" />
@@ -673,6 +646,9 @@
     <menu id="10017">
       <phrase id="menutext" value="Mutasi" />
     </menu>
+    <menu id="10120">
+      <phrase id="menutext" value="Laba / Rugi Kotor" />
+    </menu>
     <menu id="10042">
       <phrase id="menutext" value="Laba / Rugi Kotor" />
     </menu>
@@ -684,6 +660,33 @@
     </menu>
     <menu id="10031">
       <phrase id="menutext" value="Piutang" />
+    </menu>
+    <menu id="10112">
+      <phrase id="menutext" value="v 08harga jual terakhir" />
+    </menu>
+    <menu id="10113">
+      <phrase id="menutext" value="v 09margin" />
+    </menu>
+    <menu id="10114">
+      <phrase id="menutext" value="t 10sap" />
+    </menu>
+    <menu id="10115">
+      <phrase id="menutext" value="v 15penjualan" />
+    </menu>
+    <menu id="10116">
+      <phrase id="menutext" value="v 16hpp" />
+    </menu>
+    <menu id="10109">
+      <phrase id="menutext" value="v 13beli" />
+    </menu>
+    <menu id="10110">
+      <phrase id="menutext" value="v 14jual detail" />
+    </menu>
+    <menu id="10104">
+      <phrase id="menutext" value="t 09nilai stok" />
+    </menu>
+    <menu id="10105">
+      <phrase id="menutext" value="v 04keluar" />
     </menu>
     <menu id="10106">
       <phrase id="menutext" value="v 06transaksi" />
@@ -1470,6 +1473,9 @@
       <field id="lr_kotor">
         <phrase id="fldcaption" value="lr kotor" />
       </field>
+    </table>
+    <table id="cf_02hitung_lr_php">
+      <phrase id="tblcaption" value="Laba / Rugi Kotor" />
     </table>
   </project>
 </ew-language>
