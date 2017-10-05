@@ -504,94 +504,32 @@ function Row_Inserted($rsold, &$rsnew) {
 	ew_Execute($q);
 }
 ]]></CustomScript>
-  <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="cf_01hitung_nilai_stok.php" ScriptL2Key=""><![CDATA[<div class="panel panel-default">
-
-  <div class="panel-heading">
-	<b><a data-toggle="collapse" href="#collapse1">on progress</a></b>
-  </div>
-  <div id="collapse1" class="panel-collapse collapse in">
-  	<div class="panel-body">
-  		oct 5, 2017:</br>
-  		<ul>
-  			<li><a href="r_lrsmry.php">Laporan - Laba / Rugi Kotor</a></li>
-  		</ul>
-  	</div>
-  </div>
-
-  <div class="panel-heading">
-	<b><a data-toggle="collapse" href="#collapse4">update</a></b>
-  </div>
-  <div id="collapse4" class="panel-collapse collapse in">
-  	<div class="panel-body">
-  		oct 4, 2017:</br>
-  		<ul>
-  			<li><a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a> sudah benar</li>
-  			<li>alias nama item : </li>
-  				<ul>
-  					<li>nama item urutan pertama => untuk internal, urutan selanjutnya untuk eksternal</li>
-  					<li>antar-urutan dipisahkan dengan tanda koma</li>
-  				</ul>
-  		</ul>
-  		<br>
-  		oct 3, 2017:</br>
-  		<ul>
-  			<li><a href="t_05customerlist.php">Master - Customer</a></li>
-  				<ul>
-  					<li>by default : Customer menggunakan pilihan Nama Item urutan pertama, kecuali ada perubahan</li>
-  				</ul>
-  			<li><a href="t_02itemlist.php">Master - Item</a></li>
-  				<ul>
-  					<li>pemisahan urutan : dengan tanda koma</li>
-  				</ul>
-  		</ul>
-  	</div>
-  </div>
-
-  <div class="panel-heading">
-  	<b><a data-toggle="collapse" href="#collapse2">pending</a></b>
-  </div>
-  <div id="collapse2" class="panel-collapse collapse">
-  	<div class="panel-body">
-  		oct 2, 2017:</br>
-  		<ul>
-  			<li>hpp (harga pokok penjualan) => <a href="cf_01hitung_nilai_stok.php">Laporan - Nilai Stok</a></li>
-  		</ul>
-  	</div>
-  </div>
-
-  <div class="panel-heading">
-  	<b><a data-toggle="collapse" href="#collapse3">to do</a></b>
-  </div>
-  <div id="collapse3" class="panel-collapse collapse">
-  	<div class="panel-body">
-  		sep 28, 2017:</br>
-  		<ul>
-  			<li>dead stock</li>
-  			<li>retur</li>
-  			<li>invoice</li>
-  			<li>backup</li>
-  			<li>restore</li>
-  			<li>closing</li>
-  			<li>stock opname</li>
-  			<li>margin :: total per month, perlu menyertakan quantity</li>
-  			<li>konversi satuan</li>
-  			<li>hak akses</li>
-  		</ul>
-  	</div>
-  </div>
-
-</div>
+  <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="cf_01hitung_nilai_stok.php" ScriptL2Key=""><![CDATA[<form id="myform" name="myform" class="form-horizontal" method="post" action="cf_01hitung_nilai_stok1.php">
+	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit">Hitung Nilai Stok</button>
+</form>
 ]]></CustomScript>
   <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="cf_00home.php" ScriptL2Key=""><![CDATA[<div class="panel panel-default">
 
   <div class="panel-heading">
+	<b><a data-toggle="collapse" href="#collapse5">what's new</a></b>
+  </div>
+  <div id="collapse5" class="panel-collapse collapse in">
+  	<div class="panel-body">
+  		oct 5, 2017:</br>
+  		<ul>
+  			<li><a href="r_lrsmry.php">Laporan - Laba / Rugi Kotor</a></li>
+  		</ul>
+  	</div>
+  </div>
+
+  <div class="panel-heading">
 	<b><a data-toggle="collapse" href="#collapse1">on progress</a></b>
   </div>
   <div id="collapse1" class="panel-collapse collapse in">
   	<div class="panel-body">
   		oct 5, 2017:</br>
   		<ul>
-  			<li><a href="r_lrsmry.php">Laporan - Laba / Rugi Kotor</a></li>
+  			<li><a href="#">-</a></li>
   		</ul>
   	</div>
   </div>
