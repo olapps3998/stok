@@ -362,14 +362,14 @@ Page_Rendering();
   		<ul>
   			<li>dead stock</li>
   			<li>retur</li>
+  			<li>hak akses</li>
   			<li>invoice</li>
-  			<li>backup</li>
-  			<li>restore</li>
-  			<li>closing</li>
-  			<li>stock opname</li>
   			<li>margin :: total per month, perlu menyertakan quantity</li>
   			<li>konversi satuan</li>
-  			<li>hak akses</li>
+  			<li>stock opname</li>
+  			<li>closing</li>
+  			<li>backup</li>
+  			<li>restore</li>
   		</ul>
   	</div>
   </div>

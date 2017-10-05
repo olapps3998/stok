@@ -3936,7 +3936,7 @@ function ewr_FilterDropDownValue($fld, $sep = ", ") {
 	$value = $fld->DropDownValue;
 	if (is_array($value))
 		$value = implode($sep, $value);
-	if ($fld->DropDownValue == EWR_INIT_VALUE || is_null($fld->DropDownValue))
+	if ($value == EWR_INIT_VALUE || is_null($value))
 		$value = ($sep == ",") ? "" : $ReportLanguage->Phrase("PleaseSelect"); // Output empty string as value for input tag
 	return $value;
 }
