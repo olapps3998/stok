@@ -307,8 +307,8 @@ Page_Rendering();
   	<div class="panel-body">
   		oct, 7 2017:</br>
   		<ul>
-  			<li>create <a href="#">Laporan - Mutasi (Detail)</a>: diberi keterangan "beli", "jual", "dead stock"</li>
   			<li>revisi <a href="#">Laporan - Mutasi</a>: ditambah data dari transaksi "Dead Stock"</li>
+  			<li>create <a href="#">Laporan - Mutasi (Detail)</a>: diberi keterangan "beli", "jual", "dead stock"</li>
   			<li>create <a href="#">Transaksi - Dead Stock</a>: diberi keterangan "beli", "jual", "dead stock"</li>
   		</ul>
   	</div>
