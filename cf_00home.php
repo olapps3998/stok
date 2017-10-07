@@ -293,10 +293,10 @@ Page_Rendering();
   </div>
   <div id="collapse5" class="panel-collapse collapse in">
   	<div class="panel-body">
-  		-<!--oct, 5 2017: --></br>
-  		<!--<ul>
-  			<li><a href="r_lrsmry.php">Laporan - Laba / Rugi Kotor</a></li>
-  		</ul>-->
+  		oct, 7 2017:</br>
+  		<ul>
+  			<li><a href="t_11dead_stoklist.php">Transaksi - Dead Stock</a></li>
+  		</ul>
   	</div>
   </div>
 
@@ -307,9 +307,9 @@ Page_Rendering();
   	<div class="panel-body">
   		oct, 7 2017:</br>
   		<ul>
+  			<li>create <a href="#">Laporan - Dead-Stock</a></li>
   			<li>revisi <a href="#">Laporan - Mutasi</a>: ditambah data dari transaksi "Dead Stock"</li>
   			<li>create <a href="#">Laporan - Mutasi (Detail)</a>: diberi keterangan "beli", "jual", "dead stock"</li>
-  			<li>create <a href="#">Transaksi - Dead Stock</a>: diberi keterangan "beli", "jual", "dead stock"</li>
   		</ul>
   	</div>
   </div>
