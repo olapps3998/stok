@@ -296,6 +296,7 @@ Page_Rendering();
   		oct, 11 2017:</br>
   		<ul>
   			<li><a href="r_dead_stoksmry.php">Laporan - Dead-Stock</a></li>
+  			<li><a href="r_mutasi_detailsmry.php">Laporan - Mutasi Detail</a></li>
   		</ul>
   	</div>
   </div>
@@ -305,10 +306,11 @@ Page_Rendering();
   </div>
   <div id="collapse1" class="panel-collapse collapse in">
   	<div class="panel-body">
-  		oct, 7 2017:</br>
+  		-
+  		<!--oct, 7 2017:</br>
   		<ul>
   			<li>create <a href="#">Laporan - Mutasi (Detail)</a>: diberi keterangan "beli", "jual", "dead stock"</li>
-  		</ul>
+  		</ul>-->
   	</div>
   </div>
 
@@ -374,7 +376,7 @@ Page_Rendering();
   	<div class="panel-body">
   		sep 28, 2017:</br>
   		<ul>
-  			<li>dead stock</li>
+  			<li><strike>dead stock</strike></li>
   			<li>retur</li>
   			<li>hak akses</li>
   			<li>invoice</li>
