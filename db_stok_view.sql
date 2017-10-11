@@ -115,55 +115,54 @@ From t_07jual_detail
 Order By jual_detail_id;
 
 create view v_06transaksi as
-    SELECT 
-        `a`.`item_id` AS `item_id`,
-        `a`.`item_nama` AS `item_nama`,
-        `b`.`tgl_beli` AS `tgl`,
-        `y`.`vendor_nama` AS `vendor_customer`,
-        `b`.`qty` AS `qty`,
-        'M' AS `jenis`,
-        `z`.`satuan_nama` AS `satuan_nama`,
-        `b`.`harga` AS `harga`,
-        `b`.`sub_total` AS `sub_total`,
-        `b`.`beli_id` AS `detail_id`
-    FROM
-        (((`t_02item` `a`
-        LEFT JOIN `v_13beli` `b` ON ((`a`.`item_id` = `b`.`item_id`)))
-        LEFT JOIN `t_01vendor` `y` ON ((`b`.`vendor_id` = `y`.`vendor_id`)))
-        LEFT JOIN `t_03satuan` `z` ON ((`b`.`satuan_id` = `z`.`satuan_id`))) 
-    UNION ALL SELECT 
-        `a`.`item_id` AS `item_id`,
-        `a`.`item_nama` AS `item_nama`,
-        `b`.`tgl_kirim` AS `tgl_kirim`,
-        `y`.`customer_nama` AS `customer_nama`,
-        `b`.`qty` AS `qty`,
-        'K' AS `K`,
-        `z`.`satuan_nama` AS `satuan_nama`,
-        `b`.`harga` AS `harga`,
-        `b`.`sub_total` AS `sub_total`,
-        `b`.`jual_detail_id` AS `jual_detail_id`
-    FROM
-        ((((`t_02item` `a`
-        LEFT JOIN `v_14jual_detail` `b` ON ((`a`.`item_id` = `b`.`item_id`)))
-        LEFT JOIN `t_06jual` `c` ON ((`b`.`jual_id` = `c`.`jual_id`)))
-        LEFT JOIN `t_05customer` `y` ON ((`c`.`customer_id` = `y`.`customer_id`)))
-        LEFT JOIN `t_03satuan` `z` ON ((`b`.`satuan_id` = `z`.`satuan_id`))) 
-    UNION ALL SELECT 
-        `a`.`item_id` AS `item_id`,
-        `a`.`item_nama` AS `item_nama`,
-        `b`.`tgl` AS `tgl`,
-        'Dead-Stock' AS `Dead-Stock`,
-        `b`.`qty` AS `qty`,
-        'K' AS `K`,
-        `c`.`satuan_nama` AS `satuan_nama`,
-        0 AS `0`,
-        0 AS `0`,
-        `b`.`dead_stok_id` AS `dead_stok_id`
-    FROM
-        ((`t_02item` `a`
-        LEFT JOIN `t_11dead_stok` `b` ON ((`a`.`item_id` = `b`.`item_id`)))
-        LEFT JOIN `t_03satuan` `c` ON ((`b`.`satuan_id` = `c`.`satuan_id`)))
-    ORDER BY `item_id` , `tgl` , `jenis` DESC , `detail_id`;
+Select a.item_id As item_id,
+  a.item_nama As item_nama,
+  b.tgl_beli As tgl,
+  y.vendor_nama As vendor_customer,
+  b.qty As qty,
+  'M' As jenis,
+  z.satuan_nama As satuan_nama,
+  b.harga As harga,
+  b.sub_total As sub_total,
+  b.beli_id As detail_id
+From ((t_02item a
+  Left Join v_13beli b On a.item_id = b.item_id)
+  Left Join t_01vendor y On b.vendor_id = y.vendor_id)
+  Left Join t_03satuan z On b.satuan_id = z.satuan_id
+union All
+Select a.item_id As item_id,
+  a.item_nama As item_nama,
+  b.tgl_kirim As tgl_kirim,
+  y.customer_nama As customer_nama,
+  b.qty As qty,
+  'K' As K,
+  z.satuan_nama As satuan_nama,
+  b.harga As harga,
+  b.sub_total As sub_total,
+  b.jual_detail_id As jual_detail_id
+From (((t_02item a
+  Left Join v_14jual_detail b On a.item_id = b.item_id)
+  Left Join t_06jual c On b.jual_id = c.jual_id)
+  Left Join t_05customer y On c.customer_id = y.customer_id)
+  Left Join t_03satuan z On b.satuan_id = z.satuan_id
+union All
+Select a.item_id As item_id,
+  a.item_nama As item_nama,
+  b.tgl As tgl,
+  'Dead-Stock' As `Dead-Stock`,
+  b.qty As qty,
+  'K' As K,
+  c.satuan_nama As satuan_nama,
+  0 As `0`,
+  0 As `0`,
+  b.dead_stok_id As dead_stok_id
+From (t_11dead_stok b
+  Left Join t_02item a On a.item_id = b.item_id)
+  Left Join t_03satuan c On b.satuan_id = c.satuan_id
+Order By item_id,
+  tgl,
+  jenis Desc,
+  detail_id;
 
 create view v_07mutasi as  
 Select v_06transaksi.item_id As item_id,
@@ -363,3 +362,15 @@ create view v_17mutasi_detail as
         (`t_08item_saldo` `a`
         LEFT JOIN `t_02item` `b` ON ((`a`.`item_id` = `b`.`item_id`)))
     ORDER BY `item_id` , `tgl` , `jenis` DESC , `detail_id`;
+	
+create view v_18dead_stok as
+Select a.dead_stok_id As dead_stok_id,
+  a.tgl As tgl,
+  a.item_id As item_id,
+  a.qty As qty,
+  a.satuan_id As satuan_id,
+  b.item_nama As item_nama,
+  c.satuan_nama As satuan_nama
+From (t_11dead_stok a
+  Left Join t_02item b On a.item_id = b.item_id)
+  Left Join t_03satuan c On a.satuan_id = c.satuan_id;

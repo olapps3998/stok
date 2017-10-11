@@ -61,9 +61,9 @@ class crr_mutasi_detail extends crTableBase {
 		$this->item_nama->FldGroupSql = "";
 
 		// tgl
-		$this->tgl = new crField('r_mutasi_detail', 'r_mutasi_detail', 'x_tgl', 'tgl', '`tgl`', 133, EWR_DATATYPE_DATE, 0);
+		$this->tgl = new crField('r_mutasi_detail', 'r_mutasi_detail', 'x_tgl', 'tgl', '`tgl`', 133, EWR_DATATYPE_DATE, 7);
 		$this->tgl->Sortable = TRUE; // Allow sort
-		$this->tgl->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_FORMAT"], $ReportLanguage->Phrase("IncorrectDate"));
+		$this->tgl->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_SEPARATOR"], $ReportLanguage->Phrase("IncorrectDateDMY"));
 		$this->fields['tgl'] = &$this->tgl;
 		$this->tgl->DateFilter = "";
 		$this->tgl->SqlSelect = "";
@@ -404,6 +404,19 @@ class crr_mutasi_detail extends crTableBase {
 	function SetupLookupFilters($fld) {
 		global $gsLanguage;
 		switch ($fld->FldVar) {
+		case "x_item_nama":
+			$sSqlWrk = "";
+		$sSqlWrk = "SELECT DISTINCT `item_nama`, `item_nama` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v_17mutasi_detail`";
+		$sWhereWrk = "";
+		$this->item_nama->LookupFilters = array();
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "DB", "f0" => '`item_nama` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter));
+			$sSqlWrk = "";
+		$this->Lookup_Selecting($this->item_nama, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+		$sSqlWrk .= " ORDER BY `item_nama` ASC";
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 

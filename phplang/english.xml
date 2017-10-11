@@ -583,6 +583,21 @@
   <project>
     <phrase id="bodytitle" value="L.A.B. STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="10128">
+      <phrase id="menutext" value="t 99beli" />
+    </menu>
+    <menu id="10129">
+      <phrase id="menutext" value="v 02jual laporan" />
+    </menu>
+    <menu id="10130">
+      <phrase id="menutext" value="v 11piutang" />
+    </menu>
+    <menu id="10131">
+      <phrase id="menutext" value="v 17mutasi detail" />
+    </menu>
+    <menu id="10132">
+      <phrase id="menutext" value="v 18dead stok" />
+    </menu>
     <menu id="10124">
       <phrase id="menutext" value="Detail Penjualan" />
     </menu>

@@ -1460,7 +1460,7 @@
         <phrase id="fldcaption" value="Item ID" />
       </field>
       <field id="item_nama">
-        <phrase id="fldcaption" value="Item" />
+        <phrase id="fldcaption" value="Item Nama" />
       </field>
       <field id="tgl">
         <phrase id="fldcaption" value="Tgl." />
@@ -1517,7 +1517,7 @@
         <phrase id="fldcaption" value="Tgl. Assign" />
       </field>
       <field id="item_nama">
-        <phrase id="fldcaption" value="Item Nama" />
+        <phrase id="fldcaption" value="Nama Item" />
       </field>
       <field id="item_id">
         <phrase id="fldcaption" value="Item ID" />
