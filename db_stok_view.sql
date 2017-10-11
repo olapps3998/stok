@@ -329,3 +329,37 @@ From (t_09nilai_stok a
   Left Join t_10sap b On a.item_id = b.item_id)
   Left Join v_15penjualan c On a.item_id = c.item_id
 Group By a.item_id;
+
+create view v_17mutasi_detail as
+    SELECT 
+        `v_06transaksi`.`item_id` AS `item_id`,
+        `v_06transaksi`.`item_nama` AS `item_nama`,
+        `v_06transaksi`.`tgl` AS `tgl`,
+        vendor_customer as ket,
+        (CASE `v_06transaksi`.`jenis`
+            WHEN 'M' THEN `v_06transaksi`.`qty`
+            ELSE 0
+        END) AS `masuk`,
+        (CASE `v_06transaksi`.`jenis`
+            WHEN 'K' THEN `v_06transaksi`.`qty`
+            ELSE 0
+        END) AS `keluar`,
+        `v_06transaksi`.`qty` AS `saldo`,
+        `v_06transaksi`.`jenis` AS `jenis`,
+        `v_06transaksi`.`detail_id` AS `detail_id`
+    FROM
+        `v_06transaksi` 
+    UNION ALL SELECT 
+        `a`.`item_id` AS `item_id`,
+        `b`.`item_nama` AS `item_nama`,
+        `a`.`tgl` AS `tgl`,
+        'Saldo Awal',
+        `a`.`qty` AS `qty`,
+        0 AS `0`,
+        `a`.`qty` AS `qty`,
+        'M' AS `M`,
+        0 AS `0`
+    FROM
+        (`t_08item_saldo` `a`
+        LEFT JOIN `t_02item` `b` ON ((`a`.`item_id` = `b`.`item_id`)))
+    ORDER BY `item_id` , `tgl` , `jenis` DESC , `detail_id`;

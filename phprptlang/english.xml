@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/10/7" version="10.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/10/11" version="10.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -350,6 +350,21 @@
   <project>
     <phrase id="bodytitle" value="L.A.B. STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="45">
+      <phrase id="menutext" value="t 11dead stok" />
+    </menu>
+    <menu id="47">
+      <phrase id="menutext" value="v 18dead stok" />
+    </menu>
+    <menu id="48">
+      <phrase id="menutext" value="Dead Stok" />
+    </menu>
+    <menu id="43">
+      <phrase id="menutext" value="v 17mutasi detail" />
+    </menu>
+    <menu id="44">
+      <phrase id="menutext" value="Mutasi Detail" />
+    </menu>
     <menu id="39">
       <phrase id="menutext" value="v 15penjualan" />
     </menu>
@@ -1389,6 +1404,132 @@
       </field>
       <field id="lr_kotor">
         <phrase id="fldcaption" value="Laba / Rugi Kotor" />
+      </field>
+    </table>
+    <table id="t_11dead_stok">
+      <phrase id="tblcaption" value="t 11dead stok" />
+      <field id="dead_stok_id">
+        <phrase id="fldcaption" value="dead stok id" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="qty" />
+      </field>
+      <field id="satuan_id">
+        <phrase id="fldcaption" value="satuan id" />
+      </field>
+    </table>
+    <table id="v_17mutasi_detail">
+      <phrase id="tblcaption" value="v 17mutasi detail" />
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
+      </field>
+      <field id="ket">
+        <phrase id="fldcaption" value="ket" />
+      </field>
+      <field id="masuk">
+        <phrase id="fldcaption" value="masuk" />
+      </field>
+      <field id="keluar">
+        <phrase id="fldcaption" value="keluar" />
+      </field>
+      <field id="saldo">
+        <phrase id="fldcaption" value="saldo" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="jenis" />
+      </field>
+      <field id="detail_id">
+        <phrase id="fldcaption" value="detail id" />
+      </field>
+    </table>
+    <table id="r_mutasi_detail">
+      <phrase id="tblcaption" value="Mutasi Detail" />
+      <field id="item_id">
+        <phrase id="fldcaption" value="Item ID" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="Item" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="Tgl." />
+      </field>
+      <field id="ket">
+        <phrase id="fldcaption" value="Keterangan" />
+      </field>
+      <field id="masuk">
+        <phrase id="fldcaption" value="Masuk" />
+      </field>
+      <field id="keluar">
+        <phrase id="fldcaption" value="Keluar" />
+      </field>
+      <field id="saldo">
+        <phrase id="fldcaption" value="Saldo" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="jenis" />
+      </field>
+      <field id="detail_id">
+        <phrase id="fldcaption" value="detail id" />
+      </field>
+    </table>
+    <table id="v_18dead_stok">
+      <phrase id="tblcaption" value="v 18dead stok" />
+      <field id="dead_stok_id">
+        <phrase id="fldcaption" value="dead stok id" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="item id" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="qty" />
+      </field>
+      <field id="satuan_id">
+        <phrase id="fldcaption" value="satuan id" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="satuan_nama">
+        <phrase id="fldcaption" value="satuan nama" />
+      </field>
+    </table>
+    <table id="r_dead_stok">
+      <phrase id="tblcaption" value="Dead Stok" />
+      <field id="dead_stok_id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="Tgl. Assign" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="Item Nama" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="Item ID" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty." />
+      </field>
+      <field id="satuan_id">
+        <phrase id="fldcaption" value="satuan id" />
+      </field>
+      <field id="satuan_nama">
+        <phrase id="fldcaption" value="Satuan" />
       </field>
     </table>
   </project>

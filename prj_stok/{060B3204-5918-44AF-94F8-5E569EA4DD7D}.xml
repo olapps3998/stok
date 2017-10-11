@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<configuration date="2017/10/07" author="e.World Technology Ltd.">
-  <project id="{060B3204-5918-44AF-94F8-5E569EA4DD7D}" file="D:\xampp3\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="10.0" datetime="2017/10/07 13:33:08" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;">
+<configuration date="2017/10/11" author="e.World Technology Ltd.">
+  <project id="{060B3204-5918-44AF-94F8-5E569EA4DD7D}" file="D:\xampp3\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="10.0" datetime="2017/10/11 11:25:05" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;">
     <table id="t_00audit_trail" name="t_00audit_trail" caption="t 00audit trail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t_01vendor" name="t_01vendor" caption="t 01vendor" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t_02item" name="t_02item" caption="t 02item" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
@@ -38,5 +38,10 @@
     <table id="v_15penjualan" name="v_15penjualan" caption="v 15penjualan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="v_16hpp" name="v_16hpp" caption="v 16hpp" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="r_lr" name="r_lr" caption="Laba / Rugi Kotor" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t_11dead_stok" name="t_11dead_stok" caption="t 11dead stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="v_17mutasi_detail" name="v_17mutasi_detail" caption="v 17mutasi detail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="r_mutasi_detail" name="r_mutasi_detail" caption="Mutasi Detail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="v_18dead_stok" name="v_18dead_stok" caption="v 18dead stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="r_dead_stok" name="r_dead_stok" caption="Dead Stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
   </project>
 </configuration>
