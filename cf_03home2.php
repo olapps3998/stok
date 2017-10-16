@@ -13,9 +13,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$cf_02hitung_lr_php = NULL; // Initialize page object first
+$cf_03home2_php = NULL; // Initialize page object first
 
-class ccf_02hitung_lr_php {
+class ccf_03home2_php {
 
 	// Page ID
 	var $PageID = 'custom';
@@ -24,10 +24,10 @@ class ccf_02hitung_lr_php {
 	var $ProjectID = "{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}";
 
 	// Table name
-	var $TableName = 'cf_02hitung_lr.php';
+	var $TableName = 'cf_03home2.php';
 
 	// Page object name
-	var $PageObjName = 'cf_02hitung_lr_php';
+	var $PageObjName = 'cf_03home2_php';
 
 	// Page name
 	function PageName() {
@@ -193,7 +193,7 @@ class ccf_02hitung_lr_php {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'cf_02hitung_lr.php', TRUE);
+			define("EW_TABLE_NAME", 'cf_03home2.php', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -259,7 +259,7 @@ class ccf_02hitung_lr_php {
 		global $Breadcrumb;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("custom", "cf_02hitung_lr_php", $url, "", "cf_02hitung_lr_php", TRUE);
+		$Breadcrumb->Add("custom", "cf_03home2_php", $url, "", "cf_03home2_php", TRUE);
 	}
 }
 ?>
@@ -267,13 +267,13 @@ class ccf_02hitung_lr_php {
 <?php
 
 // Create page object
-if (!isset($cf_02hitung_lr_php)) $cf_02hitung_lr_php = new ccf_02hitung_lr_php();
+if (!isset($cf_03home2_php)) $cf_03home2_php = new ccf_03home2_php();
 
 // Page init
-$cf_02hitung_lr_php->Page_Init();
+$cf_03home2_php->Page_Init();
 
 // Page main
-$cf_02hitung_lr_php->Page_Main();
+$cf_03home2_php->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
@@ -286,11 +286,174 @@ Page_Rendering();
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<form id="myform" name="myform" class="form-horizontal" method="post" action="cf_02hitung_lr1.php">
-	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit">Hitung HPP</button>
-</form>
+<?php
+$db =& DbHelper();
+
+function show_table($r) {
+	echo "<table border='0'>";
+	while (!$r->EOF) {
+		$tgl = $r->fields("tgl");
+		$tgl2 = date_create($tgl);
+		echo "<tr><td colspan='3'>".date_format($tgl2, "d-m-Y")."</td></tr>";
+		while ($tgl == $r->fields["tgl"]) {
+			$jdl = $r->fields["jdl"];
+			echo "<tr><td width='25'>&nbsp;</td><td colspan='2'><li>".$jdl."</li></td></tr>";
+			while ($jdl == $r->fields["jdl"]) {
+				if ($r->fields["ket"] != null or $r->fields["ket"] != "") {
+					echo "<tr><td width='25'>&nbsp;</td><td width='25'>&nbsp;</td><td><li>".$r->fields["ket"]."</li></td></tr>";
+				}
+				$r->MoveNext();
+			}
+		}
+		echo "<tr><td>&nbsp;</td></tr>";
+	}
+	echo "</table>";
+}
+?>
+
+<style>
+.panel-heading a{
+  display:block;
+}
+
+.panel-heading a.collapsed {
+  background: url(http://upload.wikimedia.org/wikipedia/commons/3/36/Vector_skin_right_arrow.png) center right no-repeat;
+}
+
+.panel-heading a {
+  background: url(http://www.useragentman.com/blog/wp-content/themes/useragentman/images/widgets/downArrow.png) center right no-repeat;
+}
+</style>
+
+<div class="row">
+
+	<div class="col-lg-6 col-md-6 col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a data-toggle="collapse" href="#whatsnew">what's new</a></strong></div>
+			<div id="whatsnew" class="panel-collapse collapse in">
+			<div class="panel-body">
+			<?php
+			$sql = "
+				SELECT 
+					tgl, 
+					jdl, 
+					ket 
+				FROM t_99home
+				where
+					kat = '0whats_new'
+				order by
+					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
+				";
+			$r = $db->Execute($sql);
+			show_table($r);
+			?>
+			</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="col-lg-6 col-md-6 col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a class="collapsed" data-toggle="collapse" href="#onprogress">on progress</a></strong></div>
+			<div id="onprogress" class="panel-collapse collapse">
+			<div class="panel-body">
+			<?php
+			$sql = "
+				SELECT 
+					tgl, 
+					jdl, 
+					ket 
+				FROM t_99home
+				where
+					kat = '1on_progress'
+				order by
+					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
+				";
+			$r = $db->Execute($sql);
+			show_table($r);
+			?>
+			</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-6 col-md-6 col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a class="collapsed" data-toggle="collapse" href="#update">update</a></strong></div>
+			<div id="update" class="panel-collapse collapse">
+			<div class="panel-body">
+			<?php
+			$sql = "
+				SELECT 
+					tgl, 
+					jdl, 
+					ket 
+				FROM t_99home
+				where
+					kat = '2update'
+				order by
+					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
+				";
+			$r = $db->Execute($sql);
+			show_table($r);
+			?>
+			</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-6 col-md-6 col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a class="collapsed" data-toggle="collapse" href="#pending">pending</a></strong></div>
+			<div id="pending" class="panel-collapse collapse">
+			<div class="panel-body">
+			<?php
+			$sql = "
+				SELECT 
+					tgl, 
+					jdl, 
+					ket 
+				FROM t_99home
+				where
+					kat = '3pending'
+				order by
+					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
+				";
+			$r = $db->Execute($sql);
+			show_table($r);
+			?>
+			</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-6 col-md-6 col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a class="collapsed" data-toggle="collapse" href="#todo">to do</a></strong></div>
+			<div id="todo" class="panel-collapse collapse">
+			<div class="panel-body">
+			<?php
+			$sql = "
+				SELECT 
+					tgl, 
+					jdl, 
+					ket 
+				FROM t_99home
+				where
+					kat = '4todo'
+				order by
+					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
+				";
+			$r = $db->Execute($sql);
+			show_table($r);
+			?>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>
 <?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
 <?php include_once "footer.php" ?>
 <?php
-$cf_02hitung_lr_php->Page_Terminate();
+$cf_03home2_php->Page_Terminate();
 ?>

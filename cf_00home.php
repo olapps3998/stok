@@ -306,18 +306,17 @@ Page_Rendering();
   </div>
   <div id="collapse1" class="panel-collapse collapse in">
   	<div class="panel-body">
-  		-
-  		<!--oct, 7 2017:</br>
+  		oct, 11 2017:</br>
   		<ul>
-  			<li>create <a href="#">Laporan - Mutasi (Detail)</a>: diberi keterangan "beli", "jual", "dead stock"</li>
-  		</ul>-->
+  			<li>create Transaksi - Retur Penjualan</li>
+  		</ul>
   	</div>
   </div>
 
   <div class="panel-heading">
 	<b><a data-toggle="collapse" href="#collapse4">update</a></b>
   </div>
-  <div id="collapse4" class="panel-collapse collapse in">
+  <div id="collapse4" class="panel-collapse collapse">
   	<div class="panel-body">
   		oct 7, 2017:</br>
   		<ul>

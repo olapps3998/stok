@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<configuration date="2017/10/11" author="e.World Technology Ltd.">
-  <project id="{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}" file="D:\xampp3\htdocs\stok\prj_stok.pmp" name="prj_stok" product="PHPMaker" version="13.0" datetime="2017/10/11 14:14:53" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;">
+<configuration date="2017/10/16" author="e.World Technology Ltd.">
+  <project id="{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}" file="D:\xampp3\htdocs\stok\prj_stok.pmp" name="prj_stok" product="PHPMaker" version="13.0" datetime="2017/10/16 16:42:30" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;">
     <table id="cf_00home_php" name="cf_00home.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="cf_01hitung_nilai_stok_php" name="cf_01hitung_nilai_stok.php" caption="Nilai Stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t_00audit_trail" name="t_00audit_trail" caption="t 00audit trail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
@@ -13,7 +13,6 @@
     <table id="t_07jual_detail" name="t_07jual_detail" caption="Detail Penjualan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t_08item_saldo" name="t_08item_saldo" caption="Saldo Awal" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t_09nilai_stok" name="t_09nilai_stok" caption="t 09nilai stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_99beli" name="t_99beli" caption="t 99beli" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="v_01beli_laporan" name="v_01beli_laporan" caption="v 01beli laporan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="v_02jual_laporan" name="v_02jual_laporan" caption="v 02jual laporan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="v_03masuk" name="v_03masuk" caption="v 03masuk" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
@@ -35,5 +34,8 @@
     <table id="t_11dead_stok" name="t_11dead_stok" caption="Dead-Stock" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="v_17mutasi_detail" name="v_17mutasi_detail" caption="v 17mutasi detail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="v_18dead_stok" name="v_18dead_stok" caption="v 18dead stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t_12retur" name="t_12retur" caption="Retur" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t_99home" name="t_99home" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="cf_03home2_php" name="cf_03home2.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
   </project>
 </configuration>
