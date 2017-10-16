@@ -287,22 +287,6 @@ Page_Rendering();
 </div>
 <?php } ?>
 <?php
-//$db =& DbHelper();
-//$conn =& DbHelper();
-
-//$conn = new cdb_stok_db();
-
-//if ($_SERVER["HTTP_HOST"] == "stok.aimpglobal.com") {
-	//include "conn_adodb.php";
-	//$conn = ADONewConnection('mysql');
-	//$conn->Connect('mysql.idhostinger.com','u197022578_stok','M457r1P 81','u197022578_stok');
-//}
-//else {
-	//include_once "ewcfg13.php";
-	//include_once "phpfn13.php";
-//	$conn =& DbHelper();
-//}
-
 function show_table($r) {
 	echo "<table border='0'>";
 	while (!$r->EOF) {
@@ -347,18 +331,8 @@ function show_table($r) {
 			<div id="whatsnew" class="panel-collapse collapse in">
 			<div class="panel-body">
 			<?php
-			$sql = "
-				SELECT 
-					tgl, 
-					jdl, 
-					ket 
-				FROM t_99home
-				where
-					kat = '0whats_new'
-				order by
-					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
-				";
-			//$r = $conn->Execute($sql);
+			$sql = "SELECT tgl, jdl, ket FROM t_99home where kat = '0whats_new'
+				order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
 			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
@@ -373,17 +347,8 @@ function show_table($r) {
 			<div id="onprogress" class="panel-collapse collapse">
 			<div class="panel-body">
 			<?php
-			$sql = "
-				SELECT 
-					tgl, 
-					jdl, 
-					ket 
-				FROM t_99home
-				where
-					kat = '1on_progress'
-				order by
-					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
-				";
+			$sql = "SELECT tgl, jdl, ket FROM t_99home where kat = '1on_progress'
+				order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
 			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
@@ -398,17 +363,8 @@ function show_table($r) {
 			<div id="update" class="panel-collapse collapse">
 			<div class="panel-body">
 			<?php
-			$sql = "
-				SELECT 
-					tgl, 
-					jdl, 
-					ket 
-				FROM t_99home
-				where
-					kat = '2update'
-				order by
-					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
-				";
+			$sql = "SELECT tgl, jdl, ket FROM t_99home where kat = '2update'
+				order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
 			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
@@ -423,17 +379,8 @@ function show_table($r) {
 			<div id="pending" class="panel-collapse collapse">
 			<div class="panel-body">
 			<?php
-			$sql = "
-				SELECT 
-					tgl, 
-					jdl, 
-					ket 
-				FROM t_99home
-				where
-					kat = '3pending'
-				order by
-					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
-				";
+			$sql = "SELECT tgl, jdl, ket FROM t_99home where kat = '3pending'
+				order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
 			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
@@ -448,18 +395,8 @@ function show_table($r) {
 			<div id="todo" class="panel-collapse collapse">
 			<div class="panel-body">
 			<?php
-			$sql = "
-				SELECT 
-					tgl, 
-					jdl, 
-					ket 
-				FROM t_99home
-				where
-					kat = '4todo'
-				order by
-					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
-				";
-			//$r = $conn->Execute($sql);
+			$sql = "SELECT tgl, jdl, ket FROM t_99home where kat = '4todo'
+				order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
 			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
