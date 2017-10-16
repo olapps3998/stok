@@ -353,7 +353,7 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $db->Execute($sql);
+			$r = $conn->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -378,7 +378,7 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $db->Execute($sql);
+			$r = $conn->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -403,7 +403,7 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $db->Execute($sql);
+			$r = $conn->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -428,7 +428,7 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $db->Execute($sql);
+			$r = $conn->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -453,7 +453,7 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $db->Execute($sql);
+			$r = $conn->Execute($sql);
 			show_table($r);
 			?>
 			</div>
