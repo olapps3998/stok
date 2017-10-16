@@ -288,20 +288,20 @@ Page_Rendering();
 <?php } ?>
 <?php
 //$db =& DbHelper();
-//$conn =& DbHelper();
+$conn =& DbHelper();
 
 //$conn = new cdb_stok_db();
 
-if ($_SERVER["HTTP_HOST"] == "stok.aimpglobal.com") {
+//if ($_SERVER["HTTP_HOST"] == "stok.aimpglobal.com") {
 	//include "conn_adodb.php";
-	$conn = ADONewConnection('mysql');
-	$conn->Connect('mysql.idhostinger.com','u197022578_stok','M457r1P 81','u197022578_stok');
-}
-else {
+	//$conn = ADONewConnection('mysql');
+	//$conn->Connect('mysql.idhostinger.com','u197022578_stok','M457r1P 81','u197022578_stok');
+//}
+//else {
 	//include_once "ewcfg13.php";
 	//include_once "phpfn13.php";
-	$conn =& DbHelper();
-}
+//	$conn =& DbHelper();
+//}
 
 function show_table($r) {
 	echo "<table border='0'>";
