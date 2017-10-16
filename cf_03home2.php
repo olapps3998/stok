@@ -287,7 +287,16 @@ Page_Rendering();
 </div>
 <?php } ?>
 <?php
-$db =& DbHelper();
+//$db =& DbHelper();
+
+if ($_SERVER["HTTP_HOST"] == "stok.aimpglobal.com") {
+	include "conn_adodb.php";
+}
+else {
+	include_once "ewcfg13.php";
+	include_once "phpfn13.php";
+	$conn =& DbHelper();
+}
 
 function show_table($r) {
 	echo "<table border='0'>";
