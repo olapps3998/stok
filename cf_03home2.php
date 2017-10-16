@@ -288,7 +288,9 @@ Page_Rendering();
 <?php } ?>
 <?php
 //$db =& DbHelper();
-$conn =& DbHelper();
+//$conn =& DbHelper();
+
+$conn = new cdb_stok_db();
 
 /*if ($_SERVER["HTTP_HOST"] == "stok.aimpglobal.com") {
 	include "conn_adodb.php";

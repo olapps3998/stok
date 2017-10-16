@@ -788,7 +788,9 @@ function Row_Inserted($rsold, &$rsnew) {
 ]]></CustomScript>
   <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="cf_03home2.php" ScriptL2Key=""><![CDATA[<?php
 //$db =& DbHelper();
-$conn =& DbHelper();
+//$conn =& DbHelper();
+
+$conn = new cdb_stok_db();
 
 /*if ($_SERVER["HTTP_HOST"] == "stok.aimpglobal.com") {
 	include "conn_adodb.php";
