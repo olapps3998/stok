@@ -788,7 +788,7 @@ function Row_Inserted($rsold, &$rsnew) {
 ]]></CustomScript>
   <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="cf_03home2.php" ScriptL2Key=""><![CDATA[<?php
 //$db =& DbHelper();
-$conn =& DbHelper();
+//$conn =& DbHelper();
 
 //$conn = new cdb_stok_db();
 
@@ -858,7 +858,8 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $conn->Execute($sql);
+			//$r = $conn->Execute($sql);
+			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -883,7 +884,7 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $conn->Execute($sql);
+			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -908,7 +909,7 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $conn->Execute($sql);
+			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -933,7 +934,7 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $conn->Execute($sql);
+			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -958,7 +959,8 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $conn->Execute($sql);
+			//$r = $conn->Execute($sql);
+			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
 			</div>

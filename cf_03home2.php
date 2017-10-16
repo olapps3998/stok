@@ -288,7 +288,7 @@ Page_Rendering();
 <?php } ?>
 <?php
 //$db =& DbHelper();
-$conn =& DbHelper();
+//$conn =& DbHelper();
 
 //$conn = new cdb_stok_db();
 
@@ -358,7 +358,8 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $conn->Execute($sql);
+			//$r = $conn->Execute($sql);
+			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -383,7 +384,7 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $conn->Execute($sql);
+			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -408,7 +409,7 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $conn->Execute($sql);
+			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -433,7 +434,7 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $conn->Execute($sql);
+			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
 			</div>
@@ -458,7 +459,8 @@ function show_table($r) {
 				order by
 					`tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC
 				";
-			$r = $conn->Execute($sql);
+			//$r = $conn->Execute($sql);
+			$r = Conn()->Execute($sql);
 			show_table($r);
 			?>
 			</div>
