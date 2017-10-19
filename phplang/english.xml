@@ -583,23 +583,8 @@
   <project>
     <phrase id="bodytitle" value="L.A.B. STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
-    <menu id="10136">
-      <phrase id="menutext" value="Home Head" />
-    </menu>
     <menu id="10135">
       <phrase id="menutext" value="Home" />
-    </menu>
-    <menu id="10134">
-      <phrase id="menutext" value="Home" />
-    </menu>
-    <menu id="10129">
-      <phrase id="menutext" value="v 02jual laporan" />
-    </menu>
-    <menu id="6">
-      <phrase id="menutext" value="Home" />
-    </menu>
-    <menu id="10130">
-      <phrase id="menutext" value="v 11piutang" />
     </menu>
     <menu id="7">
       <phrase id="menutext" value="Master" />
@@ -619,8 +604,8 @@
     <menu id="10018">
       <phrase id="menutext" value="Customer" />
     </menu>
-    <menu id="10131">
-      <phrase id="menutext" value="v 17mutasi detail" />
+    <menu id="10134">
+      <phrase id="menutext" value="Home" />
     </menu>
     <menu id="10016">
       <phrase id="menutext" value="Transaksi" />
@@ -637,8 +622,8 @@
     <menu id="10133">
       <phrase id="menutext" value="Retur Penjualan" />
     </menu>
-    <menu id="10132">
-      <phrase id="menutext" value="v 18dead stok" />
+    <menu id="10129">
+      <phrase id="menutext" value="v 02jual laporan" />
     </menu>
     <menu id="9">
       <phrase id="menutext" value="Laporan" />
@@ -651,6 +636,9 @@
     </menu>
     <menu id="10013">
       <phrase id="menutext" value="Penjualan" />
+    </menu>
+    <menu id="10049">
+      <phrase id="menutext" value="Retur Penjualan" />
     </menu>
     <menu id="10015">
       <phrase id="menutext" value="Stok" />
@@ -678,6 +666,18 @@
     </menu>
     <menu id="10031">
       <phrase id="menutext" value="Piutang" />
+    </menu>
+    <menu id="6">
+      <phrase id="menutext" value="Home" />
+    </menu>
+    <menu id="10130">
+      <phrase id="menutext" value="v 11piutang" />
+    </menu>
+    <menu id="10131">
+      <phrase id="menutext" value="v 17mutasi detail" />
+    </menu>
+    <menu id="10132">
+      <phrase id="menutext" value="v 18dead stok" />
     </menu>
     <menu id="10124">
       <phrase id="menutext" value="Detail Penjualan" />
@@ -736,6 +736,18 @@
     <menu id="10014">
       <phrase id="menutext" value="Transaksi" />
     </menu>
+    <menu id="10033">
+      <phrase id="menutext" value="t 99beli" />
+    </menu>
+    <menu id="10126">
+      <phrase id="menutext" value="v 03masuk" />
+    </menu>
+    <menu id="10136">
+      <phrase id="menutext" value="Home Head" />
+    </menu>
+    <menu id="10137">
+      <phrase id="menutext" value="v 04keluar" />
+    </menu>
     <menu id="10045">
       <phrase id="menutext" value="t 11dead stok" />
     </menu>
@@ -766,9 +778,6 @@
     <menu id="10032">
       <phrase id="menutext" value="t 08item saldo" />
     </menu>
-    <menu id="10033">
-      <phrase id="menutext" value="t 99beli" />
-    </menu>
     <menu id="10034">
       <phrase id="menutext" value="t 09nilai stok" />
     </menu>
@@ -795,12 +804,6 @@
     </menu>
     <menu id="10023">
       <phrase id="menutext" value="v 07mutasi" />
-    </menu>
-    <menu id="10126">
-      <phrase id="menutext" value="v 03masuk" />
-    </menu>
-    <menu id="10127">
-      <phrase id="menutext" value="v 04keluar" />
     </menu>
     <menu id="10020">
       <phrase id="menutext" value="v 05stok" />

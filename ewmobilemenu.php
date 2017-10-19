@@ -18,6 +18,7 @@ $RootMenu->AddMenuItem(10133, "mmi_t_12retur", $Language->MenuPhrase("10133", "M
 $RootMenu->AddMenuItem(9, "mmci_Laporan", $Language->MenuPhrase("9", "MenuText"), "", -1, "", TRUE, FALSE, TRUE);
 $RootMenu->AddMenuItem(10008, "mmri_r5fbeli", $Language->MenuPhrase("10008", "MenuText"), "r_belismry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(10013, "mmri_r5fjual", $Language->MenuPhrase("10013", "MenuText"), "r_jualsmry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", TRUE, FALSE, FALSE);
+$RootMenu->AddMenuItem(10049, "mmri_t5f12retur", $Language->MenuPhrase("10049", "MenuText"), "t_12returrpt.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(10015, "mmri_r5fstok", $Language->MenuPhrase("10015", "MenuText"), "r_stoksmry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(10125, "mmri_r5fdead5fstok", $Language->MenuPhrase("10125", "MenuText"), "r_dead_stoksmry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(10048, "mmi_cf_01hitung_nilai_stok_php", $Language->MenuPhrase("10048", "MenuText"), "cf_01hitung_nilai_stok.php", 9, "", TRUE, FALSE, TRUE);
