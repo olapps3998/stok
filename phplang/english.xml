@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/10/17" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/10/19" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -583,6 +583,9 @@
   <project>
     <phrase id="bodytitle" value="L.A.B. STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="10136">
+      <phrase id="menutext" value="Home Head" />
+    </menu>
     <menu id="10135">
       <phrase id="menutext" value="Home" />
     </menu>
@@ -1612,6 +1615,22 @@
     </table>
     <table id="cf_03home2_php">
       <phrase id="tblcaption" value="Home" />
+    </table>
+    <table id="t_98home_head">
+      <phrase id="tblcaption" value="Home Head" />
+      <field id="id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="kode">
+        <phrase id="fldcaption" value="Kode" />
+      </field>
+      <field id="flag">
+        <phrase id="fldcaption" value="Show" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Ya" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="Tidak" />
+      </field>
     </table>
   </project>
 </ew-language>

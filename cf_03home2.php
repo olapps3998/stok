@@ -307,6 +307,18 @@ function show_table($r) {
 	}
 	echo "</table>";
 }
+
+function show_detail($kode) {
+	$q = "select flag from t_98home_head where kode = '".$kode."'";
+	$r = Conn()->Execute($q);
+	return ($r->fields["flag"] == 0 ? "" : "in");
+}
+
+function if_collapsed($kode) {
+	$q = "select flag from t_98home_head where kode = '".$kode."'";
+	$r = Conn()->Execute($q);
+	return ($r->fields["flag"] == 0 ? "class='collapsed'" : "");
+}
 ?>
 
 <style>
@@ -327,8 +339,8 @@ function show_table($r) {
 
 	<div class="col-lg-6 col-md-6 col-sm-6">
 		<div class="panel panel-default">
-			<div class="panel-heading"><strong><a data-toggle="collapse" href="#whatsnew">what's new</a></strong></div>
-			<div id="whatsnew" class="panel-collapse collapse in">
+			<div class="panel-heading"><strong><a <?php echo if_collapsed('0whats_new'); ?> data-toggle="collapse" href="#whatsnew">what's new</a></strong></div>
+			<div id="whatsnew" class="panel-collapse collapse <?php echo show_detail('0whats_new'); ?>">
 			<div class="panel-body">
 			<?php
 			$sql = "SELECT tgl, jdl, ket FROM t_99home where kat = '0whats_new'
@@ -343,8 +355,8 @@ function show_table($r) {
 	
 	<div class="col-lg-6 col-md-6 col-sm-6">
 		<div class="panel panel-default">
-			<div class="panel-heading"><strong><a class="collapsed" data-toggle="collapse" href="#onprogress">on progress</a></strong></div>
-			<div id="onprogress" class="panel-collapse collapse">
+			<div class="panel-heading"><strong><a <?php echo if_collapsed('1on_progress'); ?> data-toggle="collapse" href="#onprogress">on progress</a></strong></div>
+			<div id="onprogress" class="panel-collapse collapse <?php echo show_detail('1on_progress'); ?>">
 			<div class="panel-body">
 			<?php
 			$sql = "SELECT tgl, jdl, ket FROM t_99home where kat = '1on_progress'
@@ -359,8 +371,8 @@ function show_table($r) {
 
 	<div class="col-lg-6 col-md-6 col-sm-6">
 		<div class="panel panel-default">
-			<div class="panel-heading"><strong><a class="collapsed" data-toggle="collapse" href="#update">update</a></strong></div>
-			<div id="update" class="panel-collapse collapse">
+			<div class="panel-heading"><strong><a <?php echo if_collapsed('2update'); ?> data-toggle="collapse" href="#update">update</a></strong></div>
+			<div id="update" class="panel-collapse collapse <?php echo show_detail('2update'); ?>">
 			<div class="panel-body">
 			<?php
 			$sql = "SELECT tgl, jdl, ket FROM t_99home where kat = '2update'
@@ -375,8 +387,8 @@ function show_table($r) {
 
 	<div class="col-lg-6 col-md-6 col-sm-6">
 		<div class="panel panel-default">
-			<div class="panel-heading"><strong><a class="collapsed" data-toggle="collapse" href="#pending">pending</a></strong></div>
-			<div id="pending" class="panel-collapse collapse">
+			<div class="panel-heading"><strong><a <?php echo if_collapsed('3pending'); ?> data-toggle="collapse" href="#pending">pending</a></strong></div>
+			<div id="pending" class="panel-collapse collapse <?php echo show_detail('3pending'); ?>">
 			<div class="panel-body">
 			<?php
 			$sql = "SELECT tgl, jdl, ket FROM t_99home where kat = '3pending'
@@ -391,8 +403,8 @@ function show_table($r) {
 
 	<div class="col-lg-6 col-md-6 col-sm-6">
 		<div class="panel panel-default">
-			<div class="panel-heading"><strong><a class="collapsed" data-toggle="collapse" href="#todo">to do</a></strong></div>
-			<div id="todo" class="panel-collapse collapse">
+			<div class="panel-heading"><strong><a <?php echo if_collapsed('4todo'); ?> data-toggle="collapse" href="#todo">to do</a></strong></div>
+			<div id="todo" class="panel-collapse collapse <?php echo show_detail('4todo'); ?>">
 			<div class="panel-body">
 			<?php
 			$sql = "SELECT tgl, jdl, ket FROM t_99home where kat = '4todo'
