@@ -47,43 +47,25 @@ From t_07jual_detail
 Group By t_07jual_detail.item_id;
 
 create view v_05stok as
-    SELECT 
-        `a`.`item_id` AS `item_id`,
-        `a`.`item_nama` AS `item_nama`,
-        ((CASE
-            WHEN ISNULL(`b`.`masuk`) THEN 0
-            ELSE `b`.`masuk`
-        END) + (CASE
-            WHEN ISNULL(`d`.`qty`) THEN 0
-            ELSE `d`.`qty`
-        END)) AS `masuk`,
-        (CASE
-            WHEN ISNULL(`c`.`keluar`) THEN 0
-            ELSE `c`.`keluar`
-        END) + (CASE
-            WHEN ISNULL(`e`.`qty`) THEN 0
-            ELSE `e`.`qty`
-        END) AS `keluar`,
-        (((CASE
-            WHEN ISNULL(`b`.`masuk`) THEN 0
-            ELSE `b`.`masuk`
-        END) + (CASE
-            WHEN ISNULL(`d`.`qty`) THEN 0
-            ELSE `d`.`qty`
-        END)) - (CASE
-            WHEN ISNULL(`c`.`keluar`) THEN 0
-            ELSE `c`.`keluar`
-        END) - (CASE
-            WHEN ISNULL(`e`.`qty`) THEN 0
-            ELSE `e`.`qty`
-        END)) AS `saldo`
-    FROM
-        (((`t_02item` `a`
-        LEFT JOIN `v_03masuk` `b` ON ((`a`.`item_id` = `b`.`item_id`)))
-        LEFT JOIN `v_04keluar` `c` ON ((`a`.`item_id` = `c`.`item_id`)))
-        LEFT JOIN `t_08item_saldo` `d` ON ((`a`.`item_id` = `d`.`item_id`)))
-        left join t_11dead_stok e on a.item_id = e.item_id
-    ORDER BY `a`.`item_id`;
+Select a.item_id As item_id,
+  a.item_nama As item_nama,
+  ((Case When isnull(b.masuk) Then 0 Else b.masuk End) + (Case
+    When isnull(d.qty) Then 0 Else d.qty End)) As masuk,
+  (((Case When isnull(c.keluar) Then 0 Else c.keluar End) + (Case
+    When isnull(e.qty) Then 0 Else e.qty End)) - (Case When isnull(f.qty) Then 0
+    Else f.qty End)) As keluar,
+  (((((Case When isnull(b.masuk) Then 0 Else b.masuk End) + (Case
+    When isnull(d.qty) Then 0 Else d.qty End)) - (Case
+    When isnull(c.keluar) Then 0 Else c.keluar End)) - (Case
+    When isnull(e.qty) Then 0 Else e.qty End)) + (Case When isnull(f.qty) Then 0
+    Else f.qty End)) As saldo
+From ((((t_02item a
+  Left Join v_03masuk b On a.item_id = b.item_id)
+  Left Join v_04keluar c On a.item_id = c.item_id)
+  Left Join t_08item_saldo d On a.item_id = d.item_id)
+  Left Join t_11dead_stok e On a.item_id = e.item_id)
+  Left Join t_12retur f On a.item_id = f.item_id
+Order By item_id;
 
 create view v_13beli as
 Select t_04beli.beli_id As beli_id,
