@@ -1967,7 +1967,7 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 	// - Variables setup: Session[EWR_TABLE_SESSION_ORDER_BY], Session["sort_Table_Field"]
 	function GetSort($options = array()) {
 		if ($this->DrillDown)
-			return "`tgl` ASC, `jenis` ASC, `detail_id` ASC";
+			return "`detail_id` ASC, `jenis` DESC";
 		$bResetSort = @$options["resetsort"] == "1" || @$_GET["cmd"] == "resetsort";
 		$orderBy = (@$options["order"] <> "") ? @$options["order"] : ewr_StripSlashes(@$_GET["order"]);
 		$orderType = (@$options["ordertype"] <> "") ? @$options["ordertype"] : ewr_StripSlashes(@$_GET["ordertype"]);
@@ -2019,10 +2019,9 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 
 		// Set up default sort
 		if ($this->getOrderBy() == "") {
-			$this->setOrderBy("`tgl` ASC, `jenis` ASC, `detail_id` ASC");
-			$this->tgl->setSort("ASC");
-			$this->jenis->setSort("ASC");
+			$this->setOrderBy("`detail_id` ASC, `jenis` DESC");
 			$this->detail_id->setSort("ASC");
+			$this->jenis->setSort("DESC");
 		}
 		return $this->getOrderBy();
 	}
@@ -2264,8 +2263,9 @@ class crr_nilai_stok_summary extends crr_nilai_stok {
 	function Page_Render() {
 
 		//echo "Page Render";
-		$this->jenis->Visible = false;
-		$this->detail_id->Visible = false;
+		//$this->jenis->Visible = false;
+		//$this->detail_id->Visible = false;
+
 	}
 
 	// Page Data Rendering event

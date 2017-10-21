@@ -39,7 +39,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// id
 		$this->id = new crField('r_nilai_stok', 'r_nilai_stok', 'x_id', 'id', '`id`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->id->Sortable = TRUE; // Allow sort
+		$this->id->Sortable = FALSE; // Allow sort
 		$this->id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->fields['id'] = &$this->id;
 		$this->id->DateFilter = "";
@@ -48,7 +48,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// item_id
 		$this->item_id = new crField('r_nilai_stok', 'r_nilai_stok', 'x_item_id', 'item_id', '`item_id`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->item_id->Sortable = TRUE; // Allow sort
+		$this->item_id->Sortable = FALSE; // Allow sort
 		$this->item_id->GroupingFieldId = 1;
 		$this->item_id->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
 		$this->item_id->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
@@ -63,7 +63,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// item_nama
 		$this->item_nama = new crField('r_nilai_stok', 'r_nilai_stok', 'x_item_nama', 'item_nama', '`item_nama`', 200, EWR_DATATYPE_STRING, -1);
-		$this->item_nama->Sortable = TRUE; // Allow sort
+		$this->item_nama->Sortable = FALSE; // Allow sort
 		$this->item_nama->GroupingFieldId = 2;
 		$this->item_nama->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
 		$this->item_nama->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
@@ -77,7 +77,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// tgl
 		$this->tgl = new crField('r_nilai_stok', 'r_nilai_stok', 'x_tgl', 'tgl', '`tgl`', 200, EWR_DATATYPE_STRING, 7);
-		$this->tgl->Sortable = TRUE; // Allow sort
+		$this->tgl->Sortable = FALSE; // Allow sort
 		$this->tgl->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectField");
 		$this->fields['tgl'] = &$this->tgl;
 		$this->tgl->DateFilter = "";
@@ -86,7 +86,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// in_qty
 		$this->in_qty = new crField('r_nilai_stok', 'r_nilai_stok', 'x_in_qty', 'in_qty', '`in_qty`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->in_qty->Sortable = TRUE; // Allow sort
+		$this->in_qty->Sortable = FALSE; // Allow sort
 		$this->in_qty->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['in_qty'] = &$this->in_qty;
 		$this->in_qty->DateFilter = "";
@@ -95,7 +95,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// in_harga
 		$this->in_harga = new crField('r_nilai_stok', 'r_nilai_stok', 'x_in_harga', 'in_harga', '`in_harga`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->in_harga->Sortable = TRUE; // Allow sort
+		$this->in_harga->Sortable = FALSE; // Allow sort
 		$this->in_harga->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['in_harga'] = &$this->in_harga;
 		$this->in_harga->DateFilter = "";
@@ -104,7 +104,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// in_sub_total
 		$this->in_sub_total = new crField('r_nilai_stok', 'r_nilai_stok', 'x_in_sub_total', 'in_sub_total', '`in_sub_total`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->in_sub_total->Sortable = TRUE; // Allow sort
+		$this->in_sub_total->Sortable = FALSE; // Allow sort
 		$this->in_sub_total->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['in_sub_total'] = &$this->in_sub_total;
 		$this->in_sub_total->DateFilter = "";
@@ -113,7 +113,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// out_qty
 		$this->out_qty = new crField('r_nilai_stok', 'r_nilai_stok', 'x_out_qty', 'out_qty', '`out_qty`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->out_qty->Sortable = TRUE; // Allow sort
+		$this->out_qty->Sortable = FALSE; // Allow sort
 		$this->out_qty->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['out_qty'] = &$this->out_qty;
 		$this->out_qty->DateFilter = "";
@@ -122,7 +122,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// out_harga
 		$this->out_harga = new crField('r_nilai_stok', 'r_nilai_stok', 'x_out_harga', 'out_harga', '`out_harga`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->out_harga->Sortable = TRUE; // Allow sort
+		$this->out_harga->Sortable = FALSE; // Allow sort
 		$this->out_harga->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['out_harga'] = &$this->out_harga;
 		$this->out_harga->DateFilter = "";
@@ -131,7 +131,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// out_sub_total
 		$this->out_sub_total = new crField('r_nilai_stok', 'r_nilai_stok', 'x_out_sub_total', 'out_sub_total', '`out_sub_total`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->out_sub_total->Sortable = TRUE; // Allow sort
+		$this->out_sub_total->Sortable = FALSE; // Allow sort
 		$this->out_sub_total->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['out_sub_total'] = &$this->out_sub_total;
 		$this->out_sub_total->DateFilter = "";
@@ -140,7 +140,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// saldo_qty
 		$this->saldo_qty = new crField('r_nilai_stok', 'r_nilai_stok', 'x_saldo_qty', 'saldo_qty', '`saldo_qty`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->saldo_qty->Sortable = TRUE; // Allow sort
+		$this->saldo_qty->Sortable = FALSE; // Allow sort
 		$this->saldo_qty->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['saldo_qty'] = &$this->saldo_qty;
 		$this->saldo_qty->DateFilter = "";
@@ -149,7 +149,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// saldo_harga
 		$this->saldo_harga = new crField('r_nilai_stok', 'r_nilai_stok', 'x_saldo_harga', 'saldo_harga', '`saldo_harga`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->saldo_harga->Sortable = TRUE; // Allow sort
+		$this->saldo_harga->Sortable = FALSE; // Allow sort
 		$this->saldo_harga->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['saldo_harga'] = &$this->saldo_harga;
 		$this->saldo_harga->DateFilter = "";
@@ -158,7 +158,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// saldo_sub_total
 		$this->saldo_sub_total = new crField('r_nilai_stok', 'r_nilai_stok', 'x_saldo_sub_total', 'saldo_sub_total', '`saldo_sub_total`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->saldo_sub_total->Sortable = TRUE; // Allow sort
+		$this->saldo_sub_total->Sortable = FALSE; // Allow sort
 		$this->saldo_sub_total->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['saldo_sub_total'] = &$this->saldo_sub_total;
 		$this->saldo_sub_total->DateFilter = "";
@@ -167,7 +167,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// jenis
 		$this->jenis = new crField('r_nilai_stok', 'r_nilai_stok', 'x_jenis', 'jenis', '`jenis`', 200, EWR_DATATYPE_STRING, -1);
-		$this->jenis->Sortable = TRUE; // Allow sort
+		$this->jenis->Sortable = FALSE; // Allow sort
 		$this->fields['jenis'] = &$this->jenis;
 		$this->jenis->DateFilter = "";
 		$this->jenis->SqlSelect = "";
@@ -175,7 +175,7 @@ class crr_nilai_stok extends crTableBase {
 
 		// detail_id
 		$this->detail_id = new crField('r_nilai_stok', 'r_nilai_stok', 'x_detail_id', 'detail_id', '`detail_id`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->detail_id->Sortable = TRUE; // Allow sort
+		$this->detail_id->Sortable = FALSE; // Allow sort
 		$this->detail_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->fields['detail_id'] = &$this->detail_id;
 		$this->detail_id->DateFilter = "";
