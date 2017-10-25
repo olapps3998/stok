@@ -356,6 +356,8 @@ class ct_02item_view extends ct_02item {
 		$this->item_id->SetVisibility();
 		$this->item_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->item_nama->SetVisibility();
+		$this->sat_id->SetVisibility();
+		$this->hrg_jual->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -680,6 +682,13 @@ class ct_02item_view extends ct_02item {
 		}
 		$this->item_id->setDbValue($rs->fields('item_id'));
 		$this->item_nama->setDbValue($rs->fields('item_nama'));
+		$this->sat_id->setDbValue($rs->fields('sat_id'));
+		if (array_key_exists('EV__sat_id', $rs->fields)) {
+			$this->sat_id->VirtualValue = $rs->fields('EV__sat_id'); // Set up virtual field value
+		} else {
+			$this->sat_id->VirtualValue = ""; // Clear value
+		}
+		$this->hrg_jual->setDbValue($rs->fields('hrg_jual'));
 	}
 
 	// Load DbValue from recordset
@@ -689,6 +698,8 @@ class ct_02item_view extends ct_02item {
 		$this->kat_id->DbValue = $row['kat_id'];
 		$this->item_id->DbValue = $row['item_id'];
 		$this->item_nama->DbValue = $row['item_nama'];
+		$this->sat_id->DbValue = $row['sat_id'];
+		$this->hrg_jual->DbValue = $row['hrg_jual'];
 	}
 
 	// Render row values based on field settings
@@ -703,6 +714,10 @@ class ct_02item_view extends ct_02item {
 		$this->ListUrl = $this->GetListUrl();
 		$this->SetupOtherOptions();
 
+		// Convert decimal values if posted back
+		if ($this->hrg_jual->FormValue == $this->hrg_jual->CurrentValue && is_numeric(ew_StrToFloat($this->hrg_jual->CurrentValue)))
+			$this->hrg_jual->CurrentValue = ew_StrToFloat($this->hrg_jual->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
@@ -710,6 +725,8 @@ class ct_02item_view extends ct_02item {
 		// kat_id
 		// item_id
 		// item_nama
+		// sat_id
+		// hrg_jual
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -749,6 +766,40 @@ class ct_02item_view extends ct_02item {
 		$this->item_nama->ViewValue = $this->item_nama->CurrentValue;
 		$this->item_nama->ViewCustomAttributes = "";
 
+		// sat_id
+		if ($this->sat_id->VirtualValue <> "") {
+			$this->sat_id->ViewValue = $this->sat_id->VirtualValue;
+		} else {
+			$this->sat_id->ViewValue = $this->sat_id->CurrentValue;
+		if (strval($this->sat_id->CurrentValue) <> "") {
+			$sFilterWrk = "`satuan_id`" . ew_SearchString("=", $this->sat_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `satuan_id`, `satuan_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_03satuan`";
+		$sWhereWrk = "";
+		$this->sat_id->LookupFilters = array("dx1" => '`satuan_nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->sat_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->sat_id->ViewValue = $this->sat_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->sat_id->ViewValue = $this->sat_id->CurrentValue;
+			}
+		} else {
+			$this->sat_id->ViewValue = NULL;
+		}
+		}
+		$this->sat_id->ViewCustomAttributes = "";
+
+		// hrg_jual
+		$this->hrg_jual->ViewValue = $this->hrg_jual->CurrentValue;
+		$this->hrg_jual->ViewValue = ew_FormatNumber($this->hrg_jual->ViewValue, 0, -2, -2, -2);
+		$this->hrg_jual->CellCssStyle .= "text-align: right;";
+		$this->hrg_jual->ViewCustomAttributes = "";
+
 			// kat_id
 			$this->kat_id->LinkCustomAttributes = "";
 			$this->kat_id->HrefValue = "";
@@ -763,6 +814,16 @@ class ct_02item_view extends ct_02item {
 			$this->item_nama->LinkCustomAttributes = "";
 			$this->item_nama->HrefValue = "";
 			$this->item_nama->TooltipValue = "";
+
+			// sat_id
+			$this->sat_id->LinkCustomAttributes = "";
+			$this->sat_id->HrefValue = "";
+			$this->sat_id->TooltipValue = "";
+
+			// hrg_jual
+			$this->hrg_jual->LinkCustomAttributes = "";
+			$this->hrg_jual->HrefValue = "";
+			$this->hrg_jual->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1173,6 +1234,7 @@ ft_02itemview.ValidateRequired = false;
 
 // Dynamic selection lists
 ft_02itemview.Lists["x_kat_id"] = {"LinkField":"x_kat_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_kat_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_13kategori"};
+ft_02itemview.Lists["x_sat_id"] = {"LinkField":"x_satuan_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_satuan_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_03satuan"};
 
 // Form object for search
 </script>
@@ -1290,6 +1352,28 @@ $t_02item_view->ShowMessage();
 <span id="el_t_02item_item_nama">
 <span<?php echo $t_02item->item_nama->ViewAttributes() ?>>
 <?php echo $t_02item->item_nama->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t_02item->sat_id->Visible) { // sat_id ?>
+	<tr id="r_sat_id">
+		<td><span id="elh_t_02item_sat_id"><?php echo $t_02item->sat_id->FldCaption() ?></span></td>
+		<td data-name="sat_id"<?php echo $t_02item->sat_id->CellAttributes() ?>>
+<span id="el_t_02item_sat_id">
+<span<?php echo $t_02item->sat_id->ViewAttributes() ?>>
+<?php echo $t_02item->sat_id->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t_02item->hrg_jual->Visible) { // hrg_jual ?>
+	<tr id="r_hrg_jual">
+		<td><span id="elh_t_02item_hrg_jual"><?php echo $t_02item->hrg_jual->FldCaption() ?></span></td>
+		<td data-name="hrg_jual"<?php echo $t_02item->hrg_jual->CellAttributes() ?>>
+<span id="el_t_02item_hrg_jual">
+<span<?php echo $t_02item->hrg_jual->ViewAttributes() ?>>
+<?php echo $t_02item->hrg_jual->ViewValue ?></span>
 </span>
 </td>
 	</tr>

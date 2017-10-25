@@ -258,6 +258,8 @@ class ct_02item_edit extends ct_02item {
 		$this->item_id->SetVisibility();
 		$this->item_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->item_nama->SetVisibility();
+		$this->sat_id->SetVisibility();
+		$this->hrg_jual->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -517,6 +519,12 @@ class ct_02item_edit extends ct_02item {
 		if (!$this->item_nama->FldIsDetailKey) {
 			$this->item_nama->setFormValue($objForm->GetValue("x_item_nama"));
 		}
+		if (!$this->sat_id->FldIsDetailKey) {
+			$this->sat_id->setFormValue($objForm->GetValue("x_sat_id"));
+		}
+		if (!$this->hrg_jual->FldIsDetailKey) {
+			$this->hrg_jual->setFormValue($objForm->GetValue("x_hrg_jual"));
+		}
 	}
 
 	// Restore form values
@@ -526,6 +534,8 @@ class ct_02item_edit extends ct_02item {
 		$this->kat_id->CurrentValue = $this->kat_id->FormValue;
 		$this->item_id->CurrentValue = $this->item_id->FormValue;
 		$this->item_nama->CurrentValue = $this->item_nama->FormValue;
+		$this->sat_id->CurrentValue = $this->sat_id->FormValue;
+		$this->hrg_jual->CurrentValue = $this->hrg_jual->FormValue;
 	}
 
 	// Load recordset
@@ -591,6 +601,13 @@ class ct_02item_edit extends ct_02item {
 		}
 		$this->item_id->setDbValue($rs->fields('item_id'));
 		$this->item_nama->setDbValue($rs->fields('item_nama'));
+		$this->sat_id->setDbValue($rs->fields('sat_id'));
+		if (array_key_exists('EV__sat_id', $rs->fields)) {
+			$this->sat_id->VirtualValue = $rs->fields('EV__sat_id'); // Set up virtual field value
+		} else {
+			$this->sat_id->VirtualValue = ""; // Clear value
+		}
+		$this->hrg_jual->setDbValue($rs->fields('hrg_jual'));
 	}
 
 	// Load DbValue from recordset
@@ -600,6 +617,8 @@ class ct_02item_edit extends ct_02item {
 		$this->kat_id->DbValue = $row['kat_id'];
 		$this->item_id->DbValue = $row['item_id'];
 		$this->item_nama->DbValue = $row['item_nama'];
+		$this->sat_id->DbValue = $row['sat_id'];
+		$this->hrg_jual->DbValue = $row['hrg_jual'];
 	}
 
 	// Render row values based on field settings
@@ -607,14 +626,20 @@ class ct_02item_edit extends ct_02item {
 		global $Security, $Language, $gsLanguage;
 
 		// Initialize URLs
-		// Call Row_Rendering event
+		// Convert decimal values if posted back
 
+		if ($this->hrg_jual->FormValue == $this->hrg_jual->CurrentValue && is_numeric(ew_StrToFloat($this->hrg_jual->CurrentValue)))
+			$this->hrg_jual->CurrentValue = ew_StrToFloat($this->hrg_jual->CurrentValue);
+
+		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
 		// kat_id
 		// item_id
 		// item_nama
+		// sat_id
+		// hrg_jual
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -654,6 +679,40 @@ class ct_02item_edit extends ct_02item {
 		$this->item_nama->ViewValue = $this->item_nama->CurrentValue;
 		$this->item_nama->ViewCustomAttributes = "";
 
+		// sat_id
+		if ($this->sat_id->VirtualValue <> "") {
+			$this->sat_id->ViewValue = $this->sat_id->VirtualValue;
+		} else {
+			$this->sat_id->ViewValue = $this->sat_id->CurrentValue;
+		if (strval($this->sat_id->CurrentValue) <> "") {
+			$sFilterWrk = "`satuan_id`" . ew_SearchString("=", $this->sat_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `satuan_id`, `satuan_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_03satuan`";
+		$sWhereWrk = "";
+		$this->sat_id->LookupFilters = array("dx1" => '`satuan_nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->sat_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->sat_id->ViewValue = $this->sat_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->sat_id->ViewValue = $this->sat_id->CurrentValue;
+			}
+		} else {
+			$this->sat_id->ViewValue = NULL;
+		}
+		}
+		$this->sat_id->ViewCustomAttributes = "";
+
+		// hrg_jual
+		$this->hrg_jual->ViewValue = $this->hrg_jual->CurrentValue;
+		$this->hrg_jual->ViewValue = ew_FormatNumber($this->hrg_jual->ViewValue, 0, -2, -2, -2);
+		$this->hrg_jual->CellCssStyle .= "text-align: right;";
+		$this->hrg_jual->ViewCustomAttributes = "";
+
 			// kat_id
 			$this->kat_id->LinkCustomAttributes = "";
 			$this->kat_id->HrefValue = "";
@@ -668,6 +727,16 @@ class ct_02item_edit extends ct_02item {
 			$this->item_nama->LinkCustomAttributes = "";
 			$this->item_nama->HrefValue = "";
 			$this->item_nama->TooltipValue = "";
+
+			// sat_id
+			$this->sat_id->LinkCustomAttributes = "";
+			$this->sat_id->HrefValue = "";
+			$this->sat_id->TooltipValue = "";
+
+			// hrg_jual
+			$this->hrg_jual->LinkCustomAttributes = "";
+			$this->hrg_jual->HrefValue = "";
+			$this->hrg_jual->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// kat_id
@@ -708,6 +777,39 @@ class ct_02item_edit extends ct_02item {
 			$this->item_nama->EditValue = ew_HtmlEncode($this->item_nama->CurrentValue);
 			$this->item_nama->PlaceHolder = ew_RemoveHtml($this->item_nama->FldCaption());
 
+			// sat_id
+			$this->sat_id->EditAttrs["class"] = "form-control";
+			$this->sat_id->EditCustomAttributes = "";
+			$this->sat_id->EditValue = ew_HtmlEncode($this->sat_id->CurrentValue);
+			if (strval($this->sat_id->CurrentValue) <> "") {
+				$sFilterWrk = "`satuan_id`" . ew_SearchString("=", $this->sat_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$sSqlWrk = "SELECT `satuan_id`, `satuan_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_03satuan`";
+			$sWhereWrk = "";
+			$this->sat_id->LookupFilters = array("dx1" => '`satuan_nama`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->sat_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
+					$this->sat_id->EditValue = $this->sat_id->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->sat_id->EditValue = ew_HtmlEncode($this->sat_id->CurrentValue);
+				}
+			} else {
+				$this->sat_id->EditValue = NULL;
+			}
+			$this->sat_id->PlaceHolder = ew_RemoveHtml($this->sat_id->FldCaption());
+
+			// hrg_jual
+			$this->hrg_jual->EditAttrs["class"] = "form-control";
+			$this->hrg_jual->EditCustomAttributes = "";
+			$this->hrg_jual->EditValue = ew_HtmlEncode($this->hrg_jual->CurrentValue);
+			$this->hrg_jual->PlaceHolder = ew_RemoveHtml($this->hrg_jual->FldCaption());
+			if (strval($this->hrg_jual->EditValue) <> "" && is_numeric($this->hrg_jual->EditValue)) $this->hrg_jual->EditValue = ew_FormatNumber($this->hrg_jual->EditValue, -2, -2, -2, -2);
+
 			// Edit refer script
 			// kat_id
 
@@ -721,6 +823,14 @@ class ct_02item_edit extends ct_02item {
 			// item_nama
 			$this->item_nama->LinkCustomAttributes = "";
 			$this->item_nama->HrefValue = "";
+
+			// sat_id
+			$this->sat_id->LinkCustomAttributes = "";
+			$this->sat_id->HrefValue = "";
+
+			// hrg_jual
+			$this->hrg_jual->LinkCustomAttributes = "";
+			$this->hrg_jual->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -748,6 +858,12 @@ class ct_02item_edit extends ct_02item {
 		}
 		if (!$this->item_nama->FldIsDetailKey && !is_null($this->item_nama->FormValue) && $this->item_nama->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->item_nama->FldCaption(), $this->item_nama->ReqErrMsg));
+		}
+		if (!$this->sat_id->FldIsDetailKey && !is_null($this->sat_id->FormValue) && $this->sat_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->sat_id->FldCaption(), $this->sat_id->ReqErrMsg));
+		}
+		if (!ew_CheckNumber($this->hrg_jual->FormValue)) {
+			ew_AddMessage($gsFormError, $this->hrg_jual->FldErrMsg());
 		}
 
 		// Return validate result
@@ -810,6 +926,12 @@ class ct_02item_edit extends ct_02item {
 			// item_nama
 			$this->item_nama->SetDbValueDef($rsnew, $this->item_nama->CurrentValue, "", $this->item_nama->ReadOnly);
 
+			// sat_id
+			$this->sat_id->SetDbValueDef($rsnew, $this->sat_id->CurrentValue, 0, $this->sat_id->ReadOnly);
+
+			// hrg_jual
+			$this->hrg_jual->SetDbValueDef($rsnew, $this->hrg_jual->CurrentValue, 0, $this->hrg_jual->ReadOnly);
+
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
 			if ($bUpdateRow) {
@@ -869,6 +991,18 @@ class ct_02item_edit extends ct_02item {
 			if ($sSqlWrk <> "")
 				$fld->LookupFilters["s"] .= $sSqlWrk;
 			break;
+		case "x_sat_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `satuan_id` AS `LinkFld`, `satuan_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_03satuan`";
+			$sWhereWrk = "{filter}";
+			$this->sat_id->LookupFilters = array("dx1" => '`satuan_nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`satuan_id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->sat_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -885,6 +1019,19 @@ class ct_02item_edit extends ct_02item {
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->kat_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$sSqlWrk .= " LIMIT " . EW_AUTO_SUGGEST_MAX_ENTRIES;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
+		case "x_sat_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `satuan_id`, `satuan_nama` AS `DispFld` FROM `t_03satuan`";
+			$sWhereWrk = "`satuan_nama` LIKE '{query_value}%'";
+			$this->sat_id->LookupFilters = array("dx1" => '`satuan_nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->sat_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			$sSqlWrk .= " LIMIT " . EW_AUTO_SUGGEST_MAX_ENTRIES;
 			if ($sSqlWrk <> "")
@@ -1007,6 +1154,12 @@ ft_02itemedit.Validate = function() {
 			elm = this.GetElements("x" + infix + "_item_nama");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_02item->item_nama->FldCaption(), $t_02item->item_nama->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_sat_id");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_02item->sat_id->FldCaption(), $t_02item->sat_id->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_hrg_jual");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t_02item->hrg_jual->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1041,6 +1194,7 @@ ft_02itemedit.ValidateRequired = false;
 
 // Dynamic selection lists
 ft_02itemedit.Lists["x_kat_id"] = {"LinkField":"x_kat_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_kat_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_13kategori"};
+ft_02itemedit.Lists["x_sat_id"] = {"LinkField":"x_satuan_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_satuan_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_03satuan"};
 
 // Form object for search
 </script>
@@ -1160,6 +1314,42 @@ ft_02itemedit.CreateAutoSuggest({"id":"x_kat_id","forceSelect":true});
 <input type="text" data-table="t_02item" data-field="x_item_nama" name="x_item_nama" id="x_item_nama" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t_02item->item_nama->getPlaceHolder()) ?>" value="<?php echo $t_02item->item_nama->EditValue ?>"<?php echo $t_02item->item_nama->EditAttributes() ?>>
 </span>
 <?php echo $t_02item->item_nama->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_02item->sat_id->Visible) { // sat_id ?>
+	<div id="r_sat_id" class="form-group">
+		<label id="elh_t_02item_sat_id" class="col-sm-2 control-label ewLabel"><?php echo $t_02item->sat_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t_02item->sat_id->CellAttributes() ?>>
+<span id="el_t_02item_sat_id">
+<?php
+$wrkonchange = trim(" " . @$t_02item->sat_id->EditAttrs["onchange"]);
+if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
+$t_02item->sat_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x_sat_id" style="white-space: nowrap; z-index: 8960">
+	<input type="text" name="sv_x_sat_id" id="sv_x_sat_id" value="<?php echo $t_02item->sat_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($t_02item->sat_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_02item->sat_id->getPlaceHolder()) ?>"<?php echo $t_02item->sat_id->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t_02item" data-field="x_sat_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_02item->sat_id->DisplayValueSeparatorAttribute() ?>" name="x_sat_id" id="x_sat_id" value="<?php echo ew_HtmlEncode($t_02item->sat_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<input type="hidden" name="q_x_sat_id" id="q_x_sat_id" value="<?php echo $t_02item->sat_id->LookupFilterQuery(true) ?>">
+<script type="text/javascript">
+ft_02itemedit.CreateAutoSuggest({"id":"x_sat_id","forceSelect":true});
+</script>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_02item->sat_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_sat_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" name="s_x_sat_id" id="s_x_sat_id" value="<?php echo $t_02item->sat_id->LookupFilterQuery(false) ?>">
+<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_02item->sat_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x_sat_id',url:'t_03satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x_sat_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_02item->sat_id->FldCaption() ?></span></button>
+<input type="hidden" name="s_x_sat_id" id="s_x_sat_id" value="<?php echo $t_02item->sat_id->LookupFilterQuery() ?>">
+</span>
+<?php echo $t_02item->sat_id->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t_02item->hrg_jual->Visible) { // hrg_jual ?>
+	<div id="r_hrg_jual" class="form-group">
+		<label id="elh_t_02item_hrg_jual" for="x_hrg_jual" class="col-sm-2 control-label ewLabel"><?php echo $t_02item->hrg_jual->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_02item->hrg_jual->CellAttributes() ?>>
+<span id="el_t_02item_hrg_jual">
+<input type="text" data-table="t_02item" data-field="x_hrg_jual" name="x_hrg_jual" id="x_hrg_jual" size="30" placeholder="<?php echo ew_HtmlEncode($t_02item->hrg_jual->getPlaceHolder()) ?>" value="<?php echo $t_02item->hrg_jual->EditValue ?>"<?php echo $t_02item->hrg_jual->EditAttributes() ?>>
+</span>
+<?php echo $t_02item->hrg_jual->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div>

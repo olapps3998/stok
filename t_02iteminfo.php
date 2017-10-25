@@ -16,6 +16,8 @@ class ct_02item extends cTable {
 	var $kat_id;
 	var $item_id;
 	var $item_nama;
+	var $sat_id;
+	var $hrg_jual;
 
 	//
 	// Table class constructor
@@ -63,6 +65,18 @@ class ct_02item extends cTable {
 		$this->item_nama = new cField('t_02item', 't_02item', 'x_item_nama', 'item_nama', '`item_nama`', '`item_nama`', 200, -1, FALSE, '`item_nama`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->item_nama->Sortable = TRUE; // Allow sort
 		$this->fields['item_nama'] = &$this->item_nama;
+
+		// sat_id
+		$this->sat_id = new cField('t_02item', 't_02item', 'x_sat_id', 'sat_id', '`sat_id`', '`sat_id`', 3, -1, FALSE, '`EV__sat_id`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'TEXT');
+		$this->sat_id->Sortable = TRUE; // Allow sort
+		$this->sat_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['sat_id'] = &$this->sat_id;
+
+		// hrg_jual
+		$this->hrg_jual = new cField('t_02item', 't_02item', 'x_hrg_jual', 'hrg_jual', '`hrg_jual`', '`hrg_jual`', 4, -1, FALSE, '`hrg_jual`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->hrg_jual->Sortable = TRUE; // Allow sort
+		$this->hrg_jual->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['hrg_jual'] = &$this->hrg_jual;
 	}
 
 	// Set Field Visibility
@@ -153,7 +167,7 @@ class ct_02item extends cTable {
 	function getSqlSelectList() { // Select for List page
 		$select = "";
 		$select = "SELECT * FROM (" .
-			"SELECT *, (SELECT `kat_nama` FROM `t_13kategori` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`kat_id` = `t_02item`.`kat_id` LIMIT 1) AS `EV__kat_id` FROM `t_02item`" .
+			"SELECT *, (SELECT `kat_nama` FROM `t_13kategori` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`kat_id` = `t_02item`.`kat_id` LIMIT 1) AS `EV__kat_id`, (SELECT `satuan_nama` FROM `t_03satuan` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`satuan_id` = `t_02item`.`sat_id` LIMIT 1) AS `EV__sat_id` FROM `t_02item`" .
 			") `EW_TMP_TABLE`";
 		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
 	}
@@ -306,6 +320,12 @@ class ct_02item extends cTable {
 			strpos($sWhere, " " . $this->kat_id->FldVirtualExpression . " ") !== FALSE)
 			return TRUE;
 		if (strpos($sOrderBy, " " . $this->kat_id->FldVirtualExpression . " ") !== FALSE)
+			return TRUE;
+		if ($this->sat_id->AdvancedSearch->SearchValue <> "" ||
+			$this->sat_id->AdvancedSearch->SearchValue2 <> "" ||
+			strpos($sWhere, " " . $this->sat_id->FldVirtualExpression . " ") !== FALSE)
+			return TRUE;
+		if (strpos($sOrderBy, " " . $this->sat_id->FldVirtualExpression . " ") !== FALSE)
 			return TRUE;
 		return FALSE;
 	}
@@ -640,6 +660,8 @@ class ct_02item extends cTable {
 		$this->kat_id->setDbValue($rs->fields('kat_id'));
 		$this->item_id->setDbValue($rs->fields('item_id'));
 		$this->item_nama->setDbValue($rs->fields('item_nama'));
+		$this->sat_id->setDbValue($rs->fields('sat_id'));
+		$this->hrg_jual->setDbValue($rs->fields('hrg_jual'));
 	}
 
 	// Render list row values
@@ -653,6 +675,8 @@ class ct_02item extends cTable {
 		// kat_id
 		// item_id
 		// item_nama
+		// sat_id
+		// hrg_jual
 		// kat_id
 
 		if ($this->kat_id->VirtualValue <> "") {
@@ -690,6 +714,40 @@ class ct_02item extends cTable {
 		$this->item_nama->ViewValue = $this->item_nama->CurrentValue;
 		$this->item_nama->ViewCustomAttributes = "";
 
+		// sat_id
+		if ($this->sat_id->VirtualValue <> "") {
+			$this->sat_id->ViewValue = $this->sat_id->VirtualValue;
+		} else {
+			$this->sat_id->ViewValue = $this->sat_id->CurrentValue;
+		if (strval($this->sat_id->CurrentValue) <> "") {
+			$sFilterWrk = "`satuan_id`" . ew_SearchString("=", $this->sat_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `satuan_id`, `satuan_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_03satuan`";
+		$sWhereWrk = "";
+		$this->sat_id->LookupFilters = array("dx1" => '`satuan_nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->sat_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->sat_id->ViewValue = $this->sat_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->sat_id->ViewValue = $this->sat_id->CurrentValue;
+			}
+		} else {
+			$this->sat_id->ViewValue = NULL;
+		}
+		}
+		$this->sat_id->ViewCustomAttributes = "";
+
+		// hrg_jual
+		$this->hrg_jual->ViewValue = $this->hrg_jual->CurrentValue;
+		$this->hrg_jual->ViewValue = ew_FormatNumber($this->hrg_jual->ViewValue, 0, -2, -2, -2);
+		$this->hrg_jual->CellCssStyle .= "text-align: right;";
+		$this->hrg_jual->ViewCustomAttributes = "";
+
 		// kat_id
 		$this->kat_id->LinkCustomAttributes = "";
 		$this->kat_id->HrefValue = "";
@@ -704,6 +762,16 @@ class ct_02item extends cTable {
 		$this->item_nama->LinkCustomAttributes = "";
 		$this->item_nama->HrefValue = "";
 		$this->item_nama->TooltipValue = "";
+
+		// sat_id
+		$this->sat_id->LinkCustomAttributes = "";
+		$this->sat_id->HrefValue = "";
+		$this->sat_id->TooltipValue = "";
+
+		// hrg_jual
+		$this->hrg_jual->LinkCustomAttributes = "";
+		$this->hrg_jual->HrefValue = "";
+		$this->hrg_jual->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -733,6 +801,19 @@ class ct_02item extends cTable {
 		$this->item_nama->EditCustomAttributes = "";
 		$this->item_nama->EditValue = $this->item_nama->CurrentValue;
 		$this->item_nama->PlaceHolder = ew_RemoveHtml($this->item_nama->FldCaption());
+
+		// sat_id
+		$this->sat_id->EditAttrs["class"] = "form-control";
+		$this->sat_id->EditCustomAttributes = "";
+		$this->sat_id->EditValue = $this->sat_id->CurrentValue;
+		$this->sat_id->PlaceHolder = ew_RemoveHtml($this->sat_id->FldCaption());
+
+		// hrg_jual
+		$this->hrg_jual->EditAttrs["class"] = "form-control";
+		$this->hrg_jual->EditCustomAttributes = "";
+		$this->hrg_jual->EditValue = $this->hrg_jual->CurrentValue;
+		$this->hrg_jual->PlaceHolder = ew_RemoveHtml($this->hrg_jual->FldCaption());
+		if (strval($this->hrg_jual->EditValue) <> "" && is_numeric($this->hrg_jual->EditValue)) $this->hrg_jual->EditValue = ew_FormatNumber($this->hrg_jual->EditValue, -2, -2, -2, -2);
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -764,10 +845,14 @@ class ct_02item extends cTable {
 					if ($this->kat_id->Exportable) $Doc->ExportCaption($this->kat_id);
 					if ($this->item_id->Exportable) $Doc->ExportCaption($this->item_id);
 					if ($this->item_nama->Exportable) $Doc->ExportCaption($this->item_nama);
+					if ($this->sat_id->Exportable) $Doc->ExportCaption($this->sat_id);
+					if ($this->hrg_jual->Exportable) $Doc->ExportCaption($this->hrg_jual);
 				} else {
 					if ($this->kat_id->Exportable) $Doc->ExportCaption($this->kat_id);
 					if ($this->item_id->Exportable) $Doc->ExportCaption($this->item_id);
 					if ($this->item_nama->Exportable) $Doc->ExportCaption($this->item_nama);
+					if ($this->sat_id->Exportable) $Doc->ExportCaption($this->sat_id);
+					if ($this->hrg_jual->Exportable) $Doc->ExportCaption($this->hrg_jual);
 				}
 				$Doc->EndExportRow();
 			}
@@ -802,10 +887,14 @@ class ct_02item extends cTable {
 						if ($this->kat_id->Exportable) $Doc->ExportField($this->kat_id);
 						if ($this->item_id->Exportable) $Doc->ExportField($this->item_id);
 						if ($this->item_nama->Exportable) $Doc->ExportField($this->item_nama);
+						if ($this->sat_id->Exportable) $Doc->ExportField($this->sat_id);
+						if ($this->hrg_jual->Exportable) $Doc->ExportField($this->hrg_jual);
 					} else {
 						if ($this->kat_id->Exportable) $Doc->ExportField($this->kat_id);
 						if ($this->item_id->Exportable) $Doc->ExportField($this->item_id);
 						if ($this->item_nama->Exportable) $Doc->ExportField($this->item_nama);
+						if ($this->sat_id->Exportable) $Doc->ExportField($this->sat_id);
+						if ($this->hrg_jual->Exportable) $Doc->ExportField($this->hrg_jual);
 					}
 					$Doc->EndExportRow();
 				}

@@ -900,6 +900,12 @@
       <field id="item_nama">
         <phrase id="fldcaption" value="Nama Item" />
       </field>
+      <field id="sat_id">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="hrg_jual">
+        <phrase id="fldcaption" value="Harga Jual" />
+      </field>
     </table>
     <table id="t_03satuan">
       <phrase id="tblcaption" value="Satuan" />
