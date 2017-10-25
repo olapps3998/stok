@@ -251,6 +251,7 @@ class ct_02item_delete extends ct_02item {
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
+		$this->kat_id->SetVisibility();
 		$this->item_id->SetVisibility();
 		$this->item_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->item_nama->SetVisibility();
@@ -385,7 +386,7 @@ class ct_02item_delete extends ct_02item {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -428,6 +429,12 @@ class ct_02item_delete extends ct_02item {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
+		$this->kat_id->setDbValue($rs->fields('kat_id'));
+		if (array_key_exists('EV__kat_id', $rs->fields)) {
+			$this->kat_id->VirtualValue = $rs->fields('EV__kat_id'); // Set up virtual field value
+		} else {
+			$this->kat_id->VirtualValue = ""; // Clear value
+		}
 		$this->item_id->setDbValue($rs->fields('item_id'));
 		$this->item_nama->setDbValue($rs->fields('item_nama'));
 	}
@@ -436,6 +443,7 @@ class ct_02item_delete extends ct_02item {
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
+		$this->kat_id->DbValue = $row['kat_id'];
 		$this->item_id->DbValue = $row['item_id'];
 		$this->item_nama->DbValue = $row['item_nama'];
 	}
@@ -450,10 +458,39 @@ class ct_02item_delete extends ct_02item {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
+		// kat_id
 		// item_id
 		// item_nama
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
+
+		// kat_id
+		if ($this->kat_id->VirtualValue <> "") {
+			$this->kat_id->ViewValue = $this->kat_id->VirtualValue;
+		} else {
+			$this->kat_id->ViewValue = $this->kat_id->CurrentValue;
+		if (strval($this->kat_id->CurrentValue) <> "") {
+			$sFilterWrk = "`kat_id`" . ew_SearchString("=", $this->kat_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `kat_id`, `kat_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_13kategori`";
+		$sWhereWrk = "";
+		$this->kat_id->LookupFilters = array("dx1" => '`kat_nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->kat_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->kat_id->ViewValue = $this->kat_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->kat_id->ViewValue = $this->kat_id->CurrentValue;
+			}
+		} else {
+			$this->kat_id->ViewValue = NULL;
+		}
+		}
+		$this->kat_id->ViewCustomAttributes = "";
 
 		// item_id
 		$this->item_id->ViewValue = $this->item_id->CurrentValue;
@@ -462,6 +499,11 @@ class ct_02item_delete extends ct_02item {
 		// item_nama
 		$this->item_nama->ViewValue = $this->item_nama->CurrentValue;
 		$this->item_nama->ViewCustomAttributes = "";
+
+			// kat_id
+			$this->kat_id->LinkCustomAttributes = "";
+			$this->kat_id->HrefValue = "";
+			$this->kat_id->TooltipValue = "";
 
 			// item_id
 			$this->item_id->LinkCustomAttributes = "";
@@ -689,8 +731,9 @@ ft_02itemdelete.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+ft_02itemdelete.Lists["x_kat_id"] = {"LinkField":"x_kat_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_kat_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_13kategori"};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -721,6 +764,9 @@ $t_02item_delete->ShowMessage();
 <?php echo $t_02item->TableCustomInnerHtml ?>
 	<thead>
 	<tr class="ewTableHeader">
+<?php if ($t_02item->kat_id->Visible) { // kat_id ?>
+		<th><span id="elh_t_02item_kat_id" class="t_02item_kat_id"><?php echo $t_02item->kat_id->FldCaption() ?></span></th>
+<?php } ?>
 <?php if ($t_02item->item_id->Visible) { // item_id ?>
 		<th><span id="elh_t_02item_item_id" class="t_02item_item_id"><?php echo $t_02item->item_id->FldCaption() ?></span></th>
 <?php } ?>
@@ -748,6 +794,14 @@ while (!$t_02item_delete->Recordset->EOF) {
 	$t_02item_delete->RenderRow();
 ?>
 	<tr<?php echo $t_02item->RowAttributes() ?>>
+<?php if ($t_02item->kat_id->Visible) { // kat_id ?>
+		<td<?php echo $t_02item->kat_id->CellAttributes() ?>>
+<span id="el<?php echo $t_02item_delete->RowCnt ?>_t_02item_kat_id" class="t_02item_kat_id">
+<span<?php echo $t_02item->kat_id->ViewAttributes() ?>>
+<?php echo $t_02item->kat_id->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($t_02item->item_id->Visible) { // item_id ?>
 		<td<?php echo $t_02item->item_id->CellAttributes() ?>>
 <span id="el<?php echo $t_02item_delete->RowCnt ?>_t_02item_item_id" class="t_02item_item_id">

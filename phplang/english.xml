@@ -891,11 +891,14 @@
     </table>
     <table id="t_02item">
       <phrase id="tblcaption" value="Item" />
+      <field id="kat_id">
+        <phrase id="fldcaption" value="Kategori" />
+      </field>
       <field id="item_id">
-        <phrase id="fldcaption" value="ID" />
+        <phrase id="fldcaption" value="ID Item" />
       </field>
       <field id="item_nama">
-        <phrase id="fldcaption" value="Nama" />
+        <phrase id="fldcaption" value="Nama Item" />
       </field>
     </table>
     <table id="t_03satuan">

@@ -13,6 +13,7 @@ class ct_02item extends cTable {
 	var $AuditTrailOnView = FALSE;
 	var $AuditTrailOnViewData = FALSE;
 	var $AuditTrailOnSearch = FALSE;
+	var $kat_id;
 	var $item_id;
 	var $item_nama;
 
@@ -45,6 +46,12 @@ class ct_02item extends cTable {
 		$this->AllowAddDeleteRow = ew_AllowAddDeleteRow(); // Allow add/delete row
 		$this->UserIDAllowSecurity = 0; // User ID Allow
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
+
+		// kat_id
+		$this->kat_id = new cField('t_02item', 't_02item', 'x_kat_id', 'kat_id', '`kat_id`', '`kat_id`', 3, -1, FALSE, '`EV__kat_id`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'TEXT');
+		$this->kat_id->Sortable = TRUE; // Allow sort
+		$this->kat_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['kat_id'] = &$this->kat_id;
 
 		// item_id
 		$this->item_id = new cField('t_02item', 't_02item', 'x_item_id', 'item_id', '`item_id`', '`item_id`', 3, -1, FALSE, '`item_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
@@ -87,9 +94,31 @@ class ct_02item extends cTable {
 			} else {
 				$this->setSessionOrderBy($sSortField . " " . $sThisSort); // Save to Session
 			}
+			$sSortFieldList = ($ofld->FldVirtualExpression <> "") ? $ofld->FldVirtualExpression : $sSortField;
+			if ($ctrl) {
+				$sOrderByList = $this->getSessionOrderByList();
+				if (strpos($sOrderByList, $sSortFieldList . " " . $sLastSort) !== FALSE) {
+					$sOrderByList = str_replace($sSortFieldList . " " . $sLastSort, $sSortFieldList . " " . $sThisSort, $sOrderByList);
+				} else {
+					if ($sOrderByList <> "") $sOrderByList .= ", ";
+					$sOrderByList .= $sSortFieldList . " " . $sThisSort;
+				}
+				$this->setSessionOrderByList($sOrderByList); // Save to Session
+			} else {
+				$this->setSessionOrderByList($sSortFieldList . " " . $sThisSort); // Save to Session
+			}
 		} else {
 			if (!$ctrl) $ofld->setSort("");
 		}
+	}
+
+	// Session ORDER BY for List page
+	function getSessionOrderByList() {
+		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST];
+	}
+
+	function setSessionOrderByList($v) {
+		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST] = $v;
 	}
 
 	// Table level SQL
@@ -118,6 +147,23 @@ class ct_02item extends cTable {
 
 	function setSqlSelect($v) {
 		$this->_SqlSelect = $v;
+	}
+	var $_SqlSelectList = "";
+
+	function getSqlSelectList() { // Select for List page
+		$select = "";
+		$select = "SELECT * FROM (" .
+			"SELECT *, (SELECT `kat_nama` FROM `t_13kategori` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`kat_id` = `t_02item`.`kat_id` LIMIT 1) AS `EV__kat_id` FROM `t_02item`" .
+			") `EW_TMP_TABLE`";
+		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
+	}
+
+	function SqlSelectList() { // For backward compatibility
+		return $this->getSqlSelectList();
+	}
+
+	function setSqlSelectList($v) {
+		$this->_SqlSelectList = $v;
 	}
 	var $_SqlWhere = "";
 
@@ -230,15 +276,38 @@ class ct_02item extends cTable {
 		ew_AddFilter($sFilter, $this->CurrentFilter);
 		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$this->Recordset_Selecting($sFilter);
-		$sSort = $this->getSessionOrderBy();
-		return ew_BuildSelectSql($this->getSqlSelect(), $this->getSqlWhere(), $this->getSqlGroupBy(),
-			$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
+		if ($this->UseVirtualFields()) {
+			$sSort = $this->getSessionOrderByList();
+			return ew_BuildSelectSql($this->getSqlSelectList(), $this->getSqlWhere(), $this->getSqlGroupBy(),
+				$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
+		} else {
+			$sSort = $this->getSessionOrderBy();
+			return ew_BuildSelectSql($this->getSqlSelect(), $this->getSqlWhere(), $this->getSqlGroupBy(),
+				$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
+		}
 	}
 
 	// Get ORDER BY clause
 	function GetOrderBy() {
-		$sSort = $this->getSessionOrderBy();
+		$sSort = ($this->UseVirtualFields()) ? $this->getSessionOrderByList() : $this->getSessionOrderBy();
 		return ew_BuildSelectSql("", "", "", "", $this->getSqlOrderBy(), "", $sSort);
+	}
+
+	// Check if virtual fields is used in SQL
+	function UseVirtualFields() {
+		$sWhere = $this->getSessionWhere();
+		$sOrderBy = $this->getSessionOrderByList();
+		if ($sWhere <> "")
+			$sWhere = " " . str_replace(array("(",")"), array("",""), $sWhere) . " ";
+		if ($sOrderBy <> "")
+			$sOrderBy = " " . str_replace(array("(",")"), array("",""), $sOrderBy) . " ";
+		if ($this->kat_id->AdvancedSearch->SearchValue <> "" ||
+			$this->kat_id->AdvancedSearch->SearchValue2 <> "" ||
+			strpos($sWhere, " " . $this->kat_id->FldVirtualExpression . " ") !== FALSE)
+			return TRUE;
+		if (strpos($sOrderBy, " " . $this->kat_id->FldVirtualExpression . " ") !== FALSE)
+			return TRUE;
+		return FALSE;
 	}
 
 	// Try to get record count
@@ -568,6 +637,7 @@ class ct_02item extends cTable {
 
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
+		$this->kat_id->setDbValue($rs->fields('kat_id'));
 		$this->item_id->setDbValue($rs->fields('item_id'));
 		$this->item_nama->setDbValue($rs->fields('item_nama'));
 	}
@@ -580,16 +650,50 @@ class ct_02item extends cTable {
 		$this->Row_Rendering();
 
    // Common render codes
+		// kat_id
 		// item_id
 		// item_nama
-		// item_id
+		// kat_id
 
+		if ($this->kat_id->VirtualValue <> "") {
+			$this->kat_id->ViewValue = $this->kat_id->VirtualValue;
+		} else {
+			$this->kat_id->ViewValue = $this->kat_id->CurrentValue;
+		if (strval($this->kat_id->CurrentValue) <> "") {
+			$sFilterWrk = "`kat_id`" . ew_SearchString("=", $this->kat_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `kat_id`, `kat_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_13kategori`";
+		$sWhereWrk = "";
+		$this->kat_id->LookupFilters = array("dx1" => '`kat_nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->kat_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->kat_id->ViewValue = $this->kat_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->kat_id->ViewValue = $this->kat_id->CurrentValue;
+			}
+		} else {
+			$this->kat_id->ViewValue = NULL;
+		}
+		}
+		$this->kat_id->ViewCustomAttributes = "";
+
+		// item_id
 		$this->item_id->ViewValue = $this->item_id->CurrentValue;
 		$this->item_id->ViewCustomAttributes = "";
 
 		// item_nama
 		$this->item_nama->ViewValue = $this->item_nama->CurrentValue;
 		$this->item_nama->ViewCustomAttributes = "";
+
+		// kat_id
+		$this->kat_id->LinkCustomAttributes = "";
+		$this->kat_id->HrefValue = "";
+		$this->kat_id->TooltipValue = "";
 
 		// item_id
 		$this->item_id->LinkCustomAttributes = "";
@@ -611,6 +715,12 @@ class ct_02item extends cTable {
 
 		// Call Row Rendering event
 		$this->Row_Rendering();
+
+		// kat_id
+		$this->kat_id->EditAttrs["class"] = "form-control";
+		$this->kat_id->EditCustomAttributes = "";
+		$this->kat_id->EditValue = $this->kat_id->CurrentValue;
+		$this->kat_id->PlaceHolder = ew_RemoveHtml($this->kat_id->FldCaption());
 
 		// item_id
 		$this->item_id->EditAttrs["class"] = "form-control";
@@ -651,9 +761,11 @@ class ct_02item extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
+					if ($this->kat_id->Exportable) $Doc->ExportCaption($this->kat_id);
 					if ($this->item_id->Exportable) $Doc->ExportCaption($this->item_id);
 					if ($this->item_nama->Exportable) $Doc->ExportCaption($this->item_nama);
 				} else {
+					if ($this->kat_id->Exportable) $Doc->ExportCaption($this->kat_id);
 					if ($this->item_id->Exportable) $Doc->ExportCaption($this->item_id);
 					if ($this->item_nama->Exportable) $Doc->ExportCaption($this->item_nama);
 				}
@@ -687,9 +799,11 @@ class ct_02item extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
+						if ($this->kat_id->Exportable) $Doc->ExportField($this->kat_id);
 						if ($this->item_id->Exportable) $Doc->ExportField($this->item_id);
 						if ($this->item_nama->Exportable) $Doc->ExportField($this->item_nama);
 					} else {
+						if ($this->kat_id->Exportable) $Doc->ExportField($this->kat_id);
 						if ($this->item_id->Exportable) $Doc->ExportField($this->item_id);
 						if ($this->item_nama->Exportable) $Doc->ExportField($this->item_nama);
 					}

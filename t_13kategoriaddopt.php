@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t_02iteminfo.php" ?>
+<?php include_once "t_13kategoriinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -13,9 +13,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t_02item_addopt = NULL; // Initialize page object first
+$t_13kategori_addopt = NULL; // Initialize page object first
 
-class ct_02item_addopt extends ct_02item {
+class ct_13kategori_addopt extends ct_13kategori {
 
 	// Page ID
 	var $PageID = 'addopt';
@@ -24,10 +24,10 @@ class ct_02item_addopt extends ct_02item {
 	var $ProjectID = "{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}";
 
 	// Table name
-	var $TableName = 't_02item';
+	var $TableName = 't_13kategori';
 
 	// Page object name
-	var $PageObjName = 't_02item_addopt';
+	var $PageObjName = 't_13kategori_addopt';
 
 	// Page name
 	function PageName() {
@@ -224,10 +224,10 @@ class ct_02item_addopt extends ct_02item {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t_02item)
-		if (!isset($GLOBALS["t_02item"]) || get_class($GLOBALS["t_02item"]) == "ct_02item") {
-			$GLOBALS["t_02item"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t_02item"];
+		// Table object (t_13kategori)
+		if (!isset($GLOBALS["t_13kategori"]) || get_class($GLOBALS["t_13kategori"]) == "ct_13kategori") {
+			$GLOBALS["t_13kategori"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t_13kategori"];
 		}
 
 		// Page ID
@@ -236,7 +236,7 @@ class ct_02item_addopt extends ct_02item {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't_02item', TRUE);
+			define("EW_TABLE_NAME", 't_13kategori', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -254,8 +254,7 @@ class ct_02item_addopt extends ct_02item {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->kat_id->SetVisibility();
-		$this->item_nama->SetVisibility();
+		$this->kat_nama->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -301,13 +300,13 @@ class ct_02item_addopt extends ct_02item {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t_02item;
+		global $EW_EXPORT, $t_13kategori;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t_02item);
+				$doc = new $class($t_13kategori);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -365,8 +364,7 @@ class ct_02item_addopt extends ct_02item {
 				if ($this->AddRow()) { // Add successful
 					$row = array();
 					$row["x_kat_id"] = $this->kat_id->DbValue;
-					$row["x_item_id"] = $this->item_id->DbValue;
-					$row["x_item_nama"] = $this->item_nama->DbValue;
+					$row["x_kat_nama"] = $this->kat_nama->DbValue;
 					if (!EW_DEBUG_ENABLED && ob_get_length())
 						ob_end_clean();
 					echo ew_ArrayToJson(array($row));
@@ -392,10 +390,8 @@ class ct_02item_addopt extends ct_02item {
 
 	// Load default values
 	function LoadDefaultValues() {
-		$this->kat_id->CurrentValue = NULL;
-		$this->kat_id->OldValue = $this->kat_id->CurrentValue;
-		$this->item_nama->CurrentValue = NULL;
-		$this->item_nama->OldValue = $this->item_nama->CurrentValue;
+		$this->kat_nama->CurrentValue = NULL;
+		$this->kat_nama->OldValue = $this->kat_nama->CurrentValue;
 	}
 
 	// Load form values
@@ -403,19 +399,15 @@ class ct_02item_addopt extends ct_02item {
 
 		// Load from form
 		global $objForm;
-		if (!$this->kat_id->FldIsDetailKey) {
-			$this->kat_id->setFormValue(ew_ConvertFromUtf8($objForm->GetValue("x_kat_id")));
-		}
-		if (!$this->item_nama->FldIsDetailKey) {
-			$this->item_nama->setFormValue(ew_ConvertFromUtf8($objForm->GetValue("x_item_nama")));
+		if (!$this->kat_nama->FldIsDetailKey) {
+			$this->kat_nama->setFormValue(ew_ConvertFromUtf8($objForm->GetValue("x_kat_nama")));
 		}
 	}
 
 	// Restore form values
 	function RestoreFormValues() {
 		global $objForm;
-		$this->kat_id->CurrentValue = ew_ConvertToUtf8($this->kat_id->FormValue);
-		$this->item_nama->CurrentValue = ew_ConvertToUtf8($this->item_nama->FormValue);
+		$this->kat_nama->CurrentValue = ew_ConvertToUtf8($this->kat_nama->FormValue);
 	}
 
 	// Load row based on key values
@@ -448,13 +440,7 @@ class ct_02item_addopt extends ct_02item {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->kat_id->setDbValue($rs->fields('kat_id'));
-		if (array_key_exists('EV__kat_id', $rs->fields)) {
-			$this->kat_id->VirtualValue = $rs->fields('EV__kat_id'); // Set up virtual field value
-		} else {
-			$this->kat_id->VirtualValue = ""; // Clear value
-		}
-		$this->item_id->setDbValue($rs->fields('item_id'));
-		$this->item_nama->setDbValue($rs->fields('item_nama'));
+		$this->kat_nama->setDbValue($rs->fields('kat_nama'));
 	}
 
 	// Load DbValue from recordset
@@ -462,8 +448,7 @@ class ct_02item_addopt extends ct_02item {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->kat_id->DbValue = $row['kat_id'];
-		$this->item_id->DbValue = $row['item_id'];
-		$this->item_nama->DbValue = $row['item_nama'];
+		$this->kat_nama->DbValue = $row['kat_nama'];
 	}
 
 	// Render row values based on field settings
@@ -477,99 +462,35 @@ class ct_02item_addopt extends ct_02item {
 
 		// Common render codes for all row types
 		// kat_id
-		// item_id
-		// item_nama
+		// kat_nama
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
 		// kat_id
-		if ($this->kat_id->VirtualValue <> "") {
-			$this->kat_id->ViewValue = $this->kat_id->VirtualValue;
-		} else {
-			$this->kat_id->ViewValue = $this->kat_id->CurrentValue;
-		if (strval($this->kat_id->CurrentValue) <> "") {
-			$sFilterWrk = "`kat_id`" . ew_SearchString("=", $this->kat_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `kat_id`, `kat_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_13kategori`";
-		$sWhereWrk = "";
-		$this->kat_id->LookupFilters = array("dx1" => '`kat_nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->kat_id, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->kat_id->ViewValue = $this->kat_id->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->kat_id->ViewValue = $this->kat_id->CurrentValue;
-			}
-		} else {
-			$this->kat_id->ViewValue = NULL;
-		}
-		}
+		$this->kat_id->ViewValue = $this->kat_id->CurrentValue;
 		$this->kat_id->ViewCustomAttributes = "";
 
-		// item_id
-		$this->item_id->ViewValue = $this->item_id->CurrentValue;
-		$this->item_id->ViewCustomAttributes = "";
+		// kat_nama
+		$this->kat_nama->ViewValue = $this->kat_nama->CurrentValue;
+		$this->kat_nama->ViewCustomAttributes = "";
 
-		// item_nama
-		$this->item_nama->ViewValue = $this->item_nama->CurrentValue;
-		$this->item_nama->ViewCustomAttributes = "";
-
-			// kat_id
-			$this->kat_id->LinkCustomAttributes = "";
-			$this->kat_id->HrefValue = "";
-			$this->kat_id->TooltipValue = "";
-
-			// item_nama
-			$this->item_nama->LinkCustomAttributes = "";
-			$this->item_nama->HrefValue = "";
-			$this->item_nama->TooltipValue = "";
+			// kat_nama
+			$this->kat_nama->LinkCustomAttributes = "";
+			$this->kat_nama->HrefValue = "";
+			$this->kat_nama->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
-			// kat_id
-			$this->kat_id->EditAttrs["class"] = "form-control";
-			$this->kat_id->EditCustomAttributes = "";
-			$this->kat_id->EditValue = ew_HtmlEncode($this->kat_id->CurrentValue);
-			if (strval($this->kat_id->CurrentValue) <> "") {
-				$sFilterWrk = "`kat_id`" . ew_SearchString("=", $this->kat_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `kat_id`, `kat_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_13kategori`";
-			$sWhereWrk = "";
-			$this->kat_id->LookupFilters = array("dx1" => '`kat_nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->kat_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-				$rswrk = Conn()->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$arwrk = array();
-					$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-					$this->kat_id->EditValue = $this->kat_id->DisplayValue($arwrk);
-					$rswrk->Close();
-				} else {
-					$this->kat_id->EditValue = ew_HtmlEncode($this->kat_id->CurrentValue);
-				}
-			} else {
-				$this->kat_id->EditValue = NULL;
-			}
-			$this->kat_id->PlaceHolder = ew_RemoveHtml($this->kat_id->FldCaption());
-
-			// item_nama
-			$this->item_nama->EditAttrs["class"] = "form-control";
-			$this->item_nama->EditCustomAttributes = "";
-			$this->item_nama->EditValue = ew_HtmlEncode($this->item_nama->CurrentValue);
-			$this->item_nama->PlaceHolder = ew_RemoveHtml($this->item_nama->FldCaption());
+			// kat_nama
+			$this->kat_nama->EditAttrs["class"] = "form-control";
+			$this->kat_nama->EditCustomAttributes = "";
+			$this->kat_nama->EditValue = ew_HtmlEncode($this->kat_nama->CurrentValue);
+			$this->kat_nama->PlaceHolder = ew_RemoveHtml($this->kat_nama->FldCaption());
 
 			// Add refer script
-			// kat_id
+			// kat_nama
 
-			$this->kat_id->LinkCustomAttributes = "";
-			$this->kat_id->HrefValue = "";
-
-			// item_nama
-			$this->item_nama->LinkCustomAttributes = "";
-			$this->item_nama->HrefValue = "";
+			$this->kat_nama->LinkCustomAttributes = "";
+			$this->kat_nama->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -592,11 +513,8 @@ class ct_02item_addopt extends ct_02item {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->kat_id->FldIsDetailKey && !is_null($this->kat_id->FormValue) && $this->kat_id->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->kat_id->FldCaption(), $this->kat_id->ReqErrMsg));
-		}
-		if (!$this->item_nama->FldIsDetailKey && !is_null($this->item_nama->FormValue) && $this->item_nama->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->item_nama->FldCaption(), $this->item_nama->ReqErrMsg));
+		if (!$this->kat_nama->FldIsDetailKey && !is_null($this->kat_nama->FormValue) && $this->kat_nama->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->kat_nama->FldCaption(), $this->kat_nama->ReqErrMsg));
 		}
 
 		// Return validate result
@@ -614,17 +532,6 @@ class ct_02item_addopt extends ct_02item {
 	// Add record
 	function AddRow($rsold = NULL) {
 		global $Language, $Security;
-		if ($this->item_nama->CurrentValue <> "") { // Check field with unique index
-			$sFilter = "(item_nama = '" . ew_AdjustSql($this->item_nama->CurrentValue, $this->DBID) . "')";
-			$rsChk = $this->LoadRs($sFilter);
-			if ($rsChk && !$rsChk->EOF) {
-				$sIdxErrMsg = str_replace("%f", $this->item_nama->FldCaption(), $Language->Phrase("DupIndex"));
-				$sIdxErrMsg = str_replace("%v", $this->item_nama->CurrentValue, $sIdxErrMsg);
-				$this->setFailureMessage($sIdxErrMsg);
-				$rsChk->Close();
-				return FALSE;
-			}
-		}
 		$conn = &$this->Connection();
 
 		// Load db values from rsold
@@ -633,11 +540,8 @@ class ct_02item_addopt extends ct_02item {
 		}
 		$rsnew = array();
 
-		// kat_id
-		$this->kat_id->SetDbValueDef($rsnew, $this->kat_id->CurrentValue, 0, FALSE);
-
-		// item_nama
-		$this->item_nama->SetDbValueDef($rsnew, $this->item_nama->CurrentValue, "", FALSE);
+		// kat_nama
+		$this->kat_nama->SetDbValueDef($rsnew, $this->kat_nama->CurrentValue, "", FALSE);
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -674,7 +578,7 @@ class ct_02item_addopt extends ct_02item {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_02itemlist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_13kategorilist.php"), "", $this->TableVar, TRUE);
 		$PageId = "addopt";
 		$Breadcrumb->Add("addopt", $PageId, $url);
 	}
@@ -684,18 +588,6 @@ class ct_02item_addopt extends ct_02item {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
-		case "x_kat_id":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `kat_id` AS `LinkFld`, `kat_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_13kategori`";
-			$sWhereWrk = "{filter}";
-			$this->kat_id->LookupFilters = array("dx1" => '`kat_nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`kat_id` = {filter_value}', "t0" => "3", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->kat_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
 		}
 	}
 
@@ -704,19 +596,6 @@ class ct_02item_addopt extends ct_02item {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
-		case "x_kat_id":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `kat_id`, `kat_nama` AS `DispFld` FROM `t_13kategori`";
-			$sWhereWrk = "`kat_nama` LIKE '{query_value}%'";
-			$this->kat_id->LookupFilters = array("dx1" => '`kat_nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->kat_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$sSqlWrk .= " LIMIT " . EW_AUTO_SUGGEST_MAX_ENTRIES;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
 		}
 	}
 
@@ -793,28 +672,28 @@ class ct_02item_addopt extends ct_02item {
 <?php
 
 // Create page object
-if (!isset($t_02item_addopt)) $t_02item_addopt = new ct_02item_addopt();
+if (!isset($t_13kategori_addopt)) $t_13kategori_addopt = new ct_13kategori_addopt();
 
 // Page init
-$t_02item_addopt->Page_Init();
+$t_13kategori_addopt->Page_Init();
 
 // Page main
-$t_02item_addopt->Page_Main();
+$t_13kategori_addopt->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t_02item_addopt->Page_Render();
+$t_13kategori_addopt->Page_Render();
 ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "addopt";
-var CurrentForm = ft_02itemaddopt = new ew_Form("ft_02itemaddopt", "addopt");
+var CurrentForm = ft_13kategoriaddopt = new ew_Form("ft_13kategoriaddopt", "addopt");
 
 // Validate form
-ft_02itemaddopt.Validate = function() {
+ft_13kategoriaddopt.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -828,12 +707,9 @@ ft_02itemaddopt.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_kat_id");
+			elm = this.GetElements("x" + infix + "_kat_nama");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_02item->kat_id->FldCaption(), $t_02item->kat_id->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_item_nama");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_02item->item_nama->FldCaption(), $t_02item->item_nama->ReqErrMsg)) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t_13kategori->kat_nama->FldCaption(), $t_13kategori->kat_nama->ReqErrMsg)) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -843,7 +719,7 @@ ft_02itemaddopt.Validate = function() {
 }
 
 // Form_CustomValidate event
-ft_02itemaddopt.Form_CustomValidate = 
+ft_13kategoriaddopt.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -852,63 +728,39 @@ ft_02itemaddopt.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft_02itemaddopt.ValidateRequired = true;
+ft_13kategoriaddopt.ValidateRequired = true;
 <?php } else { ?>
-ft_02itemaddopt.ValidateRequired = false; 
+ft_13kategoriaddopt.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-ft_02itemaddopt.Lists["x_kat_id"] = {"LinkField":"x_kat_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_kat_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_13kategori"};
-
 // Form object for search
+
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php
-$t_02item_addopt->ShowMessage();
+$t_13kategori_addopt->ShowMessage();
 ?>
-<form name="ft_02itemaddopt" id="ft_02itemaddopt" class="ewForm form-horizontal" action="t_02itemaddopt.php" method="post">
-<?php if ($t_02item_addopt->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_02item_addopt->Token ?>">
+<form name="ft_13kategoriaddopt" id="ft_13kategoriaddopt" class="ewForm form-horizontal" action="t_13kategoriaddopt.php" method="post">
+<?php if ($t_13kategori_addopt->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_13kategori_addopt->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t_02item">
+<input type="hidden" name="t" value="t_13kategori">
 <input type="hidden" name="a_addopt" id="a_addopt" value="A">
-<?php if ($t_02item->kat_id->Visible) { // kat_id ?>
+<?php if ($t_13kategori->kat_nama->Visible) { // kat_nama ?>
 	<div class="form-group">
-		<label class="col-sm-3 control-label ewLabel"><?php echo $t_02item->kat_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<label class="col-sm-3 control-label ewLabel" for="x_kat_nama"><?php echo $t_13kategori->kat_nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="col-sm-9">
-<?php
-$wrkonchange = trim(" " . @$t_02item->kat_id->EditAttrs["onchange"]);
-if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
-$t_02item->kat_id->EditAttrs["onchange"] = "";
-?>
-<span id="as_x_kat_id" style="white-space: nowrap; z-index: 8990">
-	<input type="text" name="sv_x_kat_id" id="sv_x_kat_id" value="<?php echo $t_02item->kat_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($t_02item->kat_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_02item->kat_id->getPlaceHolder()) ?>"<?php echo $t_02item->kat_id->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_02item" data-field="x_kat_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_02item->kat_id->DisplayValueSeparatorAttribute() ?>" name="x_kat_id" id="x_kat_id" value="<?php echo ew_HtmlEncode($t_02item->kat_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
-<input type="hidden" name="q_x_kat_id" id="q_x_kat_id" value="<?php echo $t_02item->kat_id->LookupFilterQuery(true) ?>">
-<script type="text/javascript">
-ft_02itemaddopt.CreateAutoSuggest({"id":"x_kat_id","forceSelect":true});
-</script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_02item->kat_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_kat_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" name="s_x_kat_id" id="s_x_kat_id" value="<?php echo $t_02item->kat_id->LookupFilterQuery(false) ?>">
-<input type="hidden" name="s_x_kat_id" id="s_x_kat_id" value="<?php echo $t_02item->kat_id->LookupFilterQuery() ?>">
-</div>
-	</div>
-<?php } ?>	
-<?php if ($t_02item->item_nama->Visible) { // item_nama ?>
-	<div class="form-group">
-		<label class="col-sm-3 control-label ewLabel" for="x_item_nama"><?php echo $t_02item->item_nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-9">
-<input type="text" data-table="t_02item" data-field="x_item_nama" name="x_item_nama" id="x_item_nama" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t_02item->item_nama->getPlaceHolder()) ?>" value="<?php echo $t_02item->item_nama->EditValue ?>"<?php echo $t_02item->item_nama->EditAttributes() ?>>
+<input type="text" data-table="t_13kategori" data-field="x_kat_nama" name="x_kat_nama" id="x_kat_nama" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t_13kategori->kat_nama->getPlaceHolder()) ?>" value="<?php echo $t_13kategori->kat_nama->EditValue ?>"<?php echo $t_13kategori->kat_nama->EditAttributes() ?>>
 </div>
 	</div>
 <?php } ?>	
 </form>
 <script type="text/javascript">
-ft_02itemaddopt.Init();
+ft_13kategoriaddopt.Init();
 </script>
 <script type="text/javascript">
 
@@ -917,5 +769,5 @@ ft_02itemaddopt.Init();
 
 </script>
 <?php
-$t_02item_addopt->Page_Terminate();
+$t_13kategori_addopt->Page_Terminate();
 ?>
