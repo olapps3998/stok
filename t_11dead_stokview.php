@@ -573,7 +573,7 @@ class ct_11dead_stok_view extends ct_11dead_stok {
 		$option = &$options["action"];
 		$option->DropDownButtonPhrase = $Language->Phrase("ButtonActions");
 		$option->UseImageAndText = TRUE;
-		$option->UseDropDownButton = TRUE;
+		$option->UseDropDownButton = FALSE;
 		$option->UseButtonGroup = TRUE;
 		$item = &$option->Add($option->GroupOptionName);
 		$item->Body = "";
@@ -671,6 +671,7 @@ class ct_11dead_stok_view extends ct_11dead_stok {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
+		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
 		$this->dead_stok_id->setDbValue($rs->fields('dead_stok_id'));
 		$this->tgl->setDbValue($rs->fields('tgl'));
 		$this->item_id->setDbValue($rs->fields('item_id'));

@@ -920,33 +920,33 @@ class ct_07jual_detail_grid extends ct_07jual_detail {
 		if ($this->AllowAddDeleteRow) {
 			$item = &$this->ListOptions->Add("griddelete");
 			$item->CssStyle = "white-space: nowrap;";
-			$item->OnLeft = FALSE;
+			$item->OnLeft = TRUE;
 			$item->Visible = FALSE; // Default hidden
 		}
 
 		// Add group option item
 		$item = &$this->ListOptions->Add($this->ListOptions->GroupOptionName);
 		$item->Body = "";
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 
 		// "view"
 		$item = &$this->ListOptions->Add("view");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// "copy"
 		$item = &$this->ListOptions->Add("copy");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// "sequence"
 		$item = &$this->ListOptions->Add("sequence");
@@ -958,7 +958,7 @@ class ct_07jual_detail_grid extends ct_07jual_detail {
 
 		// Drop down button for ListOptions
 		$this->ListOptions->UseImageAndText = TRUE;
-		$this->ListOptions->UseDropDownButton = TRUE;
+		$this->ListOptions->UseDropDownButton = FALSE;
 		$this->ListOptions->DropDownButtonPhrase = $Language->Phrase("ButtonListOptions");
 		$this->ListOptions->UseButtonGroup = FALSE;
 		if ($this->ListOptions->UseButtonGroup && ew_IsMobile())

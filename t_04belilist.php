@@ -1259,38 +1259,38 @@ class ct_04beli_list extends ct_04beli {
 		if ($this->AllowAddDeleteRow) {
 			$item = &$this->ListOptions->Add("griddelete");
 			$item->CssStyle = "white-space: nowrap;";
-			$item->OnLeft = FALSE;
+			$item->OnLeft = TRUE;
 			$item->Visible = FALSE; // Default hidden
 		}
 
 		// Add group option item
 		$item = &$this->ListOptions->Add($this->ListOptions->GroupOptionName);
 		$item->Body = "";
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 
 		// "view"
 		$item = &$this->ListOptions->Add("view");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// "copy"
 		$item = &$this->ListOptions->Add("copy");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// List actions
 		$item = &$this->ListOptions->Add("listactions");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 		$item->ShowInButtonGroup = FALSE;
 		$item->ShowInDropDown = FALSE;
@@ -1298,8 +1298,9 @@ class ct_04beli_list extends ct_04beli {
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 		$item->Header = "<input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\">";
+		$item->MoveTo(0);
 		$item->ShowInDropDown = FALSE;
 		$item->ShowInButtonGroup = FALSE;
 
@@ -1313,9 +1314,9 @@ class ct_04beli_list extends ct_04beli {
 
 		// Drop down button for ListOptions
 		$this->ListOptions->UseImageAndText = TRUE;
-		$this->ListOptions->UseDropDownButton = TRUE;
+		$this->ListOptions->UseDropDownButton = FALSE;
 		$this->ListOptions->DropDownButtonPhrase = $Language->Phrase("ButtonListOptions");
-		$this->ListOptions->UseButtonGroup = FALSE;
+		$this->ListOptions->UseButtonGroup = TRUE;
 		if ($this->ListOptions->UseButtonGroup && ew_IsMobile())
 			$this->ListOptions->UseDropDownButton = TRUE;
 		$this->ListOptions->ButtonClass = "btn-sm"; // Class for button group

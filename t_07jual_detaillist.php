@@ -1262,38 +1262,38 @@ class ct_07jual_detail_list extends ct_07jual_detail {
 		if ($this->AllowAddDeleteRow) {
 			$item = &$this->ListOptions->Add("griddelete");
 			$item->CssStyle = "white-space: nowrap;";
-			$item->OnLeft = FALSE;
+			$item->OnLeft = TRUE;
 			$item->Visible = FALSE; // Default hidden
 		}
 
 		// Add group option item
 		$item = &$this->ListOptions->Add($this->ListOptions->GroupOptionName);
 		$item->Body = "";
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 
 		// "view"
 		$item = &$this->ListOptions->Add("view");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// "copy"
 		$item = &$this->ListOptions->Add("copy");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// List actions
 		$item = &$this->ListOptions->Add("listactions");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 		$item->ShowInButtonGroup = FALSE;
 		$item->ShowInDropDown = FALSE;
@@ -1301,8 +1301,9 @@ class ct_07jual_detail_list extends ct_07jual_detail {
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 		$item->Header = "<input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\">";
+		$item->MoveTo(0);
 		$item->ShowInDropDown = FALSE;
 		$item->ShowInButtonGroup = FALSE;
 
@@ -1316,9 +1317,9 @@ class ct_07jual_detail_list extends ct_07jual_detail {
 
 		// Drop down button for ListOptions
 		$this->ListOptions->UseImageAndText = TRUE;
-		$this->ListOptions->UseDropDownButton = TRUE;
+		$this->ListOptions->UseDropDownButton = FALSE;
 		$this->ListOptions->DropDownButtonPhrase = $Language->Phrase("ButtonListOptions");
-		$this->ListOptions->UseButtonGroup = FALSE;
+		$this->ListOptions->UseButtonGroup = TRUE;
 		if ($this->ListOptions->UseButtonGroup && ew_IsMobile())
 			$this->ListOptions->UseDropDownButton = TRUE;
 		$this->ListOptions->ButtonClass = "btn-sm"; // Class for button group
@@ -3221,7 +3222,7 @@ ft_07jual_detaillist.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-ft_07jual_detaillist.Lists["x_item_id"] = {"LinkField":"x_item_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_item_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_02item"};
+ft_07jual_detaillist.Lists["x_item_id"] = {"LinkField":"x_item_id","Ajax":true,"AutoFill":true,"DisplayFields":["x_item_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_02item"};
 ft_07jual_detaillist.Lists["x_satuan_id"] = {"LinkField":"x_satuan_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_satuan_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_03satuan"};
 
 // Form object for search
@@ -3501,7 +3502,7 @@ ew_CreateCalendar("ft_07jual_detaillist", "x<?php echo $t_07jual_detail_list->Ro
 		<td data-name="item_id">
 <span id="el<?php echo $t_07jual_detail_list->RowCnt ?>_t_07jual_detail_item_id" class="form-group t_07jual_detail_item_id">
 <?php
-$wrkonchange = trim(" " . @$t_07jual_detail->item_id->EditAttrs["onchange"]);
+$wrkonchange = trim("ew_AutoFill(this); " . @$t_07jual_detail->item_id->EditAttrs["onchange"]);
 if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
 $t_07jual_detail->item_id->EditAttrs["onchange"] = "";
 ?>
@@ -3517,6 +3518,7 @@ ft_07jual_detaillist.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_list-
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery(false) ?>">
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->item_id->FldCaption() ?></span></button>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery() ?>">
+<input type="hidden" name="ln_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="ln_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="x<?php echo $t_07jual_detail_list->RowIndex ?>_satuan_id,x<?php echo $t_07jual_detail_list->RowIndex ?>_harga">
 </span>
 <input type="hidden" data-table="t_07jual_detail" data-field="x_item_id" name="o<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="o<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="<?php echo ew_HtmlEncode($t_07jual_detail->item_id->OldValue) ?>">
 </td>
@@ -3737,7 +3739,7 @@ ew_CreateCalendar("ft_07jual_detaillist", "x<?php echo $t_07jual_detail_list->Ro
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_ADD) { // Add record ?>
 <span id="el<?php echo $t_07jual_detail_list->RowCnt ?>_t_07jual_detail_item_id" class="form-group t_07jual_detail_item_id">
 <?php
-$wrkonchange = trim(" " . @$t_07jual_detail->item_id->EditAttrs["onchange"]);
+$wrkonchange = trim("ew_AutoFill(this); " . @$t_07jual_detail->item_id->EditAttrs["onchange"]);
 if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
 $t_07jual_detail->item_id->EditAttrs["onchange"] = "";
 ?>
@@ -3753,13 +3755,14 @@ ft_07jual_detaillist.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_list-
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery(false) ?>">
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->item_id->FldCaption() ?></span></button>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery() ?>">
+<input type="hidden" name="ln_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="ln_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="x<?php echo $t_07jual_detail_list->RowIndex ?>_satuan_id,x<?php echo $t_07jual_detail_list->RowIndex ?>_harga">
 </span>
 <input type="hidden" data-table="t_07jual_detail" data-field="x_item_id" name="o<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="o<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="<?php echo ew_HtmlEncode($t_07jual_detail->item_id->OldValue) ?>">
 <?php } ?>
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_07jual_detail_list->RowCnt ?>_t_07jual_detail_item_id" class="form-group t_07jual_detail_item_id">
 <?php
-$wrkonchange = trim(" " . @$t_07jual_detail->item_id->EditAttrs["onchange"]);
+$wrkonchange = trim("ew_AutoFill(this); " . @$t_07jual_detail->item_id->EditAttrs["onchange"]);
 if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
 $t_07jual_detail->item_id->EditAttrs["onchange"] = "";
 ?>
@@ -3775,6 +3778,7 @@ ft_07jual_detaillist.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_list-
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery(false) ?>">
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->item_id->FldCaption() ?></span></button>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery() ?>">
+<input type="hidden" name="ln_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="ln_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="x<?php echo $t_07jual_detail_list->RowIndex ?>_satuan_id,x<?php echo $t_07jual_detail_list->RowIndex ?>_harga">
 </span>
 <?php } ?>
 <?php if ($t_07jual_detail->RowType == EW_ROWTYPE_VIEW) { // View record ?>
@@ -3960,7 +3964,7 @@ ew_CreateCalendar("ft_07jual_detaillist", "x<?php echo $t_07jual_detail_list->Ro
 		<td data-name="item_id">
 <span id="el$rowindex$_t_07jual_detail_item_id" class="form-group t_07jual_detail_item_id">
 <?php
-$wrkonchange = trim(" " . @$t_07jual_detail->item_id->EditAttrs["onchange"]);
+$wrkonchange = trim("ew_AutoFill(this); " . @$t_07jual_detail->item_id->EditAttrs["onchange"]);
 if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
 $t_07jual_detail->item_id->EditAttrs["onchange"] = "";
 ?>
@@ -3976,6 +3980,7 @@ ft_07jual_detaillist.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_list-
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery(false) ?>">
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->item_id->FldCaption() ?></span></button>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery() ?>">
+<input type="hidden" name="ln_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="ln_x<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="x<?php echo $t_07jual_detail_list->RowIndex ?>_satuan_id,x<?php echo $t_07jual_detail_list->RowIndex ?>_harga">
 </span>
 <input type="hidden" data-table="t_07jual_detail" data-field="x_item_id" name="o<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" id="o<?php echo $t_07jual_detail_list->RowIndex ?>_item_id" value="<?php echo ew_HtmlEncode($t_07jual_detail->item_id->OldValue) ?>">
 </td>

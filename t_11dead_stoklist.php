@@ -858,6 +858,7 @@ class ct_11dead_stok_list extends ct_11dead_stok {
 
 		// Begin transaction
 		$conn->BeginTrans();
+		if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateBegin")); // Batch update begin
 		$sKey = "";
 
 		// Update row index and get row key
@@ -924,11 +925,13 @@ class ct_11dead_stok_list extends ct_11dead_stok {
 
 			// Call Grid_Updated event
 			$this->Grid_Updated($rsold, $rsnew);
+			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateSuccess")); // Batch update success
 			if ($this->getSuccessMessage() == "")
 				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up update success message
 			$this->ClearInlineMode(); // Clear inline edit mode
 		} else {
 			$conn->RollbackTrans(); // Rollback transaction
+			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateRollback")); // Batch update rollback
 			if ($this->getFailureMessage() == "")
 				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
 		}
@@ -994,6 +997,7 @@ class ct_11dead_stok_list extends ct_11dead_stok {
 		// Init key filter
 		$sWrkFilter = "";
 		$addcnt = 0;
+		if ($this->AuditTrailOnAdd) $this->WriteAuditTrailDummy($Language->Phrase("BatchInsertBegin")); // Batch insert begin
 		$sKey = "";
 
 		// Get row count
@@ -1052,11 +1056,13 @@ class ct_11dead_stok_list extends ct_11dead_stok {
 
 			// Call Grid_Inserted event
 			$this->Grid_Inserted($rsnew);
+			if ($this->AuditTrailOnAdd) $this->WriteAuditTrailDummy($Language->Phrase("BatchInsertSuccess")); // Batch insert success
 			if ($this->getSuccessMessage() == "")
 				$this->setSuccessMessage($Language->Phrase("InsertSuccess")); // Set up insert success message
 			$this->ClearInlineMode(); // Clear grid add mode
 		} else {
 			$conn->RollbackTrans(); // Rollback transaction
+			if ($this->AuditTrailOnAdd) $this->WriteAuditTrailDummy($Language->Phrase("BatchInsertRollback")); // Batch insert rollback
 			if ($this->getFailureMessage() == "") {
 				$this->setFailureMessage($Language->Phrase("InsertFailed")); // Set insert failed message
 			}
@@ -1208,38 +1214,38 @@ class ct_11dead_stok_list extends ct_11dead_stok {
 		if ($this->AllowAddDeleteRow) {
 			$item = &$this->ListOptions->Add("griddelete");
 			$item->CssStyle = "white-space: nowrap;";
-			$item->OnLeft = FALSE;
+			$item->OnLeft = TRUE;
 			$item->Visible = FALSE; // Default hidden
 		}
 
 		// Add group option item
 		$item = &$this->ListOptions->Add($this->ListOptions->GroupOptionName);
 		$item->Body = "";
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 
 		// "view"
 		$item = &$this->ListOptions->Add("view");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// "copy"
 		$item = &$this->ListOptions->Add("copy");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 
 		// List actions
 		$item = &$this->ListOptions->Add("listactions");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 		$item->ShowInButtonGroup = FALSE;
 		$item->ShowInDropDown = FALSE;
@@ -1247,8 +1253,9 @@ class ct_11dead_stok_list extends ct_11dead_stok {
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
 		$item->Visible = TRUE;
-		$item->OnLeft = FALSE;
+		$item->OnLeft = TRUE;
 		$item->Header = "<input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\">";
+		$item->MoveTo(0);
 		$item->ShowInDropDown = FALSE;
 		$item->ShowInButtonGroup = FALSE;
 
@@ -1262,9 +1269,9 @@ class ct_11dead_stok_list extends ct_11dead_stok {
 
 		// Drop down button for ListOptions
 		$this->ListOptions->UseImageAndText = TRUE;
-		$this->ListOptions->UseDropDownButton = TRUE;
+		$this->ListOptions->UseDropDownButton = FALSE;
 		$this->ListOptions->DropDownButtonPhrase = $Language->Phrase("ButtonListOptions");
-		$this->ListOptions->UseButtonGroup = FALSE;
+		$this->ListOptions->UseButtonGroup = TRUE;
 		if ($this->ListOptions->UseButtonGroup && ew_IsMobile())
 			$this->ListOptions->UseDropDownButton = TRUE;
 		$this->ListOptions->ButtonClass = "btn-sm"; // Class for button group
@@ -2207,6 +2214,7 @@ class ct_11dead_stok_list extends ct_11dead_stok {
 
 		}
 		$rows = ($rs) ? $rs->GetRows() : array();
+		if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteBegin")); // Batch delete begin
 
 		// Clone old rows
 		$rsold = $rows;
@@ -2248,6 +2256,7 @@ class ct_11dead_stok_list extends ct_11dead_stok {
 			}
 		}
 		if ($DeleteRows) {
+			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteSuccess")); // Batch delete success
 		} else {
 		}
 

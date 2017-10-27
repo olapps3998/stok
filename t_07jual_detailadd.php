@@ -1247,7 +1247,7 @@ ft_07jual_detailadd.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-ft_07jual_detailadd.Lists["x_item_id"] = {"LinkField":"x_item_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_item_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_02item"};
+ft_07jual_detailadd.Lists["x_item_id"] = {"LinkField":"x_item_id","Ajax":true,"AutoFill":true,"DisplayFields":["x_item_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_02item"};
 ft_07jual_detailadd.Lists["x_satuan_id"] = {"LinkField":"x_satuan_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_satuan_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_03satuan"};
 
 // Form object for search
@@ -1302,7 +1302,7 @@ ew_CreateCalendar("ft_07jual_detailadd", "x_tgl_kirim", 7);
 		<div class="col-sm-10"><div<?php echo $t_07jual_detail->item_id->CellAttributes() ?>>
 <span id="el_t_07jual_detail_item_id">
 <?php
-$wrkonchange = trim(" " . @$t_07jual_detail->item_id->EditAttrs["onchange"]);
+$wrkonchange = trim("ew_AutoFill(this); " . @$t_07jual_detail->item_id->EditAttrs["onchange"]);
 if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
 $t_07jual_detail->item_id->EditAttrs["onchange"] = "";
 ?>
@@ -1318,6 +1318,7 @@ ft_07jual_detailadd.CreateAutoSuggest({"id":"x_item_id","forceSelect":true});
 <input type="hidden" name="s_x_item_id" id="s_x_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery(false) ?>">
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->item_id->FldCaption() ?></span></button>
 <input type="hidden" name="s_x_item_id" id="s_x_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery() ?>">
+<input type="hidden" name="ln_x_item_id" id="ln_x_item_id" value="x_satuan_id,x_harga">
 </span>
 <?php echo $t_07jual_detail->item_id->CustomMsg ?></div></div>
 	</div>

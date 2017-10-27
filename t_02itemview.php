@@ -575,7 +575,7 @@ class ct_02item_view extends ct_02item {
 		$option = &$options["action"];
 		$option->DropDownButtonPhrase = $Language->Phrase("ButtonActions");
 		$option->UseImageAndText = TRUE;
-		$option->UseDropDownButton = TRUE;
+		$option->UseDropDownButton = FALSE;
 		$option->UseButtonGroup = TRUE;
 		$item = &$option->Add($option->GroupOptionName);
 		$item->Body = "";

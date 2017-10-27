@@ -573,7 +573,7 @@ class ct_08item_saldo_view extends ct_08item_saldo {
 		$option = &$options["action"];
 		$option->DropDownButtonPhrase = $Language->Phrase("ButtonActions");
 		$option->UseImageAndText = TRUE;
-		$option->UseDropDownButton = TRUE;
+		$option->UseDropDownButton = FALSE;
 		$option->UseButtonGroup = TRUE;
 		$item = &$option->Add($option->GroupOptionName);
 		$item->Body = "";

@@ -1059,6 +1059,29 @@ class ct_07jual_detail extends cTable {
 	function GetAutoFill($id, $val) {
 		$rsarr = array();
 		$rowcnt = 0;
+		if (preg_match('/^x(\d)*_item_id$/', $id)) {
+			$conn = &$this->Connection();
+			$sSqlWrk = "SELECT `sat_id` AS FIELD0, `hrg_jual` AS FIELD1 FROM `t_02item`";
+			$sWhereWrk = "(`item_id` = " . ew_QuotedValue($val, EW_DATATYPE_NUMBER, $this->DBID) . ")";
+			$this->item_id->LookupFilters = array("dx1" => '`item_nama`');
+			$this->Lookup_Selecting($this->item_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($rs = ew_LoadRecordset($sSqlWrk, $conn)) {
+				while ($rs && !$rs->EOF) {
+					$ar = array();
+					$this->satuan_id->setDbValue($rs->fields[0]);
+					$this->harga->setDbValue($rs->fields[1]);
+					$this->RowType == EW_ROWTYPE_EDIT;
+					$this->RenderEditRow();
+					$ar[] = ($this->satuan_id->AutoFillOriginalValue) ? $this->satuan_id->CurrentValue : $this->satuan_id->EditValue;
+					$ar[] = ($this->harga->AutoFillOriginalValue) ? $this->harga->CurrentValue : $this->harga->EditValue;
+					$rowcnt += 1;
+					$rsarr[] = $ar;
+					$rs->MoveNext();
+				}
+				$rs->Close();
+			}
+		}
 
 		// Output
 		if (is_array($rsarr) && $rowcnt > 0) {
@@ -1329,6 +1352,13 @@ class ct_07jual_detail extends cTable {
 	function Row_Deleted(&$rs) {
 
 		//echo "Row Deleted";
+		$rec_cnt_det = ew_ExecuteScalar("select count(sub_total) from t_07jual_detail where jual_id = ".$rs["jual_id"]."");
+		if ($rec_cnt_det > 0) {
+			$tot_det = ew_ExecuteScalar("select sum(sub_total) from t_07jual_detail where jual_id = ".$rs["jual_id"]."");
+			ew_Execute("update t_06jual set total = ".$tot_det." where jual_id = ".$rs["jual_id"]."");
+		} else {
+			ew_Execute("update t_06jual set total = 0 where jual_id = ".$rs["jual_id"]."");
+		}
 	}
 
 	// Email Sending event
@@ -1356,8 +1386,11 @@ class ct_07jual_detail extends cTable {
 	function Row_Rendered() {
 
 		// To view properties of field class, use:
-		//var_dump($this-><FieldName>); 
+		//var_dump($this-><FieldName>);
 
+		$this->harga->ReadOnly = true;
+		$this->satuan_id->ReadOnly = true;
+		$this->sub_total->ReadOnly = true;
 	}
 
 	// User ID Filtering event

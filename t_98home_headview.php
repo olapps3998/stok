@@ -571,7 +571,7 @@ class ct_98home_head_view extends ct_98home_head {
 		$option = &$options["action"];
 		$option->DropDownButtonPhrase = $Language->Phrase("ButtonActions");
 		$option->UseImageAndText = TRUE;
-		$option->UseDropDownButton = TRUE;
+		$option->UseDropDownButton = FALSE;
 		$option->UseButtonGroup = TRUE;
 		$item = &$option->Add($option->GroupOptionName);
 		$item->Body = "";
