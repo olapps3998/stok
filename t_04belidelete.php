@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_04beliinfo.php" ?>
+<?php include_once "t_14drop_cashinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -230,6 +231,9 @@ class ct_04beli_delete extends ct_04beli {
 			$GLOBALS["Table"] = &$GLOBALS["t_04beli"];
 		}
 
+		// Table object (t_14drop_cash)
+		if (!isset($GLOBALS['t_14drop_cash'])) $GLOBALS['t_14drop_cash'] = new ct_14drop_cash();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'delete', TRUE);
@@ -251,6 +255,7 @@ class ct_04beli_delete extends ct_04beli {
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
+		$this->dc_id->SetVisibility();
 		$this->tgl_beli->SetVisibility();
 		$this->tgl_kirim->SetVisibility();
 		$this->vendor_id->SetVisibility();
@@ -338,6 +343,9 @@ class ct_04beli_delete extends ct_04beli {
 	//
 	function Page_Main() {
 		global $Language;
+
+		// Set up master/detail parameters
+		$this->SetUpMasterParms();
 
 		// Set up Breadcrumb
 		$this->SetupBreadcrumb();
@@ -438,6 +446,12 @@ class ct_04beli_delete extends ct_04beli {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->beli_id->setDbValue($rs->fields('beli_id'));
+		$this->dc_id->setDbValue($rs->fields('dc_id'));
+		if (array_key_exists('EV__dc_id', $rs->fields)) {
+			$this->dc_id->VirtualValue = $rs->fields('EV__dc_id'); // Set up virtual field value
+		} else {
+			$this->dc_id->VirtualValue = ""; // Clear value
+		}
 		$this->tgl_beli->setDbValue($rs->fields('tgl_beli'));
 		$this->tgl_kirim->setDbValue($rs->fields('tgl_kirim'));
 		$this->vendor_id->setDbValue($rs->fields('vendor_id'));
@@ -472,6 +486,7 @@ class ct_04beli_delete extends ct_04beli {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->beli_id->DbValue = $row['beli_id'];
+		$this->dc_id->DbValue = $row['dc_id'];
 		$this->tgl_beli->DbValue = $row['tgl_beli'];
 		$this->tgl_kirim->DbValue = $row['tgl_kirim'];
 		$this->vendor_id->DbValue = $row['vendor_id'];
@@ -517,6 +532,7 @@ class ct_04beli_delete extends ct_04beli {
 
 		// Common render codes for all row types
 		// beli_id
+		// dc_id
 		// tgl_beli
 		// tgl_kirim
 		// vendor_id
@@ -535,6 +551,35 @@ class ct_04beli_delete extends ct_04beli {
 		// beli_id
 		$this->beli_id->ViewValue = $this->beli_id->CurrentValue;
 		$this->beli_id->ViewCustomAttributes = "";
+
+		// dc_id
+		if ($this->dc_id->VirtualValue <> "") {
+			$this->dc_id->ViewValue = $this->dc_id->VirtualValue;
+		} else {
+		if (strval($this->dc_id->CurrentValue) <> "") {
+			$sFilterWrk = "`dc_id`" . ew_SearchString("=", $this->dc_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `dc_id`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_14drop_cash`";
+		$sWhereWrk = "";
+		$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
+				$arwrk[2] = ew_FormatNumber($rswrk->fields('Disp2Fld'), 0, -2, -2, -2);
+				$arwrk[3] = $rswrk->fields('Disp3Fld');
+				$this->dc_id->ViewValue = $this->dc_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->dc_id->ViewValue = $this->dc_id->CurrentValue;
+			}
+		} else {
+			$this->dc_id->ViewValue = NULL;
+		}
+		}
+		$this->dc_id->ViewCustomAttributes = "";
 
 		// tgl_beli
 		$this->tgl_beli->ViewValue = $this->tgl_beli->CurrentValue;
@@ -669,6 +714,11 @@ class ct_04beli_delete extends ct_04beli {
 		$this->jml_lunas->ViewValue = ew_FormatNumber($this->jml_lunas->ViewValue, 2, -2, -2, -2);
 		$this->jml_lunas->CellCssStyle .= "text-align: right;";
 		$this->jml_lunas->ViewCustomAttributes = "";
+
+			// dc_id
+			$this->dc_id->LinkCustomAttributes = "";
+			$this->dc_id->HrefValue = "";
+			$this->dc_id->TooltipValue = "";
 
 			// tgl_beli
 			$this->tgl_beli->LinkCustomAttributes = "";
@@ -818,6 +868,66 @@ class ct_04beli_delete extends ct_04beli {
 		return $DeleteRows;
 	}
 
+	// Set up master/detail based on QueryString
+	function SetUpMasterParms() {
+		$bValidMaster = FALSE;
+
+		// Get the keys for master table
+		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "t_14drop_cash") {
+				$bValidMaster = TRUE;
+				if (@$_GET["fk_dc_id"] <> "") {
+					$GLOBALS["t_14drop_cash"]->dc_id->setQueryStringValue($_GET["fk_dc_id"]);
+					$this->dc_id->setQueryStringValue($GLOBALS["t_14drop_cash"]->dc_id->QueryStringValue);
+					$this->dc_id->setSessionValue($this->dc_id->QueryStringValue);
+					if (!is_numeric($GLOBALS["t_14drop_cash"]->dc_id->QueryStringValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "t_14drop_cash") {
+				$bValidMaster = TRUE;
+				if (@$_POST["fk_dc_id"] <> "") {
+					$GLOBALS["t_14drop_cash"]->dc_id->setFormValue($_POST["fk_dc_id"]);
+					$this->dc_id->setFormValue($GLOBALS["t_14drop_cash"]->dc_id->FormValue);
+					$this->dc_id->setSessionValue($this->dc_id->FormValue);
+					if (!is_numeric($GLOBALS["t_14drop_cash"]->dc_id->FormValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		}
+		if ($bValidMaster) {
+
+			// Save current master table
+			$this->setCurrentMasterTable($sMasterTblVar);
+
+			// Reset start record counter (new master key)
+			$this->StartRec = 1;
+			$this->setStartRecordNumber($this->StartRec);
+
+			// Clear previous master key from Session
+			if ($sMasterTblVar <> "t_14drop_cash") {
+				if ($this->dc_id->CurrentValue == "") $this->dc_id->setSessionValue("");
+			}
+		}
+		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
+		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
@@ -946,6 +1056,7 @@ ft_04belidelete.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
+ft_04belidelete.Lists["x_dc_id"] = {"LinkField":"x_dc_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_tgl","x_jumlah","x_tujuan",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_14drop_cash"};
 ft_04belidelete.Lists["x_vendor_id"] = {"LinkField":"x_vendor_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_vendor_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_01vendor"};
 ft_04belidelete.Lists["x_item_id"] = {"LinkField":"x_item_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_item_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_02item"};
 ft_04belidelete.Lists["x_satuan_id"] = {"LinkField":"x_satuan_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_satuan_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_03satuan"};
@@ -981,6 +1092,9 @@ $t_04beli_delete->ShowMessage();
 <?php echo $t_04beli->TableCustomInnerHtml ?>
 	<thead>
 	<tr class="ewTableHeader">
+<?php if ($t_04beli->dc_id->Visible) { // dc_id ?>
+		<th><span id="elh_t_04beli_dc_id" class="t_04beli_dc_id"><?php echo $t_04beli->dc_id->FldCaption() ?></span></th>
+<?php } ?>
 <?php if ($t_04beli->tgl_beli->Visible) { // tgl_beli ?>
 		<th><span id="elh_t_04beli_tgl_beli" class="t_04beli_tgl_beli"><?php echo $t_04beli->tgl_beli->FldCaption() ?></span></th>
 <?php } ?>
@@ -1038,6 +1152,14 @@ while (!$t_04beli_delete->Recordset->EOF) {
 	$t_04beli_delete->RenderRow();
 ?>
 	<tr<?php echo $t_04beli->RowAttributes() ?>>
+<?php if ($t_04beli->dc_id->Visible) { // dc_id ?>
+		<td<?php echo $t_04beli->dc_id->CellAttributes() ?>>
+<span id="el<?php echo $t_04beli_delete->RowCnt ?>_t_04beli_dc_id" class="t_04beli_dc_id">
+<span<?php echo $t_04beli->dc_id->ViewAttributes() ?>>
+<?php echo $t_04beli->dc_id->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($t_04beli->tgl_beli->Visible) { // tgl_beli ?>
 		<td<?php echo $t_04beli->tgl_beli->CellAttributes() ?>>
 <span id="el<?php echo $t_04beli_delete->RowCnt ?>_t_04beli_tgl_beli" class="t_04beli_tgl_beli">

@@ -14,6 +14,7 @@ class ct_04beli extends cTable {
 	var $AuditTrailOnViewData = FALSE;
 	var $AuditTrailOnSearch = FALSE;
 	var $beli_id;
+	var $dc_id;
 	var $tgl_beli;
 	var $tgl_kirim;
 	var $vendor_id;
@@ -50,7 +51,7 @@ class ct_04beli extends cTable {
 		$this->ExportExcelPageSize = ""; // Page size (PHPExcel only)
 		$this->DetailAdd = FALSE; // Allow detail add
 		$this->DetailEdit = FALSE; // Allow detail edit
-		$this->DetailView = FALSE; // Allow detail view
+		$this->DetailView = TRUE; // Allow detail view
 		$this->ShowMultipleDetails = FALSE; // Show multiple details
 		$this->GridAddRowCount = 5;
 		$this->AllowAddDeleteRow = ew_AllowAddDeleteRow(); // Allow add/delete row
@@ -62,6 +63,14 @@ class ct_04beli extends cTable {
 		$this->beli_id->Sortable = TRUE; // Allow sort
 		$this->beli_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['beli_id'] = &$this->beli_id;
+
+		// dc_id
+		$this->dc_id = new cField('t_04beli', 't_04beli', 'x_dc_id', 'dc_id', '`dc_id`', '`dc_id`', 3, -1, FALSE, '`EV__dc_id`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'SELECT');
+		$this->dc_id->Sortable = TRUE; // Allow sort
+		$this->dc_id->UsePleaseSelect = TRUE; // Use PleaseSelect by default
+		$this->dc_id->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
+		$this->dc_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['dc_id'] = &$this->dc_id;
 
 		// tgl_beli
 		$this->tgl_beli = new cField('t_04beli', 't_04beli', 'x_tgl_beli', 'tgl_beli', '`tgl_beli`', ew_CastDateFieldForLike('`tgl_beli`', 7, "DB"), 133, 7, FALSE, '`tgl_beli`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
@@ -192,6 +201,53 @@ class ct_04beli extends cTable {
 		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST] = $v;
 	}
 
+	// Current master table name
+	function getCurrentMasterTable() {
+		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_MASTER_TABLE];
+	}
+
+	function setCurrentMasterTable($v) {
+		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_MASTER_TABLE] = $v;
+	}
+
+	// Session master WHERE clause
+	function GetMasterFilter() {
+
+		// Master filter
+		$sMasterFilter = "";
+		if ($this->getCurrentMasterTable() == "t_14drop_cash") {
+			if ($this->dc_id->getSessionValue() <> "")
+				$sMasterFilter .= "`dc_id`=" . ew_QuotedValue($this->dc_id->getSessionValue(), EW_DATATYPE_NUMBER, "DB");
+			else
+				return "";
+		}
+		return $sMasterFilter;
+	}
+
+	// Session detail WHERE clause
+	function GetDetailFilter() {
+
+		// Detail filter
+		$sDetailFilter = "";
+		if ($this->getCurrentMasterTable() == "t_14drop_cash") {
+			if ($this->dc_id->getSessionValue() <> "")
+				$sDetailFilter .= "`dc_id`=" . ew_QuotedValue($this->dc_id->getSessionValue(), EW_DATATYPE_NUMBER, "DB");
+			else
+				return "";
+		}
+		return $sDetailFilter;
+	}
+
+	// Master filter
+	function SqlMasterFilter_t_14drop_cash() {
+		return "`dc_id`=@dc_id@";
+	}
+
+	// Detail filter
+	function SqlDetailFilter_t_14drop_cash() {
+		return "`dc_id`=@dc_id@";
+	}
+
 	// Table level SQL
 	var $_SqlFrom = "";
 
@@ -224,7 +280,7 @@ class ct_04beli extends cTable {
 	function getSqlSelectList() { // Select for List page
 		$select = "";
 		$select = "SELECT * FROM (" .
-			"SELECT *, (SELECT `vendor_nama` FROM `t_01vendor` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`vendor_id` = `t_04beli`.`vendor_id` LIMIT 1) AS `EV__vendor_id`, (SELECT `item_nama` FROM `t_02item` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`item_id` = `t_04beli`.`item_id` LIMIT 1) AS `EV__item_id`, (SELECT `satuan_nama` FROM `t_03satuan` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`satuan_id` = `t_04beli`.`satuan_id` LIMIT 1) AS `EV__satuan_id` FROM `t_04beli`" .
+			"SELECT *, (SELECT CONCAT(`tgl`,'" . ew_ValueSeparator(1, $this->dc_id) . "',`jumlah`,'" . ew_ValueSeparator(2, $this->dc_id) . "',`tujuan`) FROM `t_14drop_cash` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`dc_id` = `t_04beli`.`dc_id` LIMIT 1) AS `EV__dc_id`, (SELECT `vendor_nama` FROM `t_01vendor` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`vendor_id` = `t_04beli`.`vendor_id` LIMIT 1) AS `EV__vendor_id`, (SELECT `item_nama` FROM `t_02item` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`item_id` = `t_04beli`.`item_id` LIMIT 1) AS `EV__item_id`, (SELECT `satuan_nama` FROM `t_03satuan` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`satuan_id` = `t_04beli`.`satuan_id` LIMIT 1) AS `EV__satuan_id` FROM `t_04beli`" .
 			") `EW_TMP_TABLE`";
 		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
 	}
@@ -372,6 +428,12 @@ class ct_04beli extends cTable {
 			$sWhere = " " . str_replace(array("(",")"), array("",""), $sWhere) . " ";
 		if ($sOrderBy <> "")
 			$sOrderBy = " " . str_replace(array("(",")"), array("",""), $sOrderBy) . " ";
+		if ($this->dc_id->AdvancedSearch->SearchValue <> "" ||
+			$this->dc_id->AdvancedSearch->SearchValue2 <> "" ||
+			strpos($sWhere, " " . $this->dc_id->FldVirtualExpression . " ") !== FALSE)
+			return TRUE;
+		if (strpos($sOrderBy, " " . $this->dc_id->FldVirtualExpression . " ") !== FALSE)
+			return TRUE;
 		if ($this->vendor_id->AdvancedSearch->SearchValue <> "" ||
 			$this->vendor_id->AdvancedSearch->SearchValue2 <> "" ||
 			strpos($sWhere, " " . $this->vendor_id->FldVirtualExpression . " ") !== FALSE)
@@ -624,6 +686,10 @@ class ct_04beli extends cTable {
 
 	// Add master url
 	function AddMasterUrl($url) {
+		if ($this->getCurrentMasterTable() == "t_14drop_cash" && strpos($url, EW_TABLE_SHOW_MASTER . "=") === FALSE) {
+			$url .= (strpos($url, "?") !== FALSE ? "&" : "?") . EW_TABLE_SHOW_MASTER . "=" . $this->getCurrentMasterTable();
+			$url .= "&fk_dc_id=" . urlencode($this->dc_id->CurrentValue);
+		}
 		return $url;
 	}
 
@@ -721,6 +787,7 @@ class ct_04beli extends cTable {
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
 		$this->beli_id->setDbValue($rs->fields('beli_id'));
+		$this->dc_id->setDbValue($rs->fields('dc_id'));
 		$this->tgl_beli->setDbValue($rs->fields('tgl_beli'));
 		$this->tgl_kirim->setDbValue($rs->fields('tgl_kirim'));
 		$this->vendor_id->setDbValue($rs->fields('vendor_id'));
@@ -744,6 +811,7 @@ class ct_04beli extends cTable {
 
    // Common render codes
 		// beli_id
+		// dc_id
 		// tgl_beli
 		// tgl_kirim
 		// vendor_id
@@ -760,6 +828,35 @@ class ct_04beli extends cTable {
 
 		$this->beli_id->ViewValue = $this->beli_id->CurrentValue;
 		$this->beli_id->ViewCustomAttributes = "";
+
+		// dc_id
+		if ($this->dc_id->VirtualValue <> "") {
+			$this->dc_id->ViewValue = $this->dc_id->VirtualValue;
+		} else {
+		if (strval($this->dc_id->CurrentValue) <> "") {
+			$sFilterWrk = "`dc_id`" . ew_SearchString("=", $this->dc_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `dc_id`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_14drop_cash`";
+		$sWhereWrk = "";
+		$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
+				$arwrk[2] = ew_FormatNumber($rswrk->fields('Disp2Fld'), 0, -2, -2, -2);
+				$arwrk[3] = $rswrk->fields('Disp3Fld');
+				$this->dc_id->ViewValue = $this->dc_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->dc_id->ViewValue = $this->dc_id->CurrentValue;
+			}
+		} else {
+			$this->dc_id->ViewValue = NULL;
+		}
+		}
+		$this->dc_id->ViewCustomAttributes = "";
 
 		// tgl_beli
 		$this->tgl_beli->ViewValue = $this->tgl_beli->CurrentValue;
@@ -900,6 +997,11 @@ class ct_04beli extends cTable {
 		$this->beli_id->HrefValue = "";
 		$this->beli_id->TooltipValue = "";
 
+		// dc_id
+		$this->dc_id->LinkCustomAttributes = "";
+		$this->dc_id->HrefValue = "";
+		$this->dc_id->TooltipValue = "";
+
 		// tgl_beli
 		$this->tgl_beli->LinkCustomAttributes = "";
 		$this->tgl_beli->HrefValue = "";
@@ -976,6 +1078,41 @@ class ct_04beli extends cTable {
 		$this->beli_id->EditCustomAttributes = "";
 		$this->beli_id->EditValue = $this->beli_id->CurrentValue;
 		$this->beli_id->ViewCustomAttributes = "";
+
+		// dc_id
+		$this->dc_id->EditAttrs["class"] = "form-control";
+		$this->dc_id->EditCustomAttributes = "";
+		if ($this->dc_id->getSessionValue() <> "") {
+			$this->dc_id->CurrentValue = $this->dc_id->getSessionValue();
+		if ($this->dc_id->VirtualValue <> "") {
+			$this->dc_id->ViewValue = $this->dc_id->VirtualValue;
+		} else {
+		if (strval($this->dc_id->CurrentValue) <> "") {
+			$sFilterWrk = "`dc_id`" . ew_SearchString("=", $this->dc_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `dc_id`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_14drop_cash`";
+		$sWhereWrk = "";
+		$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
+				$arwrk[2] = ew_FormatNumber($rswrk->fields('Disp2Fld'), 0, -2, -2, -2);
+				$arwrk[3] = $rswrk->fields('Disp3Fld');
+				$this->dc_id->ViewValue = $this->dc_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->dc_id->ViewValue = $this->dc_id->CurrentValue;
+			}
+		} else {
+			$this->dc_id->ViewValue = NULL;
+		}
+		}
+		$this->dc_id->ViewCustomAttributes = "";
+		} else {
+		}
 
 		// tgl_beli
 		$this->tgl_beli->EditAttrs["class"] = "form-control";
@@ -1081,6 +1218,7 @@ class ct_04beli extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
+					if ($this->dc_id->Exportable) $Doc->ExportCaption($this->dc_id);
 					if ($this->tgl_beli->Exportable) $Doc->ExportCaption($this->tgl_beli);
 					if ($this->tgl_kirim->Exportable) $Doc->ExportCaption($this->tgl_kirim);
 					if ($this->vendor_id->Exportable) $Doc->ExportCaption($this->vendor_id);
@@ -1095,6 +1233,7 @@ class ct_04beli extends cTable {
 					if ($this->jml_lunas->Exportable) $Doc->ExportCaption($this->jml_lunas);
 				} else {
 					if ($this->beli_id->Exportable) $Doc->ExportCaption($this->beli_id);
+					if ($this->dc_id->Exportable) $Doc->ExportCaption($this->dc_id);
 					if ($this->tgl_beli->Exportable) $Doc->ExportCaption($this->tgl_beli);
 					if ($this->tgl_kirim->Exportable) $Doc->ExportCaption($this->tgl_kirim);
 					if ($this->vendor_id->Exportable) $Doc->ExportCaption($this->vendor_id);
@@ -1138,6 +1277,7 @@ class ct_04beli extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
+						if ($this->dc_id->Exportable) $Doc->ExportField($this->dc_id);
 						if ($this->tgl_beli->Exportable) $Doc->ExportField($this->tgl_beli);
 						if ($this->tgl_kirim->Exportable) $Doc->ExportField($this->tgl_kirim);
 						if ($this->vendor_id->Exportable) $Doc->ExportField($this->vendor_id);
@@ -1152,6 +1292,7 @@ class ct_04beli extends cTable {
 						if ($this->jml_lunas->Exportable) $Doc->ExportField($this->jml_lunas);
 					} else {
 						if ($this->beli_id->Exportable) $Doc->ExportField($this->beli_id);
+						if ($this->dc_id->Exportable) $Doc->ExportField($this->dc_id);
 						if ($this->tgl_beli->Exportable) $Doc->ExportField($this->tgl_beli);
 						if ($this->tgl_kirim->Exportable) $Doc->ExportField($this->tgl_kirim);
 						if ($this->vendor_id->Exportable) $Doc->ExportField($this->vendor_id);
@@ -1380,6 +1521,8 @@ class ct_04beli extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
+		$tot_det = ew_ExecuteScalar("select sum(sub_total) from t_04beli where dc_id = ".$rsnew["dc_id"]."");
+		ew_Execute("update t_14drop_cash set pemakaian_total = ".$tot_det." where dc_id = ".$rsnew["dc_id"]."");
 	}
 
 	// Row Updating event
@@ -1387,7 +1530,19 @@ class ct_04beli extends cTable {
 
 		// Enter your code here
 		// To cancel, set return value to FALSE
+		//echo "old :: ".$rsold["dc_id"]."</br>new :: ".$rsnew["dc_id"];
+		//$this->setSuccessMessage("old :: ".$rsold["dc_id"]."</br>new :: ".$rsnew["dc_id"]);
 
+		if ($rsnew["dc_id"] <> 0) {
+			$this->setSuccessMessage("select sum(sub_total) from t_04beli where dc_id = ".$rsnew["dc_id"]."");
+
+			//ew_Execute("update t_14drop_cash set pemakaian_total = ".$tot_det." where dc_id = ".$rsnew["dc_id"]."");
+		}
+		else {
+			$this->setSuccessMessage("select sum(sub_total) from t_04beli where dc_id = ".$rsold["dc_id"]."");
+
+			//ew_Execute("update t_14drop_cash set pemakaian_total = ".$tot_det." where dc_id = ".$rsold["dc_id"]."");
+		}
 		return TRUE;
 	}
 
@@ -1395,6 +1550,17 @@ class ct_04beli extends cTable {
 	function Row_Updated($rsold, &$rsnew) {
 
 		//echo "Row Updated";
+		//echo "old :: ".$rsold["dc_id"]."</br>new :: ".$rsnew["dc_id"];
+
+		if ($rsnew["dc_id"] <> 0) {
+			$tot_det = ew_ExecuteScalar("select sum(sub_total) from t_04beli where dc_id = ".$rsnew["dc_id"]."");
+			ew_Execute("update t_14drop_cash set pemakaian_total = ".$tot_det." where dc_id = ".$rsnew["dc_id"]."");
+		}
+		else {
+			$tot_det = ew_ExecuteScalar("select sum(sub_total) from t_04beli where dc_id = ".$rsold["dc_id"]."");
+			$tot_det = (is_null($tot_det) ? 0 : $tot_det);
+			ew_Execute("update t_14drop_cash set pemakaian_total = ".$tot_det." where dc_id = ".$rsold["dc_id"]."");
+		}
 	}
 
 	// Row Update Conflict event

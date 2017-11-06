@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_04beliinfo.php" ?>
+<?php include_once "t_14drop_cashinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -285,6 +286,9 @@ class ct_04beli_list extends ct_04beli {
 		$this->MultiDeleteUrl = "t_04belidelete.php";
 		$this->MultiUpdateUrl = "t_04beliupdate.php";
 
+		// Table object (t_14drop_cash)
+		if (!isset($GLOBALS['t_14drop_cash'])) $GLOBALS['t_14drop_cash'] = new ct_14drop_cash();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'list', TRUE);
@@ -385,6 +389,7 @@ class ct_04beli_list extends ct_04beli {
 
 		// Setup export options
 		$this->SetupExportOptions();
+		$this->dc_id->SetVisibility();
 		$this->tgl_beli->SetVisibility();
 		$this->tgl_kirim->SetVisibility();
 		$this->vendor_id->SetVisibility();
@@ -427,6 +432,9 @@ class ct_04beli_list extends ct_04beli {
 
 		// Create Token
 		$this->CreateToken();
+
+		// Set up master detail parameters
+		$this->SetUpMasterParms();
 
 		// Setup other options
 		$this->SetupOtherOptions();
@@ -567,10 +575,6 @@ class ct_04beli_list extends ct_04beli {
 				if ($this->CurrentAction == "cancel")
 					$this->ClearInlineMode();
 
-				// Switch to grid edit mode
-				if ($this->CurrentAction == "gridedit")
-					$this->GridEditMode();
-
 				// Switch to inline edit mode
 				if ($this->CurrentAction == "edit")
 					$this->InlineEditMode();
@@ -578,27 +582,9 @@ class ct_04beli_list extends ct_04beli {
 				// Switch to inline add mode
 				if ($this->CurrentAction == "add" || $this->CurrentAction == "copy")
 					$this->InlineAddMode();
-
-				// Switch to grid add mode
-				if ($this->CurrentAction == "gridadd")
-					$this->GridAddMode();
 			} else {
 				if (@$_POST["a_list"] <> "") {
 					$this->CurrentAction = $_POST["a_list"]; // Get action
-
-					// Grid Update
-					if (($this->CurrentAction == "gridupdate" || $this->CurrentAction == "gridoverwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridedit") {
-						if ($this->ValidateGridForm()) {
-							$bGridUpdate = $this->GridUpdate();
-						} else {
-							$bGridUpdate = FALSE;
-							$this->setFailureMessage($gsFormError);
-						}
-						if (!$bGridUpdate) {
-							$this->EventCancelled = TRUE;
-							$this->CurrentAction = "gridedit"; // Stay in Grid Edit mode
-						}
-					}
 
 					// Inline Update
 					if (($this->CurrentAction == "update" || $this->CurrentAction == "overwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "edit")
@@ -607,20 +593,6 @@ class ct_04beli_list extends ct_04beli {
 					// Insert Inline
 					if ($this->CurrentAction == "insert" && @$_SESSION[EW_SESSION_INLINE_MODE] == "add")
 						$this->InlineInsert();
-
-					// Grid Insert
-					if ($this->CurrentAction == "gridinsert" && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridadd") {
-						if ($this->ValidateGridForm()) {
-							$bGridInsert = $this->GridInsert();
-						} else {
-							$bGridInsert = FALSE;
-							$this->setFailureMessage($gsFormError);
-						}
-						if (!$bGridInsert) {
-							$this->EventCancelled = TRUE;
-							$this->CurrentAction = "gridadd"; // Stay in Grid Add mode
-						}
-					}
 				}
 			}
 
@@ -647,14 +619,6 @@ class ct_04beli_list extends ct_04beli {
 					$option->HideAllOptions();
 			}
 
-			// Show grid delete link for grid add / grid edit
-			if ($this->AllowAddDeleteRow) {
-				if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
-					$item = $this->ListOptions->GetItem("griddelete");
-					if ($item) $item->Visible = TRUE;
-				}
-			}
-
 			// Set up sorting order
 			$this->SetUpSortOrder();
 		}
@@ -671,8 +635,28 @@ class ct_04beli_list extends ct_04beli {
 
 		// Build filter
 		$sFilter = "";
+
+		// Restore master/detail filter
+		$this->DbMasterFilter = $this->GetMasterFilter(); // Restore master filter
+		$this->DbDetailFilter = $this->GetDetailFilter(); // Restore detail filter
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
+
+		// Load master record
+		if ($this->CurrentMode <> "add" && $this->GetMasterFilter() <> "" && $this->getCurrentMasterTable() == "t_14drop_cash") {
+			global $t_14drop_cash;
+			$rsmaster = $t_14drop_cash->LoadRs($this->DbMasterFilter);
+			$this->MasterRecordExists = ($rsmaster && !$rsmaster->EOF);
+			if (!$this->MasterRecordExists) {
+				$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record found
+				$this->Page_Terminate("t_14drop_cashlist.php"); // Return to master page
+			} else {
+				$t_14drop_cash->LoadListRowValues($rsmaster);
+				$t_14drop_cash->RowType = EW_ROWTYPE_MASTER; // Master row
+				$t_14drop_cash->RenderListRow();
+				$rsmaster->Close();
+			}
+		}
 
 		// Set up filter in session
 		$this->setSessionWhere($sFilter);
@@ -732,16 +716,6 @@ class ct_04beli_list extends ct_04beli {
 		$this->LastAction = $this->CurrentAction; // Save last action
 		$this->CurrentAction = ""; // Clear action
 		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
-	}
-
-	// Switch to Grid Add mode
-	function GridAddMode() {
-		$_SESSION[EW_SESSION_INLINE_MODE] = "gridadd"; // Enabled grid add
-	}
-
-	// Switch to Grid Edit mode
-	function GridEditMode() {
-		$_SESSION[EW_SESSION_INLINE_MODE] = "gridedit"; // Enable grid edit
 	}
 
 	// Switch to Inline Edit mode
@@ -845,111 +819,6 @@ class ct_04beli_list extends ct_04beli {
 		}
 	}
 
-	// Perform update to grid
-	function GridUpdate() {
-		global $Language, $objForm, $gsFormError;
-		$bGridUpdate = TRUE;
-
-		// Get old recordset
-		$this->CurrentFilter = $this->BuildKeyFilter();
-		if ($this->CurrentFilter == "")
-			$this->CurrentFilter = "0=1";
-		$sSql = $this->SQL();
-		$conn = &$this->Connection();
-		if ($rs = $conn->Execute($sSql)) {
-			$rsold = $rs->GetRows();
-			$rs->Close();
-		}
-
-		// Call Grid Updating event
-		if (!$this->Grid_Updating($rsold)) {
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("GridEditCancelled")); // Set grid edit cancelled message
-			return FALSE;
-		}
-
-		// Begin transaction
-		$conn->BeginTrans();
-		if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateBegin")); // Batch update begin
-		$sKey = "";
-
-		// Update row index and get row key
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Update all rows based on key
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-			$objForm->Index = $rowindex;
-			$rowkey = strval($objForm->GetValue($this->FormKeyName));
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-
-			// Load all values and keys
-			if ($rowaction <> "insertdelete") { // Skip insert then deleted rows
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
-					$bGridUpdate = $this->SetupKeyValues($rowkey); // Set up key values
-				} else {
-					$bGridUpdate = TRUE;
-				}
-
-				// Skip empty row
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// No action required
-				// Validate form and insert/update/delete record
-
-				} elseif ($bGridUpdate) {
-					if ($rowaction == "delete") {
-						$this->CurrentFilter = $this->KeyFilter();
-						$bGridUpdate = $this->DeleteRows(); // Delete this row
-					} else if (!$this->ValidateForm()) {
-						$bGridUpdate = FALSE; // Form error, reset action
-						$this->setFailureMessage($gsFormError);
-					} else {
-						if ($rowaction == "insert") {
-							$bGridUpdate = $this->AddRow(); // Insert this row
-						} else {
-							if ($rowkey <> "") {
-								$this->SendEmail = FALSE; // Do not send email on update success
-								$bGridUpdate = $this->EditRow(); // Update this row
-							}
-						} // End update
-					}
-				}
-				if ($bGridUpdate) {
-					if ($sKey <> "") $sKey .= ", ";
-					$sKey .= $rowkey;
-				} else {
-					break;
-				}
-			}
-		}
-		if ($bGridUpdate) {
-			$conn->CommitTrans(); // Commit transaction
-
-			// Get new recordset
-			if ($rs = $conn->Execute($sSql)) {
-				$rsnew = $rs->GetRows();
-				$rs->Close();
-			}
-
-			// Call Grid_Updated event
-			$this->Grid_Updated($rsold, $rsnew);
-			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateSuccess")); // Batch update success
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up update success message
-			$this->ClearInlineMode(); // Clear inline edit mode
-		} else {
-			$conn->RollbackTrans(); // Rollback transaction
-			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateRollback")); // Batch update rollback
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
-		}
-		return $bGridUpdate;
-	}
-
 	// Build filter for all keys
 	function BuildKeyFilter() {
 		global $objForm;
@@ -988,198 +857,6 @@ class ct_04beli_list extends ct_04beli {
 		return TRUE;
 	}
 
-	// Perform Grid Add
-	function GridInsert() {
-		global $Language, $objForm, $gsFormError;
-		$rowindex = 1;
-		$bGridInsert = FALSE;
-		$conn = &$this->Connection();
-
-		// Call Grid Inserting event
-		if (!$this->Grid_Inserting()) {
-			if ($this->getFailureMessage() == "") {
-				$this->setFailureMessage($Language->Phrase("GridAddCancelled")); // Set grid add cancelled message
-			}
-			return FALSE;
-		}
-
-		// Begin transaction
-		$conn->BeginTrans();
-
-		// Init key filter
-		$sWrkFilter = "";
-		$addcnt = 0;
-		if ($this->AuditTrailOnAdd) $this->WriteAuditTrailDummy($Language->Phrase("BatchInsertBegin")); // Batch insert begin
-		$sKey = "";
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Insert all rows
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "" && $rowaction <> "insert")
-				continue; // Skip
-			$this->LoadFormValues(); // Get form values
-			if (!$this->EmptyRow()) {
-				$addcnt++;
-				$this->SendEmail = FALSE; // Do not send email on insert success
-
-				// Validate form
-				if (!$this->ValidateForm()) {
-					$bGridInsert = FALSE; // Form error, reset action
-					$this->setFailureMessage($gsFormError);
-				} else {
-					$bGridInsert = $this->AddRow($this->OldRecordset); // Insert this row
-				}
-				if ($bGridInsert) {
-					if ($sKey <> "") $sKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-					$sKey .= $this->beli_id->CurrentValue;
-
-					// Add filter for this record
-					$sFilter = $this->KeyFilter();
-					if ($sWrkFilter <> "") $sWrkFilter .= " OR ";
-					$sWrkFilter .= $sFilter;
-				} else {
-					break;
-				}
-			}
-		}
-		if ($addcnt == 0) { // No record inserted
-			$this->setFailureMessage($Language->Phrase("NoAddRecord"));
-			$bGridInsert = FALSE;
-		}
-		if ($bGridInsert) {
-			$conn->CommitTrans(); // Commit transaction
-
-			// Get new recordset
-			$this->CurrentFilter = $sWrkFilter;
-			$sSql = $this->SQL();
-			if ($rs = $conn->Execute($sSql)) {
-				$rsnew = $rs->GetRows();
-				$rs->Close();
-			}
-
-			// Call Grid_Inserted event
-			$this->Grid_Inserted($rsnew);
-			if ($this->AuditTrailOnAdd) $this->WriteAuditTrailDummy($Language->Phrase("BatchInsertSuccess")); // Batch insert success
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("InsertSuccess")); // Set up insert success message
-			$this->ClearInlineMode(); // Clear grid add mode
-		} else {
-			$conn->RollbackTrans(); // Rollback transaction
-			if ($this->AuditTrailOnAdd) $this->WriteAuditTrailDummy($Language->Phrase("BatchInsertRollback")); // Batch insert rollback
-			if ($this->getFailureMessage() == "") {
-				$this->setFailureMessage($Language->Phrase("InsertFailed")); // Set insert failed message
-			}
-		}
-		return $bGridInsert;
-	}
-
-	// Check if empty row
-	function EmptyRow() {
-		global $objForm;
-		if ($objForm->HasValue("x_tgl_beli") && $objForm->HasValue("o_tgl_beli") && $this->tgl_beli->CurrentValue <> $this->tgl_beli->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_tgl_kirim") && $objForm->HasValue("o_tgl_kirim") && $this->tgl_kirim->CurrentValue <> $this->tgl_kirim->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_vendor_id") && $objForm->HasValue("o_vendor_id") && $this->vendor_id->CurrentValue <> $this->vendor_id->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_item_id") && $objForm->HasValue("o_item_id") && $this->item_id->CurrentValue <> $this->item_id->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_qty") && $objForm->HasValue("o_qty") && $this->qty->CurrentValue <> $this->qty->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_satuan_id") && $objForm->HasValue("o_satuan_id") && $this->satuan_id->CurrentValue <> $this->satuan_id->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_harga") && $objForm->HasValue("o_harga") && $this->harga->CurrentValue <> $this->harga->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_sub_total") && $objForm->HasValue("o_sub_total") && $this->sub_total->CurrentValue <> $this->sub_total->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_tgl_dp") && $objForm->HasValue("o_tgl_dp") && $this->tgl_dp->CurrentValue <> $this->tgl_dp->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_jml_dp") && $objForm->HasValue("o_jml_dp") && $this->jml_dp->CurrentValue <> $this->jml_dp->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_tgl_lunas") && $objForm->HasValue("o_tgl_lunas") && $this->tgl_lunas->CurrentValue <> $this->tgl_lunas->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_jml_lunas") && $objForm->HasValue("o_jml_lunas") && $this->jml_lunas->CurrentValue <> $this->jml_lunas->OldValue)
-			return FALSE;
-		return TRUE;
-	}
-
-	// Validate grid form
-	function ValidateGridForm() {
-		global $objForm;
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Validate all records
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "delete" && $rowaction <> "insertdelete") {
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// Ignore
-				} else if (!$this->ValidateForm()) {
-					return FALSE;
-				}
-			}
-		}
-		return TRUE;
-	}
-
-	// Get all form values of the grid
-	function GetGridFormValues() {
-		global $objForm;
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-		$rows = array();
-
-		// Loop through all records
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "delete" && $rowaction <> "insertdelete") {
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// Ignore
-				} else {
-					$rows[] = $this->GetFieldValues("FormValue"); // Return row as array
-				}
-			}
-		}
-		return $rows; // Return as array of array
-	}
-
-	// Restore form values for current row
-	function RestoreCurrentRowFormValues($idx) {
-		global $objForm;
-
-		// Get row based on current index
-		$objForm->Index = $idx;
-		$this->LoadFormValues(); // Load form values
-	}
-
 	// Set up sort parameters
 	function SetUpSortOrder() {
 
@@ -1190,6 +867,7 @@ class ct_04beli_list extends ct_04beli {
 		if (@$_GET["order"] <> "") {
 			$this->CurrentOrder = ew_StripSlashes(@$_GET["order"]);
 			$this->CurrentOrderType = @$_GET["ordertype"];
+			$this->UpdateSort($this->dc_id, $bCtrl); // dc_id
 			$this->UpdateSort($this->tgl_beli, $bCtrl); // tgl_beli
 			$this->UpdateSort($this->tgl_kirim, $bCtrl); // tgl_kirim
 			$this->UpdateSort($this->vendor_id, $bCtrl); // vendor_id
@@ -1226,11 +904,20 @@ class ct_04beli_list extends ct_04beli {
 		// Check if reset command
 		if (substr($this->Command,0,5) == "reset") {
 
+			// Reset master/detail keys
+			if ($this->Command == "resetall") {
+				$this->setCurrentMasterTable(""); // Clear master table
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+				$this->dc_id->setSessionValue("");
+			}
+
 			// Reset sorting order
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
 				$this->setSessionOrderByList($sOrderBy);
+				$this->dc_id->setSort("");
 				$this->tgl_beli->setSort("");
 				$this->tgl_kirim->setSort("");
 				$this->vendor_id->setSort("");
@@ -1255,25 +942,11 @@ class ct_04beli_list extends ct_04beli {
 	function SetupListOptions() {
 		global $Security, $Language;
 
-		// "griddelete"
-		if ($this->AllowAddDeleteRow) {
-			$item = &$this->ListOptions->Add("griddelete");
-			$item->CssStyle = "white-space: nowrap;";
-			$item->OnLeft = TRUE;
-			$item->Visible = FALSE; // Default hidden
-		}
-
 		// Add group option item
 		$item = &$this->ListOptions->Add($this->ListOptions->GroupOptionName);
 		$item->Body = "";
 		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
-
-		// "view"
-		$item = &$this->ListOptions->Add("view");
-		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
-		$item->OnLeft = TRUE;
 
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
@@ -1350,17 +1023,6 @@ class ct_04beli_list extends ct_04beli {
 				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $BlankRowName . "\" id=\"" . $BlankRowName . "\" value=\"1\">";
 		}
 
-		// "delete"
-		if ($this->AllowAddDeleteRow) {
-			if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
-				$option = &$this->ListOptions;
-				$option->UseButtonGroup = TRUE; // Use button group for grid delete button
-				$option->UseImageAndText = TRUE; // Use image and text for grid delete button
-				$oListOpt = &$option->Items["griddelete"];
-				$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
-			}
-		}
-
 		// "sequence"
 		$oListOpt = &$this->ListOptions->Items["sequence"];
 		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
@@ -1390,20 +1052,10 @@ class ct_04beli_list extends ct_04beli {
 			return;
 		}
 
-		// "view"
-		$oListOpt = &$this->ListOptions->Items["view"];
-		$viewcaption = ew_HtmlTitle($Language->Phrase("ViewLink"));
-		if (TRUE) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewView\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . ew_HtmlEncode($this->ViewUrl) . "\">" . $Language->Phrase("ViewLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
-		}
-
 		// "edit"
 		$oListOpt = &$this->ListOptions->Items["edit"];
 		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
 		if (TRUE) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
 			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" href=\"" . ew_HtmlEncode(ew_GetHashUrl($this->InlineEditUrl, $this->PageObjName . "_row_" . $this->RowCnt)) . "\">" . $Language->Phrase("InlineEditLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -1413,7 +1065,6 @@ class ct_04beli_list extends ct_04beli {
 		$oListOpt = &$this->ListOptions->Items["copy"];
 		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
 		if (TRUE) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
 			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineCopy\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineCopyUrl) . "\">" . $Language->Phrase("InlineCopyLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -1451,9 +1102,6 @@ class ct_04beli_list extends ct_04beli {
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
 		$oListOpt->Body = "<input type=\"checkbox\" name=\"key_m[]\" value=\"" . ew_HtmlEncode($this->beli_id->CurrentValue) . "\" onclick='ew_ClickMultiCheckbox(event);'>";
-		if ($this->CurrentAction == "gridedit" && is_numeric($this->RowIndex)) {
-			$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $KeyName . "\" id=\"" . $KeyName . "\" value=\"" . $this->beli_id->CurrentValue . "\">";
-		}
 		$this->RenderListOptionsExt();
 
 		// Call ListOptions_Rendered event
@@ -1466,25 +1114,10 @@ class ct_04beli_list extends ct_04beli {
 		$options = &$this->OtherOptions;
 		$option = $options["addedit"];
 
-		// Add
-		$item = &$option->Add("add");
-		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
-		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "");
-
 		// Inline Add
 		$item = &$option->Add("inlineadd");
 		$item->Body = "<a class=\"ewAddEdit ewInlineAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineAddUrl) . "\">" .$Language->Phrase("InlineAddLink") . "</a>";
 		$item->Visible = ($this->InlineAddUrl <> "");
-		$item = &$option->Add("gridadd");
-		$item->Body = "<a class=\"ewAddEdit ewGridAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" href=\"" . ew_HtmlEncode($this->GridAddUrl) . "\">" . $Language->Phrase("GridAddLink") . "</a>";
-		$item->Visible = ($this->GridAddUrl <> "");
-
-		// Add grid edit
-		$option = $options["addedit"];
-		$item = &$option->Add("gridedit");
-		$item->Body = "<a class=\"ewAddEdit ewGridEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GridEditUrl) . "\">" . $Language->Phrase("GridEditLink") . "</a>";
-		$item->Visible = ($this->GridEditUrl <> "");
 		$option = $options["action"];
 
 		// Add multi delete
@@ -1527,7 +1160,6 @@ class ct_04beli_list extends ct_04beli {
 	function RenderOtherOptions() {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
-		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "gridedit") { // Not grid add/edit mode
 			$option = &$options["action"];
 
 			// Set up list action buttons
@@ -1549,56 +1181,6 @@ class ct_04beli_list extends ct_04beli {
 				$option = &$options["action"];
 				$option->HideAllOptions();
 			}
-		} else { // Grid add/edit mode
-
-			// Hide all options first
-			foreach ($options as &$option)
-				$option->HideAllOptions();
-			if ($this->CurrentAction == "gridadd") {
-				if ($this->AllowAddDeleteRow) {
-
-					// Add add blank row
-					$option = &$options["addedit"];
-					$option->UseDropDownButton = FALSE;
-					$option->UseImageAndText = TRUE;
-					$item = &$option->Add("addblankrow");
-					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = TRUE;
-				}
-				$option = &$options["action"];
-				$option->UseDropDownButton = FALSE;
-				$option->UseImageAndText = TRUE;
-
-				// Add grid insert
-				$item = &$option->Add("gridinsert");
-				$item->Body = "<a class=\"ewAction ewGridInsert\" title=\"" . ew_HtmlTitle($Language->Phrase("GridInsertLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridInsertLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("GridInsertLink") . "</a>";
-
-				// Add grid cancel
-				$item = &$option->Add("gridcancel");
-				$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-				$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
-			}
-			if ($this->CurrentAction == "gridedit") {
-				if ($this->AllowAddDeleteRow) {
-
-					// Add add blank row
-					$option = &$options["addedit"];
-					$option->UseDropDownButton = FALSE;
-					$option->UseImageAndText = TRUE;
-					$item = &$option->Add("addblankrow");
-					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = TRUE;
-				}
-				$option = &$options["action"];
-				$option->UseDropDownButton = FALSE;
-				$option->UseImageAndText = TRUE;
-					$item = &$option->Add("gridsave");
-					$item->Body = "<a class=\"ewAction ewGridSave\" title=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("GridSaveLink") . "</a>";
-					$item = &$option->Add("gridcancel");
-					$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-					$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
-			}
-		}
 	}
 
 	// Process list action
@@ -1749,6 +1331,7 @@ class ct_04beli_list extends ct_04beli {
 
 	// Load default values
 	function LoadDefaultValues() {
+		$this->dc_id->CurrentValue = 0;
 		$this->tgl_beli->CurrentValue = NULL;
 		$this->tgl_beli->OldValue = $this->tgl_beli->CurrentValue;
 		$this->tgl_kirim->CurrentValue = NULL;
@@ -1780,58 +1363,49 @@ class ct_04beli_list extends ct_04beli {
 
 		// Load from form
 		global $objForm;
+		if (!$this->dc_id->FldIsDetailKey) {
+			$this->dc_id->setFormValue($objForm->GetValue("x_dc_id"));
+		}
 		if (!$this->tgl_beli->FldIsDetailKey) {
 			$this->tgl_beli->setFormValue($objForm->GetValue("x_tgl_beli"));
 			$this->tgl_beli->CurrentValue = ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 7);
 		}
-		$this->tgl_beli->setOldValue($objForm->GetValue("o_tgl_beli"));
 		if (!$this->tgl_kirim->FldIsDetailKey) {
 			$this->tgl_kirim->setFormValue($objForm->GetValue("x_tgl_kirim"));
 			$this->tgl_kirim->CurrentValue = ew_UnFormatDateTime($this->tgl_kirim->CurrentValue, 7);
 		}
-		$this->tgl_kirim->setOldValue($objForm->GetValue("o_tgl_kirim"));
 		if (!$this->vendor_id->FldIsDetailKey) {
 			$this->vendor_id->setFormValue($objForm->GetValue("x_vendor_id"));
 		}
-		$this->vendor_id->setOldValue($objForm->GetValue("o_vendor_id"));
 		if (!$this->item_id->FldIsDetailKey) {
 			$this->item_id->setFormValue($objForm->GetValue("x_item_id"));
 		}
-		$this->item_id->setOldValue($objForm->GetValue("o_item_id"));
 		if (!$this->qty->FldIsDetailKey) {
 			$this->qty->setFormValue($objForm->GetValue("x_qty"));
 		}
-		$this->qty->setOldValue($objForm->GetValue("o_qty"));
 		if (!$this->satuan_id->FldIsDetailKey) {
 			$this->satuan_id->setFormValue($objForm->GetValue("x_satuan_id"));
 		}
-		$this->satuan_id->setOldValue($objForm->GetValue("o_satuan_id"));
 		if (!$this->harga->FldIsDetailKey) {
 			$this->harga->setFormValue($objForm->GetValue("x_harga"));
 		}
-		$this->harga->setOldValue($objForm->GetValue("o_harga"));
 		if (!$this->sub_total->FldIsDetailKey) {
 			$this->sub_total->setFormValue($objForm->GetValue("x_sub_total"));
 		}
-		$this->sub_total->setOldValue($objForm->GetValue("o_sub_total"));
 		if (!$this->tgl_dp->FldIsDetailKey) {
 			$this->tgl_dp->setFormValue($objForm->GetValue("x_tgl_dp"));
 			$this->tgl_dp->CurrentValue = ew_UnFormatDateTime($this->tgl_dp->CurrentValue, 7);
 		}
-		$this->tgl_dp->setOldValue($objForm->GetValue("o_tgl_dp"));
 		if (!$this->jml_dp->FldIsDetailKey) {
 			$this->jml_dp->setFormValue($objForm->GetValue("x_jml_dp"));
 		}
-		$this->jml_dp->setOldValue($objForm->GetValue("o_jml_dp"));
 		if (!$this->tgl_lunas->FldIsDetailKey) {
 			$this->tgl_lunas->setFormValue($objForm->GetValue("x_tgl_lunas"));
 			$this->tgl_lunas->CurrentValue = ew_UnFormatDateTime($this->tgl_lunas->CurrentValue, 7);
 		}
-		$this->tgl_lunas->setOldValue($objForm->GetValue("o_tgl_lunas"));
 		if (!$this->jml_lunas->FldIsDetailKey) {
 			$this->jml_lunas->setFormValue($objForm->GetValue("x_jml_lunas"));
 		}
-		$this->jml_lunas->setOldValue($objForm->GetValue("o_jml_lunas"));
 		if (!$this->beli_id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
 			$this->beli_id->setFormValue($objForm->GetValue("x_beli_id"));
 	}
@@ -1841,6 +1415,7 @@ class ct_04beli_list extends ct_04beli {
 		global $objForm;
 		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
 			$this->beli_id->CurrentValue = $this->beli_id->FormValue;
+		$this->dc_id->CurrentValue = $this->dc_id->FormValue;
 		$this->tgl_beli->CurrentValue = $this->tgl_beli->FormValue;
 		$this->tgl_beli->CurrentValue = ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 7);
 		$this->tgl_kirim->CurrentValue = $this->tgl_kirim->FormValue;
@@ -1915,6 +1490,12 @@ class ct_04beli_list extends ct_04beli {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->beli_id->setDbValue($rs->fields('beli_id'));
+		$this->dc_id->setDbValue($rs->fields('dc_id'));
+		if (array_key_exists('EV__dc_id', $rs->fields)) {
+			$this->dc_id->VirtualValue = $rs->fields('EV__dc_id'); // Set up virtual field value
+		} else {
+			$this->dc_id->VirtualValue = ""; // Clear value
+		}
 		$this->tgl_beli->setDbValue($rs->fields('tgl_beli'));
 		$this->tgl_kirim->setDbValue($rs->fields('tgl_kirim'));
 		$this->vendor_id->setDbValue($rs->fields('vendor_id'));
@@ -1949,6 +1530,7 @@ class ct_04beli_list extends ct_04beli {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->beli_id->DbValue = $row['beli_id'];
+		$this->dc_id->DbValue = $row['dc_id'];
 		$this->tgl_beli->DbValue = $row['tgl_beli'];
 		$this->tgl_kirim->DbValue = $row['tgl_kirim'];
 		$this->vendor_id->DbValue = $row['vendor_id'];
@@ -2023,6 +1605,7 @@ class ct_04beli_list extends ct_04beli {
 
 		// Common render codes for all row types
 		// beli_id
+		// dc_id
 		// tgl_beli
 		// tgl_kirim
 		// vendor_id
@@ -2041,6 +1624,35 @@ class ct_04beli_list extends ct_04beli {
 		// beli_id
 		$this->beli_id->ViewValue = $this->beli_id->CurrentValue;
 		$this->beli_id->ViewCustomAttributes = "";
+
+		// dc_id
+		if ($this->dc_id->VirtualValue <> "") {
+			$this->dc_id->ViewValue = $this->dc_id->VirtualValue;
+		} else {
+		if (strval($this->dc_id->CurrentValue) <> "") {
+			$sFilterWrk = "`dc_id`" . ew_SearchString("=", $this->dc_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `dc_id`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_14drop_cash`";
+		$sWhereWrk = "";
+		$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
+				$arwrk[2] = ew_FormatNumber($rswrk->fields('Disp2Fld'), 0, -2, -2, -2);
+				$arwrk[3] = $rswrk->fields('Disp3Fld');
+				$this->dc_id->ViewValue = $this->dc_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->dc_id->ViewValue = $this->dc_id->CurrentValue;
+			}
+		} else {
+			$this->dc_id->ViewValue = NULL;
+		}
+		}
+		$this->dc_id->ViewCustomAttributes = "";
 
 		// tgl_beli
 		$this->tgl_beli->ViewValue = $this->tgl_beli->CurrentValue;
@@ -2176,6 +1788,11 @@ class ct_04beli_list extends ct_04beli {
 		$this->jml_lunas->CellCssStyle .= "text-align: right;";
 		$this->jml_lunas->ViewCustomAttributes = "";
 
+			// dc_id
+			$this->dc_id->LinkCustomAttributes = "";
+			$this->dc_id->HrefValue = "";
+			$this->dc_id->TooltipValue = "";
+
 			// tgl_beli
 			$this->tgl_beli->LinkCustomAttributes = "";
 			$this->tgl_beli->HrefValue = "";
@@ -2237,6 +1854,69 @@ class ct_04beli_list extends ct_04beli {
 			$this->jml_lunas->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
+			// dc_id
+			$this->dc_id->EditCustomAttributes = "";
+			if ($this->dc_id->getSessionValue() <> "") {
+				$this->dc_id->CurrentValue = $this->dc_id->getSessionValue();
+			if ($this->dc_id->VirtualValue <> "") {
+				$this->dc_id->ViewValue = $this->dc_id->VirtualValue;
+			} else {
+			if (strval($this->dc_id->CurrentValue) <> "") {
+				$sFilterWrk = "`dc_id`" . ew_SearchString("=", $this->dc_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$sSqlWrk = "SELECT `dc_id`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_14drop_cash`";
+			$sWhereWrk = "";
+			$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
+					$arwrk[2] = ew_FormatNumber($rswrk->fields('Disp2Fld'), 0, -2, -2, -2);
+					$arwrk[3] = $rswrk->fields('Disp3Fld');
+					$this->dc_id->ViewValue = $this->dc_id->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->dc_id->ViewValue = $this->dc_id->CurrentValue;
+				}
+			} else {
+				$this->dc_id->ViewValue = NULL;
+			}
+			}
+			$this->dc_id->ViewCustomAttributes = "";
+			} else {
+			if (trim(strval($this->dc_id->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`dc_id`" . ew_SearchString("=", $this->dc_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			}
+			$sSqlWrk = "SELECT `dc_id`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t_14drop_cash`";
+			$sWhereWrk = "";
+			$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = ew_HtmlEncode(ew_FormatDateTime($rswrk->fields('DispFld'), 7));
+				$arwrk[2] = ew_HtmlEncode(ew_FormatNumber($rswrk->fields('Disp2Fld'), 0, -2, -2, -2));
+				$arwrk[3] = ew_HtmlEncode($rswrk->fields('Disp3Fld'));
+				$this->dc_id->ViewValue = $this->dc_id->DisplayValue($arwrk);
+			} else {
+				$this->dc_id->ViewValue = $Language->Phrase("PleaseSelect");
+			}
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			$rowswrk = count($arwrk);
+			for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+				$arwrk[$rowcntwrk][1] = ew_FormatDateTime($arwrk[$rowcntwrk][1], 7);
+				$arwrk[$rowcntwrk][2] = ew_FormatNumber($arwrk[$rowcntwrk][2], 0, -2, -2, -2);
+			}
+			$this->dc_id->EditValue = $arwrk;
+			}
+
 			// tgl_beli
 			$this->tgl_beli->EditAttrs["class"] = "form-control";
 			$this->tgl_beli->EditCustomAttributes = "";
@@ -2306,10 +1986,7 @@ class ct_04beli_list extends ct_04beli {
 			$this->qty->EditCustomAttributes = "";
 			$this->qty->EditValue = ew_HtmlEncode($this->qty->CurrentValue);
 			$this->qty->PlaceHolder = ew_RemoveHtml($this->qty->FldCaption());
-			if (strval($this->qty->EditValue) <> "" && is_numeric($this->qty->EditValue)) {
-			$this->qty->EditValue = ew_FormatNumber($this->qty->EditValue, -2, -2, -2, -2);
-			$this->qty->OldValue = $this->qty->EditValue;
-			}
+			if (strval($this->qty->EditValue) <> "" && is_numeric($this->qty->EditValue)) $this->qty->EditValue = ew_FormatNumber($this->qty->EditValue, -2, -2, -2, -2);
 
 			// satuan_id
 			$this->satuan_id->EditAttrs["class"] = "form-control";
@@ -2342,20 +2019,14 @@ class ct_04beli_list extends ct_04beli {
 			$this->harga->EditCustomAttributes = "";
 			$this->harga->EditValue = ew_HtmlEncode($this->harga->CurrentValue);
 			$this->harga->PlaceHolder = ew_RemoveHtml($this->harga->FldCaption());
-			if (strval($this->harga->EditValue) <> "" && is_numeric($this->harga->EditValue)) {
-			$this->harga->EditValue = ew_FormatNumber($this->harga->EditValue, -2, -2, -2, -2);
-			$this->harga->OldValue = $this->harga->EditValue;
-			}
+			if (strval($this->harga->EditValue) <> "" && is_numeric($this->harga->EditValue)) $this->harga->EditValue = ew_FormatNumber($this->harga->EditValue, -2, -2, -2, -2);
 
 			// sub_total
 			$this->sub_total->EditAttrs["class"] = "form-control";
 			$this->sub_total->EditCustomAttributes = "";
 			$this->sub_total->EditValue = ew_HtmlEncode($this->sub_total->CurrentValue);
 			$this->sub_total->PlaceHolder = ew_RemoveHtml($this->sub_total->FldCaption());
-			if (strval($this->sub_total->EditValue) <> "" && is_numeric($this->sub_total->EditValue)) {
-			$this->sub_total->EditValue = ew_FormatNumber($this->sub_total->EditValue, -2, -2, -2, -2);
-			$this->sub_total->OldValue = $this->sub_total->EditValue;
-			}
+			if (strval($this->sub_total->EditValue) <> "" && is_numeric($this->sub_total->EditValue)) $this->sub_total->EditValue = ew_FormatNumber($this->sub_total->EditValue, -2, -2, -2, -2);
 
 			// tgl_dp
 			$this->tgl_dp->EditAttrs["class"] = "form-control";
@@ -2368,10 +2039,7 @@ class ct_04beli_list extends ct_04beli {
 			$this->jml_dp->EditCustomAttributes = "";
 			$this->jml_dp->EditValue = ew_HtmlEncode($this->jml_dp->CurrentValue);
 			$this->jml_dp->PlaceHolder = ew_RemoveHtml($this->jml_dp->FldCaption());
-			if (strval($this->jml_dp->EditValue) <> "" && is_numeric($this->jml_dp->EditValue)) {
-			$this->jml_dp->EditValue = ew_FormatNumber($this->jml_dp->EditValue, -2, -2, -2, -2);
-			$this->jml_dp->OldValue = $this->jml_dp->EditValue;
-			}
+			if (strval($this->jml_dp->EditValue) <> "" && is_numeric($this->jml_dp->EditValue)) $this->jml_dp->EditValue = ew_FormatNumber($this->jml_dp->EditValue, -2, -2, -2, -2);
 
 			// tgl_lunas
 			$this->tgl_lunas->EditAttrs["class"] = "form-control";
@@ -2384,14 +2052,15 @@ class ct_04beli_list extends ct_04beli {
 			$this->jml_lunas->EditCustomAttributes = "";
 			$this->jml_lunas->EditValue = ew_HtmlEncode($this->jml_lunas->CurrentValue);
 			$this->jml_lunas->PlaceHolder = ew_RemoveHtml($this->jml_lunas->FldCaption());
-			if (strval($this->jml_lunas->EditValue) <> "" && is_numeric($this->jml_lunas->EditValue)) {
-			$this->jml_lunas->EditValue = ew_FormatNumber($this->jml_lunas->EditValue, -2, -2, -2, -2);
-			$this->jml_lunas->OldValue = $this->jml_lunas->EditValue;
-			}
+			if (strval($this->jml_lunas->EditValue) <> "" && is_numeric($this->jml_lunas->EditValue)) $this->jml_lunas->EditValue = ew_FormatNumber($this->jml_lunas->EditValue, -2, -2, -2, -2);
 
 			// Add refer script
-			// tgl_beli
+			// dc_id
 
+			$this->dc_id->LinkCustomAttributes = "";
+			$this->dc_id->HrefValue = "";
+
+			// tgl_beli
 			$this->tgl_beli->LinkCustomAttributes = "";
 			$this->tgl_beli->HrefValue = "";
 
@@ -2440,6 +2109,69 @@ class ct_04beli_list extends ct_04beli {
 			$this->jml_lunas->HrefValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
+			// dc_id
+			$this->dc_id->EditCustomAttributes = "";
+			if ($this->dc_id->getSessionValue() <> "") {
+				$this->dc_id->CurrentValue = $this->dc_id->getSessionValue();
+			if ($this->dc_id->VirtualValue <> "") {
+				$this->dc_id->ViewValue = $this->dc_id->VirtualValue;
+			} else {
+			if (strval($this->dc_id->CurrentValue) <> "") {
+				$sFilterWrk = "`dc_id`" . ew_SearchString("=", $this->dc_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$sSqlWrk = "SELECT `dc_id`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_14drop_cash`";
+			$sWhereWrk = "";
+			$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
+					$arwrk[2] = ew_FormatNumber($rswrk->fields('Disp2Fld'), 0, -2, -2, -2);
+					$arwrk[3] = $rswrk->fields('Disp3Fld');
+					$this->dc_id->ViewValue = $this->dc_id->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->dc_id->ViewValue = $this->dc_id->CurrentValue;
+				}
+			} else {
+				$this->dc_id->ViewValue = NULL;
+			}
+			}
+			$this->dc_id->ViewCustomAttributes = "";
+			} else {
+			if (trim(strval($this->dc_id->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`dc_id`" . ew_SearchString("=", $this->dc_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			}
+			$sSqlWrk = "SELECT `dc_id`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t_14drop_cash`";
+			$sWhereWrk = "";
+			$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = ew_HtmlEncode(ew_FormatDateTime($rswrk->fields('DispFld'), 7));
+				$arwrk[2] = ew_HtmlEncode(ew_FormatNumber($rswrk->fields('Disp2Fld'), 0, -2, -2, -2));
+				$arwrk[3] = ew_HtmlEncode($rswrk->fields('Disp3Fld'));
+				$this->dc_id->ViewValue = $this->dc_id->DisplayValue($arwrk);
+			} else {
+				$this->dc_id->ViewValue = $Language->Phrase("PleaseSelect");
+			}
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			$rowswrk = count($arwrk);
+			for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+				$arwrk[$rowcntwrk][1] = ew_FormatDateTime($arwrk[$rowcntwrk][1], 7);
+				$arwrk[$rowcntwrk][2] = ew_FormatNumber($arwrk[$rowcntwrk][2], 0, -2, -2, -2);
+			}
+			$this->dc_id->EditValue = $arwrk;
+			}
+
 			// tgl_beli
 			$this->tgl_beli->EditAttrs["class"] = "form-control";
 			$this->tgl_beli->EditCustomAttributes = "";
@@ -2509,10 +2241,7 @@ class ct_04beli_list extends ct_04beli {
 			$this->qty->EditCustomAttributes = "";
 			$this->qty->EditValue = ew_HtmlEncode($this->qty->CurrentValue);
 			$this->qty->PlaceHolder = ew_RemoveHtml($this->qty->FldCaption());
-			if (strval($this->qty->EditValue) <> "" && is_numeric($this->qty->EditValue)) {
-			$this->qty->EditValue = ew_FormatNumber($this->qty->EditValue, -2, -2, -2, -2);
-			$this->qty->OldValue = $this->qty->EditValue;
-			}
+			if (strval($this->qty->EditValue) <> "" && is_numeric($this->qty->EditValue)) $this->qty->EditValue = ew_FormatNumber($this->qty->EditValue, -2, -2, -2, -2);
 
 			// satuan_id
 			$this->satuan_id->EditAttrs["class"] = "form-control";
@@ -2545,20 +2274,14 @@ class ct_04beli_list extends ct_04beli {
 			$this->harga->EditCustomAttributes = "";
 			$this->harga->EditValue = ew_HtmlEncode($this->harga->CurrentValue);
 			$this->harga->PlaceHolder = ew_RemoveHtml($this->harga->FldCaption());
-			if (strval($this->harga->EditValue) <> "" && is_numeric($this->harga->EditValue)) {
-			$this->harga->EditValue = ew_FormatNumber($this->harga->EditValue, -2, -2, -2, -2);
-			$this->harga->OldValue = $this->harga->EditValue;
-			}
+			if (strval($this->harga->EditValue) <> "" && is_numeric($this->harga->EditValue)) $this->harga->EditValue = ew_FormatNumber($this->harga->EditValue, -2, -2, -2, -2);
 
 			// sub_total
 			$this->sub_total->EditAttrs["class"] = "form-control";
 			$this->sub_total->EditCustomAttributes = "";
 			$this->sub_total->EditValue = ew_HtmlEncode($this->sub_total->CurrentValue);
 			$this->sub_total->PlaceHolder = ew_RemoveHtml($this->sub_total->FldCaption());
-			if (strval($this->sub_total->EditValue) <> "" && is_numeric($this->sub_total->EditValue)) {
-			$this->sub_total->EditValue = ew_FormatNumber($this->sub_total->EditValue, -2, -2, -2, -2);
-			$this->sub_total->OldValue = $this->sub_total->EditValue;
-			}
+			if (strval($this->sub_total->EditValue) <> "" && is_numeric($this->sub_total->EditValue)) $this->sub_total->EditValue = ew_FormatNumber($this->sub_total->EditValue, -2, -2, -2, -2);
 
 			// tgl_dp
 			$this->tgl_dp->EditAttrs["class"] = "form-control";
@@ -2571,10 +2294,7 @@ class ct_04beli_list extends ct_04beli {
 			$this->jml_dp->EditCustomAttributes = "";
 			$this->jml_dp->EditValue = ew_HtmlEncode($this->jml_dp->CurrentValue);
 			$this->jml_dp->PlaceHolder = ew_RemoveHtml($this->jml_dp->FldCaption());
-			if (strval($this->jml_dp->EditValue) <> "" && is_numeric($this->jml_dp->EditValue)) {
-			$this->jml_dp->EditValue = ew_FormatNumber($this->jml_dp->EditValue, -2, -2, -2, -2);
-			$this->jml_dp->OldValue = $this->jml_dp->EditValue;
-			}
+			if (strval($this->jml_dp->EditValue) <> "" && is_numeric($this->jml_dp->EditValue)) $this->jml_dp->EditValue = ew_FormatNumber($this->jml_dp->EditValue, -2, -2, -2, -2);
 
 			// tgl_lunas
 			$this->tgl_lunas->EditAttrs["class"] = "form-control";
@@ -2587,14 +2307,15 @@ class ct_04beli_list extends ct_04beli {
 			$this->jml_lunas->EditCustomAttributes = "";
 			$this->jml_lunas->EditValue = ew_HtmlEncode($this->jml_lunas->CurrentValue);
 			$this->jml_lunas->PlaceHolder = ew_RemoveHtml($this->jml_lunas->FldCaption());
-			if (strval($this->jml_lunas->EditValue) <> "" && is_numeric($this->jml_lunas->EditValue)) {
-			$this->jml_lunas->EditValue = ew_FormatNumber($this->jml_lunas->EditValue, -2, -2, -2, -2);
-			$this->jml_lunas->OldValue = $this->jml_lunas->EditValue;
-			}
+			if (strval($this->jml_lunas->EditValue) <> "" && is_numeric($this->jml_lunas->EditValue)) $this->jml_lunas->EditValue = ew_FormatNumber($this->jml_lunas->EditValue, -2, -2, -2, -2);
 
 			// Edit refer script
-			// tgl_beli
+			// dc_id
 
+			$this->dc_id->LinkCustomAttributes = "";
+			$this->dc_id->HrefValue = "";
+
+			// tgl_beli
 			$this->tgl_beli->LinkCustomAttributes = "";
 			$this->tgl_beli->HrefValue = "";
 
@@ -2721,84 +2442,6 @@ class ct_04beli_list extends ct_04beli {
 		return $ValidateForm;
 	}
 
-	//
-	// Delete records based on current filter
-	//
-	function DeleteRows() {
-		global $Language, $Security;
-		$DeleteRows = TRUE;
-		$sSql = $this->SQL();
-		$conn = &$this->Connection();
-		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-		$rs = $conn->Execute($sSql);
-		$conn->raiseErrorFn = '';
-		if ($rs === FALSE) {
-			return FALSE;
-		} elseif ($rs->EOF) {
-			$this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-			$rs->Close();
-			return FALSE;
-
-		//} else {
-		//	$this->LoadRowValues($rs); // Load row values
-
-		}
-		$rows = ($rs) ? $rs->GetRows() : array();
-		if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteBegin")); // Batch delete begin
-
-		// Clone old rows
-		$rsold = $rows;
-		if ($rs)
-			$rs->Close();
-
-		// Call row deleting event
-		if ($DeleteRows) {
-			foreach ($rsold as $row) {
-				$DeleteRows = $this->Row_Deleting($row);
-				if (!$DeleteRows) break;
-			}
-		}
-		if ($DeleteRows) {
-			$sKey = "";
-			foreach ($rsold as $row) {
-				$sThisKey = "";
-				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-				$sThisKey .= $row['beli_id'];
-				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-				$DeleteRows = $this->Delete($row); // Delete
-				$conn->raiseErrorFn = '';
-				if ($DeleteRows === FALSE)
-					break;
-				if ($sKey <> "") $sKey .= ", ";
-				$sKey .= $sThisKey;
-			}
-		} else {
-
-			// Set up error message
-			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
-
-				// Use the message, do nothing
-			} elseif ($this->CancelMessage <> "") {
-				$this->setFailureMessage($this->CancelMessage);
-				$this->CancelMessage = "";
-			} else {
-				$this->setFailureMessage($Language->Phrase("DeleteCancelled"));
-			}
-		}
-		if ($DeleteRows) {
-			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteSuccess")); // Batch delete success
-		} else {
-		}
-
-		// Call Row Deleted event
-		if ($DeleteRows) {
-			foreach ($rsold as $row) {
-				$this->Row_Deleted($row);
-			}
-		}
-		return $DeleteRows;
-	}
-
 	// Update record based on key values
 	function EditRow() {
 		global $Security, $Language;
@@ -2821,6 +2464,9 @@ class ct_04beli_list extends ct_04beli {
 			$rsold = &$rs->fields;
 			$this->LoadDbValues($rsold);
 			$rsnew = array();
+
+			// dc_id
+			$this->dc_id->SetDbValueDef($rsnew, $this->dc_id->CurrentValue, 0, $this->dc_id->ReadOnly);
 
 			// tgl_beli
 			$this->tgl_beli->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 7), NULL, $this->tgl_beli->ReadOnly);
@@ -2900,6 +2546,9 @@ class ct_04beli_list extends ct_04beli {
 			$this->LoadDbValues($rsold);
 		}
 		$rsnew = array();
+
+		// dc_id
+		$this->dc_id->SetDbValueDef($rsnew, $this->dc_id->CurrentValue, 0, strval($this->dc_id->CurrentValue) == "");
 
 		// tgl_beli
 		$this->tgl_beli->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 7), NULL, FALSE);
@@ -3081,6 +2730,25 @@ class ct_04beli_list extends ct_04beli {
 		// Call Page Exporting server event
 		$this->ExportDoc->ExportCustom = !$this->Page_Exporting();
 		$ParentTable = "";
+
+		// Export master record
+		if (EW_EXPORT_MASTER_RECORD && $this->GetMasterFilter() <> "" && $this->getCurrentMasterTable() == "t_14drop_cash") {
+			global $t_14drop_cash;
+			if (!isset($t_14drop_cash)) $t_14drop_cash = new ct_14drop_cash;
+			$rsmaster = $t_14drop_cash->LoadRs($this->DbMasterFilter); // Load master record
+			if ($rsmaster && !$rsmaster->EOF) {
+				$ExportStyle = $Doc->Style;
+				$Doc->SetStyle("v"); // Change to vertical
+				if ($this->Export <> "csv" || EW_EXPORT_MASTER_RECORD_FOR_CSV) {
+					$Doc->Table = &$t_14drop_cash;
+					$t_14drop_cash->ExportDocument($Doc, $rsmaster, 1, 1);
+					$Doc->ExportEmptyRow();
+					$Doc->Table = &$this;
+				}
+				$Doc->SetStyle($ExportStyle); // Restore
+				$rsmaster->Close();
+			}
+		}
 		$sHeader = $this->PageHeader;
 		$this->Page_DataRendering($sHeader);
 		$Doc->Text .= $sHeader;
@@ -3238,6 +2906,72 @@ class ct_04beli_list extends ct_04beli {
 		}
 	}
 
+	// Set up master/detail based on QueryString
+	function SetUpMasterParms() {
+		$bValidMaster = FALSE;
+
+		// Get the keys for master table
+		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "t_14drop_cash") {
+				$bValidMaster = TRUE;
+				if (@$_GET["fk_dc_id"] <> "") {
+					$GLOBALS["t_14drop_cash"]->dc_id->setQueryStringValue($_GET["fk_dc_id"]);
+					$this->dc_id->setQueryStringValue($GLOBALS["t_14drop_cash"]->dc_id->QueryStringValue);
+					$this->dc_id->setSessionValue($this->dc_id->QueryStringValue);
+					if (!is_numeric($GLOBALS["t_14drop_cash"]->dc_id->QueryStringValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "t_14drop_cash") {
+				$bValidMaster = TRUE;
+				if (@$_POST["fk_dc_id"] <> "") {
+					$GLOBALS["t_14drop_cash"]->dc_id->setFormValue($_POST["fk_dc_id"]);
+					$this->dc_id->setFormValue($GLOBALS["t_14drop_cash"]->dc_id->FormValue);
+					$this->dc_id->setSessionValue($this->dc_id->FormValue);
+					if (!is_numeric($GLOBALS["t_14drop_cash"]->dc_id->FormValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		}
+		if ($bValidMaster) {
+
+			// Update URL
+			$this->AddUrl = $this->AddMasterUrl($this->AddUrl);
+			$this->InlineAddUrl = $this->AddMasterUrl($this->InlineAddUrl);
+			$this->GridAddUrl = $this->AddMasterUrl($this->GridAddUrl);
+			$this->GridEditUrl = $this->AddMasterUrl($this->GridEditUrl);
+
+			// Save current master table
+			$this->setCurrentMasterTable($sMasterTblVar);
+
+			// Reset start record counter (new master key)
+			$this->StartRec = 1;
+			$this->setStartRecordNumber($this->StartRec);
+
+			// Clear previous master key from Session
+			if ($sMasterTblVar <> "t_14drop_cash") {
+				if ($this->dc_id->CurrentValue == "") $this->dc_id->setSessionValue("");
+			}
+		}
+		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
+		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
@@ -3252,6 +2986,18 @@ class ct_04beli_list extends ct_04beli {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_dc_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `dc_id` AS `LinkFld`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_14drop_cash`";
+			$sWhereWrk = "{filter}";
+			$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`dc_id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		case "x_vendor_id":
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `vendor_id` AS `LinkFld`, `vendor_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_01vendor`";
@@ -3502,9 +3248,6 @@ ft_04belilist.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-		var checkrow = (gridinsert) ? !this.EmptyRow(infix) : true;
-		if (checkrow) {
-			addcnt++;
 			elm = this.GetElements("x" + infix + "_tgl_beli");
 			if (elm && !ew_CheckEuroDate(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_04beli->tgl_beli->FldErrMsg()) ?>");
@@ -3554,30 +3297,7 @@ ft_04belilist.Validate = function() {
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
 				return false;
-		} // End Grid Add checking
 	}
-	if (gridinsert && addcnt == 0) { // No row added
-		ew_Alert(ewLanguage.Phrase("NoAddRecord"));
-		return false;
-	}
-	return true;
-}
-
-// Check empty row
-ft_04belilist.EmptyRow = function(infix) {
-	var fobj = this.Form;
-	if (ew_ValueChanged(fobj, infix, "tgl_beli", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "tgl_kirim", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "vendor_id", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "item_id", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "qty", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "satuan_id", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "harga", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "sub_total", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "tgl_dp", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "jml_dp", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "tgl_lunas", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "jml_lunas", false)) return false;
 	return true;
 }
 
@@ -3597,6 +3317,7 @@ ft_04belilist.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
+ft_04belilist.Lists["x_dc_id"] = {"LinkField":"x_dc_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_tgl","x_jumlah","x_tujuan",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_14drop_cash"};
 ft_04belilist.Lists["x_vendor_id"] = {"LinkField":"x_vendor_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_vendor_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_01vendor"};
 ft_04belilist.Lists["x_item_id"] = {"LinkField":"x_item_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_item_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_02item"};
 ft_04belilist.Lists["x_satuan_id"] = {"LinkField":"x_satuan_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_satuan_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_03satuan"};
@@ -3622,14 +3343,18 @@ ft_04belilist.Lists["x_satuan_id"] = {"LinkField":"x_satuan_id","Ajax":true,"Aut
 <div class="clearfix"></div>
 </div>
 <?php } ?>
+<?php if (($t_04beli->Export == "") || (EW_EXPORT_MASTER_RECORD && $t_04beli->Export == "print")) { ?>
 <?php
-if ($t_04beli->CurrentAction == "gridadd") {
-	$t_04beli->CurrentFilter = "0=1";
-	$t_04beli_list->StartRec = 1;
-	$t_04beli_list->DisplayRecs = $t_04beli->GridAddRowCount;
-	$t_04beli_list->TotalRecs = $t_04beli_list->DisplayRecs;
-	$t_04beli_list->StopRec = $t_04beli_list->DisplayRecs;
-} else {
+if ($t_04beli_list->DbMasterFilter <> "" && $t_04beli->getCurrentMasterTable() == "t_14drop_cash") {
+	if ($t_04beli_list->MasterRecordExists) {
+?>
+<?php include_once "t_14drop_cashmaster.php" ?>
+<?php
+	}
+}
+?>
+<?php } ?>
+<?php
 	$bSelectLimit = $t_04beli_list->UseSelectLimit;
 	if ($bSelectLimit) {
 		if ($t_04beli_list->TotalRecs <= 0)
@@ -3653,7 +3378,6 @@ if ($t_04beli->CurrentAction == "gridadd") {
 		else
 			$t_04beli_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
-}
 $t_04beli_list->RenderOtherOptions();
 ?>
 <?php $t_04beli_list->ShowPageHeader(); ?>
@@ -3738,6 +3462,10 @@ $t_04beli_list->ShowMessage();
 <input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_04beli_list->Token ?>">
 <?php } ?>
 <input type="hidden" name="t" value="t_04beli">
+<?php if ($t_04beli->getCurrentMasterTable() == "t_14drop_cash" && $t_04beli->CurrentAction <> "") { ?>
+<input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="t_14drop_cash">
+<input type="hidden" name="fk_dc_id" value="<?php echo $t_04beli->dc_id->getSessionValue() ?>">
+<?php } ?>
 <div id="gmp_t_04beli" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
 <?php if ($t_04beli_list->TotalRecs > 0 || $t_04beli->CurrentAction == "add" || $t_04beli->CurrentAction == "copy" || $t_04beli->CurrentAction == "gridedit") { ?>
 <table id="tbl_t_04belilist" class="table ewTable">
@@ -3755,6 +3483,15 @@ $t_04beli_list->RenderListOptions();
 // Render list options (header, left)
 $t_04beli_list->ListOptions->Render("header", "left");
 ?>
+<?php if ($t_04beli->dc_id->Visible) { // dc_id ?>
+	<?php if ($t_04beli->SortUrl($t_04beli->dc_id) == "") { ?>
+		<th data-name="dc_id"><div id="elh_t_04beli_dc_id" class="t_04beli_dc_id"><div class="ewTableHeaderCaption"><?php echo $t_04beli->dc_id->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="dc_id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t_04beli->SortUrl($t_04beli->dc_id) ?>',2);"><div id="elh_t_04beli_dc_id" class="t_04beli_dc_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t_04beli->dc_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t_04beli->dc_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t_04beli->dc_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
 <?php if ($t_04beli->tgl_beli->Visible) { // tgl_beli ?>
 	<?php if ($t_04beli->SortUrl($t_04beli->tgl_beli) == "") { ?>
 		<th data-name="tgl_beli"><div id="elh_t_04beli_tgl_beli" class="t_04beli_tgl_beli"><div class="ewTableHeaderCaption"><?php echo $t_04beli->tgl_beli->FldCaption() ?></div></div></th>
@@ -3900,6 +3637,27 @@ $t_04beli_list->ListOptions->Render("header", "right");
 // Render list options (body, left)
 $t_04beli_list->ListOptions->Render("body", "left", $t_04beli_list->RowCnt);
 ?>
+	<?php if ($t_04beli->dc_id->Visible) { // dc_id ?>
+		<td data-name="dc_id">
+<?php if ($t_04beli->dc_id->getSessionValue() <> "") { ?>
+<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_dc_id" class="form-group t_04beli_dc_id">
+<span<?php echo $t_04beli->dc_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t_04beli->dc_id->ViewValue ?></p></span>
+</span>
+<input type="hidden" id="x<?php echo $t_04beli_list->RowIndex ?>_dc_id" name="x<?php echo $t_04beli_list->RowIndex ?>_dc_id" value="<?php echo ew_HtmlEncode($t_04beli->dc_id->CurrentValue) ?>">
+<?php } else { ?>
+<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_dc_id" class="form-group t_04beli_dc_id">
+<span class="ewLookupList">
+	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t_04beli_list->RowIndex ?>_dc_id"><?php echo (strval($t_04beli->dc_id->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t_04beli->dc_id->ViewValue); ?></span>
+</span>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->dc_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_dc_id',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" data-table="t_04beli" data-field="x_dc_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->dc_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t_04beli_list->RowIndex ?>_dc_id" id="x<?php echo $t_04beli_list->RowIndex ?>_dc_id" value="<?php echo $t_04beli->dc_id->CurrentValue ?>"<?php echo $t_04beli->dc_id->EditAttributes() ?>>
+<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_dc_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_dc_id" value="<?php echo $t_04beli->dc_id->LookupFilterQuery() ?>">
+</span>
+<?php } ?>
+<input type="hidden" data-table="t_04beli" data-field="x_dc_id" name="o<?php echo $t_04beli_list->RowIndex ?>_dc_id" id="o<?php echo $t_04beli_list->RowIndex ?>_dc_id" value="<?php echo ew_HtmlEncode($t_04beli->dc_id->OldValue) ?>">
+</td>
+	<?php } ?>
 	<?php if ($t_04beli->tgl_beli->Visible) { // tgl_beli ?>
 		<td data-name="tgl_beli">
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_tgl_beli" class="form-group t_04beli_tgl_beli">
@@ -4113,24 +3871,10 @@ $t_04beli_list->RenderRow();
 $t_04beli_list->EditRowCnt = 0;
 if ($t_04beli->CurrentAction == "edit")
 	$t_04beli_list->RowIndex = 1;
-if ($t_04beli->CurrentAction == "gridadd")
-	$t_04beli_list->RowIndex = 0;
-if ($t_04beli->CurrentAction == "gridedit")
-	$t_04beli_list->RowIndex = 0;
 while ($t_04beli_list->RecCnt < $t_04beli_list->StopRec) {
 	$t_04beli_list->RecCnt++;
 	if (intval($t_04beli_list->RecCnt) >= intval($t_04beli_list->StartRec)) {
 		$t_04beli_list->RowCnt++;
-		if ($t_04beli->CurrentAction == "gridadd" || $t_04beli->CurrentAction == "gridedit" || $t_04beli->CurrentAction == "F") {
-			$t_04beli_list->RowIndex++;
-			$objForm->Index = $t_04beli_list->RowIndex;
-			if ($objForm->HasValue($t_04beli_list->FormActionName))
-				$t_04beli_list->RowAction = strval($objForm->GetValue($t_04beli_list->FormActionName));
-			elseif ($t_04beli->CurrentAction == "gridadd")
-				$t_04beli_list->RowAction = "insert";
-			else
-				$t_04beli_list->RowAction = "";
-		}
 
 		// Set up key count
 		$t_04beli_list->KeyCount = $t_04beli_list->RowIndex;
@@ -4144,30 +3888,15 @@ while ($t_04beli_list->RecCnt < $t_04beli_list->StopRec) {
 			$t_04beli_list->LoadRowValues($t_04beli_list->Recordset); // Load row values
 		}
 		$t_04beli->RowType = EW_ROWTYPE_VIEW; // Render view
-		if ($t_04beli->CurrentAction == "gridadd") // Grid add
-			$t_04beli->RowType = EW_ROWTYPE_ADD; // Render add
-		if ($t_04beli->CurrentAction == "gridadd" && $t_04beli->EventCancelled && !$objForm->HasValue("k_blankrow")) // Insert failed
-			$t_04beli_list->RestoreCurrentRowFormValues($t_04beli_list->RowIndex); // Restore form values
 		if ($t_04beli->CurrentAction == "edit") {
 			if ($t_04beli_list->CheckInlineEditKey() && $t_04beli_list->EditRowCnt == 0) { // Inline edit
 				$t_04beli->RowType = EW_ROWTYPE_EDIT; // Render edit
 			}
 		}
-		if ($t_04beli->CurrentAction == "gridedit") { // Grid edit
-			if ($t_04beli->EventCancelled) {
-				$t_04beli_list->RestoreCurrentRowFormValues($t_04beli_list->RowIndex); // Restore form values
-			}
-			if ($t_04beli_list->RowAction == "insert")
-				$t_04beli->RowType = EW_ROWTYPE_ADD; // Render add
-			else
-				$t_04beli->RowType = EW_ROWTYPE_EDIT; // Render edit
-		}
 		if ($t_04beli->CurrentAction == "edit" && $t_04beli->RowType == EW_ROWTYPE_EDIT && $t_04beli->EventCancelled) { // Update failed
 			$objForm->Index = 1;
 			$t_04beli_list->RestoreFormValues(); // Restore form values
 		}
-		if ($t_04beli->CurrentAction == "gridedit" && ($t_04beli->RowType == EW_ROWTYPE_EDIT || $t_04beli->RowType == EW_ROWTYPE_ADD) && $t_04beli->EventCancelled) // Update failed
-			$t_04beli_list->RestoreCurrentRowFormValues($t_04beli_list->RowIndex); // Restore form values
 		if ($t_04beli->RowType == EW_ROWTYPE_EDIT) // Edit row
 			$t_04beli_list->EditRowCnt++;
 
@@ -4179,9 +3908,6 @@ while ($t_04beli_list->RecCnt < $t_04beli_list->StopRec) {
 
 		// Render list options
 		$t_04beli_list->RenderListOptions();
-
-		// Skip delete row / empty row for confirm page
-		if ($t_04beli_list->RowAction <> "delete" && $t_04beli_list->RowAction <> "insertdelete" && !($t_04beli_list->RowAction == "insert" && $t_04beli->CurrentAction == "F" && $t_04beli_list->EmptyRow())) {
 ?>
 	<tr<?php echo $t_04beli->RowAttributes() ?>>
 <?php
@@ -4189,19 +3915,39 @@ while ($t_04beli_list->RecCnt < $t_04beli_list->StopRec) {
 // Render list options (body, left)
 $t_04beli_list->ListOptions->Render("body", "left", $t_04beli_list->RowCnt);
 ?>
+	<?php if ($t_04beli->dc_id->Visible) { // dc_id ?>
+		<td data-name="dc_id"<?php echo $t_04beli->dc_id->CellAttributes() ?>>
+<?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<?php if ($t_04beli->dc_id->getSessionValue() <> "") { ?>
+<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_dc_id" class="form-group t_04beli_dc_id">
+<span<?php echo $t_04beli->dc_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t_04beli->dc_id->ViewValue ?></p></span>
+</span>
+<input type="hidden" id="x<?php echo $t_04beli_list->RowIndex ?>_dc_id" name="x<?php echo $t_04beli_list->RowIndex ?>_dc_id" value="<?php echo ew_HtmlEncode($t_04beli->dc_id->CurrentValue) ?>">
+<?php } else { ?>
+<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_dc_id" class="form-group t_04beli_dc_id">
+<span class="ewLookupList">
+	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t_04beli_list->RowIndex ?>_dc_id"><?php echo (strval($t_04beli->dc_id->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t_04beli->dc_id->ViewValue); ?></span>
+</span>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->dc_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_dc_id',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" data-table="t_04beli" data-field="x_dc_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->dc_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t_04beli_list->RowIndex ?>_dc_id" id="x<?php echo $t_04beli_list->RowIndex ?>_dc_id" value="<?php echo $t_04beli->dc_id->CurrentValue ?>"<?php echo $t_04beli->dc_id->EditAttributes() ?>>
+<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_dc_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_dc_id" value="<?php echo $t_04beli->dc_id->LookupFilterQuery() ?>">
+</span>
+<?php } ?>
+<?php } ?>
+<?php if ($t_04beli->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_dc_id" class="t_04beli_dc_id">
+<span<?php echo $t_04beli->dc_id->ViewAttributes() ?>>
+<?php echo $t_04beli->dc_id->ListViewValue() ?></span>
+</span>
+<?php } ?>
+<a id="<?php echo $t_04beli_list->PageObjName . "_row_" . $t_04beli_list->RowCnt ?>"></a></td>
+	<?php } ?>
+<?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT || $t_04beli->CurrentMode == "edit") { ?>
+<input type="hidden" data-table="t_04beli" data-field="x_beli_id" name="x<?php echo $t_04beli_list->RowIndex ?>_beli_id" id="x<?php echo $t_04beli_list->RowIndex ?>_beli_id" value="<?php echo ew_HtmlEncode($t_04beli->beli_id->CurrentValue) ?>">
+<?php } ?>
 	<?php if ($t_04beli->tgl_beli->Visible) { // tgl_beli ?>
 		<td data-name="tgl_beli"<?php echo $t_04beli->tgl_beli->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_tgl_beli" class="form-group t_04beli_tgl_beli">
-<input type="text" data-table="t_04beli" data-field="x_tgl_beli" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_beli" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_beli" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_beli->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_beli->EditValue ?>"<?php echo $t_04beli->tgl_beli->EditAttributes() ?>>
-<?php if (!$t_04beli->tgl_beli->ReadOnly && !$t_04beli->tgl_beli->Disabled && !isset($t_04beli->tgl_beli->EditAttrs["readonly"]) && !isset($t_04beli->tgl_beli->EditAttrs["disabled"])) { ?>
-<script type="text/javascript">
-ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_beli", 7);
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_tgl_beli" name="o<?php echo $t_04beli_list->RowIndex ?>_tgl_beli" id="o<?php echo $t_04beli_list->RowIndex ?>_tgl_beli" value="<?php echo ew_HtmlEncode($t_04beli->tgl_beli->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_tgl_beli" class="form-group t_04beli_tgl_beli">
 <input type="text" data-table="t_04beli" data-field="x_tgl_beli" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_beli" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_beli" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_beli->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_beli->EditValue ?>"<?php echo $t_04beli->tgl_beli->EditAttributes() ?>>
@@ -4218,28 +3964,10 @@ ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_
 <?php echo $t_04beli->tgl_beli->ListViewValue() ?></span>
 </span>
 <?php } ?>
-<a id="<?php echo $t_04beli_list->PageObjName . "_row_" . $t_04beli_list->RowCnt ?>"></a></td>
+</td>
 	<?php } ?>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<input type="hidden" data-table="t_04beli" data-field="x_beli_id" name="x<?php echo $t_04beli_list->RowIndex ?>_beli_id" id="x<?php echo $t_04beli_list->RowIndex ?>_beli_id" value="<?php echo ew_HtmlEncode($t_04beli->beli_id->CurrentValue) ?>">
-<input type="hidden" data-table="t_04beli" data-field="x_beli_id" name="o<?php echo $t_04beli_list->RowIndex ?>_beli_id" id="o<?php echo $t_04beli_list->RowIndex ?>_beli_id" value="<?php echo ew_HtmlEncode($t_04beli->beli_id->OldValue) ?>">
-<?php } ?>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT || $t_04beli->CurrentMode == "edit") { ?>
-<input type="hidden" data-table="t_04beli" data-field="x_beli_id" name="x<?php echo $t_04beli_list->RowIndex ?>_beli_id" id="x<?php echo $t_04beli_list->RowIndex ?>_beli_id" value="<?php echo ew_HtmlEncode($t_04beli->beli_id->CurrentValue) ?>">
-<?php } ?>
 	<?php if ($t_04beli->tgl_kirim->Visible) { // tgl_kirim ?>
 		<td data-name="tgl_kirim"<?php echo $t_04beli->tgl_kirim->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_tgl_kirim" class="form-group t_04beli_tgl_kirim">
-<input type="text" data-table="t_04beli" data-field="x_tgl_kirim" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_kirim->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_kirim->EditValue ?>"<?php echo $t_04beli->tgl_kirim->EditAttributes() ?>>
-<?php if (!$t_04beli->tgl_kirim->ReadOnly && !$t_04beli->tgl_kirim->Disabled && !isset($t_04beli->tgl_kirim->EditAttrs["readonly"]) && !isset($t_04beli->tgl_kirim->EditAttrs["disabled"])) { ?>
-<script type="text/javascript">
-ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim", 7);
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_tgl_kirim" name="o<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim" id="o<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim" value="<?php echo ew_HtmlEncode($t_04beli->tgl_kirim->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_tgl_kirim" class="form-group t_04beli_tgl_kirim">
 <input type="text" data-table="t_04beli" data-field="x_tgl_kirim" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_kirim->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_kirim->EditValue ?>"<?php echo $t_04beli->tgl_kirim->EditAttributes() ?>>
@@ -4260,28 +3988,6 @@ ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_
 	<?php } ?>
 	<?php if ($t_04beli->vendor_id->Visible) { // vendor_id ?>
 		<td data-name="vendor_id"<?php echo $t_04beli->vendor_id->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_vendor_id" class="form-group t_04beli_vendor_id">
-<?php
-$wrkonchange = trim(" " . @$t_04beli->vendor_id->EditAttrs["onchange"]);
-if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
-$t_04beli->vendor_id->EditAttrs["onchange"] = "";
-?>
-<span id="as_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" style="white-space: nowrap; z-index: <?php echo (9000 - $t_04beli_list->RowCnt * 10) ?>">
-	<input type="text" name="sv_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="sv_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->EditValue ?>" placeholder="<?php echo ew_HtmlEncode($t_04beli->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_04beli->vendor_id->getPlaceHolder()) ?>"<?php echo $t_04beli->vendor_id->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_vendor_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->vendor_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo ew_HtmlEncode($t_04beli->vendor_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
-<input type="hidden" name="q_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="q_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery(true) ?>">
-<script type="text/javascript">
-ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_vendor_id","forceSelect":true});
-</script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->vendor_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_vendor_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery(false) ?>">
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->vendor_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_vendor_id',url:'t_01vendoraddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->vendor_id->FldCaption() ?></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery() ?>">
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_vendor_id" name="o<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="o<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo ew_HtmlEncode($t_04beli->vendor_id->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_vendor_id" class="form-group t_04beli_vendor_id">
 <?php
@@ -4313,28 +4019,6 @@ ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_v
 	<?php } ?>
 	<?php if ($t_04beli->item_id->Visible) { // item_id ?>
 		<td data-name="item_id"<?php echo $t_04beli->item_id->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_item_id" class="form-group t_04beli_item_id">
-<?php
-$wrkonchange = trim(" " . @$t_04beli->item_id->EditAttrs["onchange"]);
-if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
-$t_04beli->item_id->EditAttrs["onchange"] = "";
-?>
-<span id="as_x<?php echo $t_04beli_list->RowIndex ?>_item_id" style="white-space: nowrap; z-index: <?php echo (9000 - $t_04beli_list->RowCnt * 10) ?>">
-	<input type="text" name="sv_x<?php echo $t_04beli_list->RowIndex ?>_item_id" id="sv_x<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->EditValue ?>" placeholder="<?php echo ew_HtmlEncode($t_04beli->item_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_04beli->item_id->getPlaceHolder()) ?>"<?php echo $t_04beli->item_id->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_item_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->item_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t_04beli_list->RowIndex ?>_item_id" id="x<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo ew_HtmlEncode($t_04beli->item_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
-<input type="hidden" name="q_x<?php echo $t_04beli_list->RowIndex ?>_item_id" id="q_x<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery(true) ?>">
-<script type="text/javascript">
-ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_item_id","forceSelect":true});
-</script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->item_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_item_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_item_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery(false) ?>">
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_list->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->item_id->FldCaption() ?></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_item_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery() ?>">
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_item_id" name="o<?php echo $t_04beli_list->RowIndex ?>_item_id" id="o<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo ew_HtmlEncode($t_04beli->item_id->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_item_id" class="form-group t_04beli_item_id">
 <?php
@@ -4366,12 +4050,6 @@ ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_i
 	<?php } ?>
 	<?php if ($t_04beli->qty->Visible) { // qty ?>
 		<td data-name="qty"<?php echo $t_04beli->qty->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_qty" class="form-group t_04beli_qty">
-<input type="text" data-table="t_04beli" data-field="x_qty" name="x<?php echo $t_04beli_list->RowIndex ?>_qty" id="x<?php echo $t_04beli_list->RowIndex ?>_qty" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->qty->getPlaceHolder()) ?>" value="<?php echo $t_04beli->qty->EditValue ?>"<?php echo $t_04beli->qty->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_qty" name="o<?php echo $t_04beli_list->RowIndex ?>_qty" id="o<?php echo $t_04beli_list->RowIndex ?>_qty" value="<?php echo ew_HtmlEncode($t_04beli->qty->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_qty" class="form-group t_04beli_qty">
 <input type="text" data-table="t_04beli" data-field="x_qty" name="x<?php echo $t_04beli_list->RowIndex ?>_qty" id="x<?php echo $t_04beli_list->RowIndex ?>_qty" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->qty->getPlaceHolder()) ?>" value="<?php echo $t_04beli->qty->EditValue ?>"<?php echo $t_04beli->qty->EditAttributes() ?>>
@@ -4387,28 +4065,6 @@ ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_i
 	<?php } ?>
 	<?php if ($t_04beli->satuan_id->Visible) { // satuan_id ?>
 		<td data-name="satuan_id"<?php echo $t_04beli->satuan_id->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_satuan_id" class="form-group t_04beli_satuan_id">
-<?php
-$wrkonchange = trim(" " . @$t_04beli->satuan_id->EditAttrs["onchange"]);
-if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
-$t_04beli->satuan_id->EditAttrs["onchange"] = "";
-?>
-<span id="as_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" style="white-space: nowrap; z-index: <?php echo (9000 - $t_04beli_list->RowCnt * 10) ?>">
-	<input type="text" name="sv_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="sv_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->EditValue ?>" placeholder="<?php echo ew_HtmlEncode($t_04beli->satuan_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_04beli->satuan_id->getPlaceHolder()) ?>"<?php echo $t_04beli->satuan_id->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_satuan_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->satuan_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo ew_HtmlEncode($t_04beli->satuan_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
-<input type="hidden" name="q_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="q_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery(true) ?>">
-<script type="text/javascript">
-ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_satuan_id","forceSelect":true});
-</script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->satuan_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_satuan_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery(false) ?>">
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->satuan_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_satuan_id',url:'t_03satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->satuan_id->FldCaption() ?></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery() ?>">
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_satuan_id" name="o<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="o<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo ew_HtmlEncode($t_04beli->satuan_id->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_satuan_id" class="form-group t_04beli_satuan_id">
 <?php
@@ -4440,12 +4096,6 @@ ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_s
 	<?php } ?>
 	<?php if ($t_04beli->harga->Visible) { // harga ?>
 		<td data-name="harga"<?php echo $t_04beli->harga->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_harga" class="form-group t_04beli_harga">
-<input type="text" data-table="t_04beli" data-field="x_harga" name="x<?php echo $t_04beli_list->RowIndex ?>_harga" id="x<?php echo $t_04beli_list->RowIndex ?>_harga" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->harga->getPlaceHolder()) ?>" value="<?php echo $t_04beli->harga->EditValue ?>"<?php echo $t_04beli->harga->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_harga" name="o<?php echo $t_04beli_list->RowIndex ?>_harga" id="o<?php echo $t_04beli_list->RowIndex ?>_harga" value="<?php echo ew_HtmlEncode($t_04beli->harga->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_harga" class="form-group t_04beli_harga">
 <input type="text" data-table="t_04beli" data-field="x_harga" name="x<?php echo $t_04beli_list->RowIndex ?>_harga" id="x<?php echo $t_04beli_list->RowIndex ?>_harga" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->harga->getPlaceHolder()) ?>" value="<?php echo $t_04beli->harga->EditValue ?>"<?php echo $t_04beli->harga->EditAttributes() ?>>
@@ -4461,12 +4111,6 @@ ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_s
 	<?php } ?>
 	<?php if ($t_04beli->sub_total->Visible) { // sub_total ?>
 		<td data-name="sub_total"<?php echo $t_04beli->sub_total->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_sub_total" class="form-group t_04beli_sub_total">
-<input type="text" data-table="t_04beli" data-field="x_sub_total" name="x<?php echo $t_04beli_list->RowIndex ?>_sub_total" id="x<?php echo $t_04beli_list->RowIndex ?>_sub_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_04beli->sub_total->EditValue ?>"<?php echo $t_04beli->sub_total->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_sub_total" name="o<?php echo $t_04beli_list->RowIndex ?>_sub_total" id="o<?php echo $t_04beli_list->RowIndex ?>_sub_total" value="<?php echo ew_HtmlEncode($t_04beli->sub_total->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_sub_total" class="form-group t_04beli_sub_total">
 <input type="text" data-table="t_04beli" data-field="x_sub_total" name="x<?php echo $t_04beli_list->RowIndex ?>_sub_total" id="x<?php echo $t_04beli_list->RowIndex ?>_sub_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_04beli->sub_total->EditValue ?>"<?php echo $t_04beli->sub_total->EditAttributes() ?>>
@@ -4482,17 +4126,6 @@ ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_s
 	<?php } ?>
 	<?php if ($t_04beli->tgl_dp->Visible) { // tgl_dp ?>
 		<td data-name="tgl_dp"<?php echo $t_04beli->tgl_dp->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_tgl_dp" class="form-group t_04beli_tgl_dp">
-<input type="text" data-table="t_04beli" data-field="x_tgl_dp" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_dp" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_dp" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_dp->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_dp->EditValue ?>"<?php echo $t_04beli->tgl_dp->EditAttributes() ?>>
-<?php if (!$t_04beli->tgl_dp->ReadOnly && !$t_04beli->tgl_dp->Disabled && !isset($t_04beli->tgl_dp->EditAttrs["readonly"]) && !isset($t_04beli->tgl_dp->EditAttrs["disabled"])) { ?>
-<script type="text/javascript">
-ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_dp", 7);
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_tgl_dp" name="o<?php echo $t_04beli_list->RowIndex ?>_tgl_dp" id="o<?php echo $t_04beli_list->RowIndex ?>_tgl_dp" value="<?php echo ew_HtmlEncode($t_04beli->tgl_dp->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_tgl_dp" class="form-group t_04beli_tgl_dp">
 <input type="text" data-table="t_04beli" data-field="x_tgl_dp" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_dp" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_dp" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_dp->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_dp->EditValue ?>"<?php echo $t_04beli->tgl_dp->EditAttributes() ?>>
@@ -4513,12 +4146,6 @@ ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_
 	<?php } ?>
 	<?php if ($t_04beli->jml_dp->Visible) { // jml_dp ?>
 		<td data-name="jml_dp"<?php echo $t_04beli->jml_dp->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_jml_dp" class="form-group t_04beli_jml_dp">
-<input type="text" data-table="t_04beli" data-field="x_jml_dp" name="x<?php echo $t_04beli_list->RowIndex ?>_jml_dp" id="x<?php echo $t_04beli_list->RowIndex ?>_jml_dp" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->jml_dp->getPlaceHolder()) ?>" value="<?php echo $t_04beli->jml_dp->EditValue ?>"<?php echo $t_04beli->jml_dp->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_jml_dp" name="o<?php echo $t_04beli_list->RowIndex ?>_jml_dp" id="o<?php echo $t_04beli_list->RowIndex ?>_jml_dp" value="<?php echo ew_HtmlEncode($t_04beli->jml_dp->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_jml_dp" class="form-group t_04beli_jml_dp">
 <input type="text" data-table="t_04beli" data-field="x_jml_dp" name="x<?php echo $t_04beli_list->RowIndex ?>_jml_dp" id="x<?php echo $t_04beli_list->RowIndex ?>_jml_dp" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->jml_dp->getPlaceHolder()) ?>" value="<?php echo $t_04beli->jml_dp->EditValue ?>"<?php echo $t_04beli->jml_dp->EditAttributes() ?>>
@@ -4534,17 +4161,6 @@ ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_
 	<?php } ?>
 	<?php if ($t_04beli->tgl_lunas->Visible) { // tgl_lunas ?>
 		<td data-name="tgl_lunas"<?php echo $t_04beli->tgl_lunas->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_tgl_lunas" class="form-group t_04beli_tgl_lunas">
-<input type="text" data-table="t_04beli" data-field="x_tgl_lunas" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_lunas->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_lunas->EditValue ?>"<?php echo $t_04beli->tgl_lunas->EditAttributes() ?>>
-<?php if (!$t_04beli->tgl_lunas->ReadOnly && !$t_04beli->tgl_lunas->Disabled && !isset($t_04beli->tgl_lunas->EditAttrs["readonly"]) && !isset($t_04beli->tgl_lunas->EditAttrs["disabled"])) { ?>
-<script type="text/javascript">
-ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas", 7);
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_tgl_lunas" name="o<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas" id="o<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas" value="<?php echo ew_HtmlEncode($t_04beli->tgl_lunas->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_tgl_lunas" class="form-group t_04beli_tgl_lunas">
 <input type="text" data-table="t_04beli" data-field="x_tgl_lunas" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_lunas->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_lunas->EditValue ?>"<?php echo $t_04beli->tgl_lunas->EditAttributes() ?>>
@@ -4565,12 +4181,6 @@ ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_
 	<?php } ?>
 	<?php if ($t_04beli->jml_lunas->Visible) { // jml_lunas ?>
 		<td data-name="jml_lunas"<?php echo $t_04beli->jml_lunas->CellAttributes() ?>>
-<?php if ($t_04beli->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_jml_lunas" class="form-group t_04beli_jml_lunas">
-<input type="text" data-table="t_04beli" data-field="x_jml_lunas" name="x<?php echo $t_04beli_list->RowIndex ?>_jml_lunas" id="x<?php echo $t_04beli_list->RowIndex ?>_jml_lunas" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->jml_lunas->getPlaceHolder()) ?>" value="<?php echo $t_04beli->jml_lunas->EditValue ?>"<?php echo $t_04beli->jml_lunas->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_jml_lunas" name="o<?php echo $t_04beli_list->RowIndex ?>_jml_lunas" id="o<?php echo $t_04beli_list->RowIndex ?>_jml_lunas" value="<?php echo ew_HtmlEncode($t_04beli->jml_lunas->OldValue) ?>">
-<?php } ?>
 <?php if ($t_04beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_04beli_list->RowCnt ?>_t_04beli_jml_lunas" class="form-group t_04beli_jml_lunas">
 <input type="text" data-table="t_04beli" data-field="x_jml_lunas" name="x<?php echo $t_04beli_list->RowIndex ?>_jml_lunas" id="x<?php echo $t_04beli_list->RowIndex ?>_jml_lunas" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->jml_lunas->getPlaceHolder()) ?>" value="<?php echo $t_04beli->jml_lunas->EditValue ?>"<?php echo $t_04beli->jml_lunas->EditAttributes() ?>>
@@ -4597,209 +4207,8 @@ ft_04belilist.UpdateOpts(<?php echo $t_04beli_list->RowIndex ?>);
 <?php } ?>
 <?php
 	}
-	} // End delete row checking
 	if ($t_04beli->CurrentAction <> "gridadd")
-		if (!$t_04beli_list->Recordset->EOF) $t_04beli_list->Recordset->MoveNext();
-}
-?>
-<?php
-	if ($t_04beli->CurrentAction == "gridadd" || $t_04beli->CurrentAction == "gridedit") {
-		$t_04beli_list->RowIndex = '$rowindex$';
-		$t_04beli_list->LoadDefaultValues();
-
-		// Set row properties
-		$t_04beli->ResetAttrs();
-		$t_04beli->RowAttrs = array_merge($t_04beli->RowAttrs, array('data-rowindex'=>$t_04beli_list->RowIndex, 'id'=>'r0_t_04beli', 'data-rowtype'=>EW_ROWTYPE_ADD));
-		ew_AppendClass($t_04beli->RowAttrs["class"], "ewTemplate");
-		$t_04beli->RowType = EW_ROWTYPE_ADD;
-
-		// Render row
-		$t_04beli_list->RenderRow();
-
-		// Render list options
-		$t_04beli_list->RenderListOptions();
-		$t_04beli_list->StartRowCnt = 0;
-?>
-	<tr<?php echo $t_04beli->RowAttributes() ?>>
-<?php
-
-// Render list options (body, left)
-$t_04beli_list->ListOptions->Render("body", "left", $t_04beli_list->RowIndex);
-?>
-	<?php if ($t_04beli->tgl_beli->Visible) { // tgl_beli ?>
-		<td data-name="tgl_beli">
-<span id="el$rowindex$_t_04beli_tgl_beli" class="form-group t_04beli_tgl_beli">
-<input type="text" data-table="t_04beli" data-field="x_tgl_beli" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_beli" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_beli" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_beli->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_beli->EditValue ?>"<?php echo $t_04beli->tgl_beli->EditAttributes() ?>>
-<?php if (!$t_04beli->tgl_beli->ReadOnly && !$t_04beli->tgl_beli->Disabled && !isset($t_04beli->tgl_beli->EditAttrs["readonly"]) && !isset($t_04beli->tgl_beli->EditAttrs["disabled"])) { ?>
-<script type="text/javascript">
-ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_beli", 7);
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_tgl_beli" name="o<?php echo $t_04beli_list->RowIndex ?>_tgl_beli" id="o<?php echo $t_04beli_list->RowIndex ?>_tgl_beli" value="<?php echo ew_HtmlEncode($t_04beli->tgl_beli->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_04beli->tgl_kirim->Visible) { // tgl_kirim ?>
-		<td data-name="tgl_kirim">
-<span id="el$rowindex$_t_04beli_tgl_kirim" class="form-group t_04beli_tgl_kirim">
-<input type="text" data-table="t_04beli" data-field="x_tgl_kirim" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_kirim->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_kirim->EditValue ?>"<?php echo $t_04beli->tgl_kirim->EditAttributes() ?>>
-<?php if (!$t_04beli->tgl_kirim->ReadOnly && !$t_04beli->tgl_kirim->Disabled && !isset($t_04beli->tgl_kirim->EditAttrs["readonly"]) && !isset($t_04beli->tgl_kirim->EditAttrs["disabled"])) { ?>
-<script type="text/javascript">
-ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim", 7);
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_tgl_kirim" name="o<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim" id="o<?php echo $t_04beli_list->RowIndex ?>_tgl_kirim" value="<?php echo ew_HtmlEncode($t_04beli->tgl_kirim->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_04beli->vendor_id->Visible) { // vendor_id ?>
-		<td data-name="vendor_id">
-<span id="el$rowindex$_t_04beli_vendor_id" class="form-group t_04beli_vendor_id">
-<?php
-$wrkonchange = trim(" " . @$t_04beli->vendor_id->EditAttrs["onchange"]);
-if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
-$t_04beli->vendor_id->EditAttrs["onchange"] = "";
-?>
-<span id="as_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" style="white-space: nowrap; z-index: <?php echo (9000 - $t_04beli_list->RowCnt * 10) ?>">
-	<input type="text" name="sv_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="sv_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->EditValue ?>" placeholder="<?php echo ew_HtmlEncode($t_04beli->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_04beli->vendor_id->getPlaceHolder()) ?>"<?php echo $t_04beli->vendor_id->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_vendor_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->vendor_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo ew_HtmlEncode($t_04beli->vendor_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
-<input type="hidden" name="q_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="q_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery(true) ?>">
-<script type="text/javascript">
-ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_vendor_id","forceSelect":true});
-</script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->vendor_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_vendor_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery(false) ?>">
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->vendor_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_vendor_id',url:'t_01vendoraddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->vendor_id->FldCaption() ?></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery() ?>">
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_vendor_id" name="o<?php echo $t_04beli_list->RowIndex ?>_vendor_id" id="o<?php echo $t_04beli_list->RowIndex ?>_vendor_id" value="<?php echo ew_HtmlEncode($t_04beli->vendor_id->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_04beli->item_id->Visible) { // item_id ?>
-		<td data-name="item_id">
-<span id="el$rowindex$_t_04beli_item_id" class="form-group t_04beli_item_id">
-<?php
-$wrkonchange = trim(" " . @$t_04beli->item_id->EditAttrs["onchange"]);
-if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
-$t_04beli->item_id->EditAttrs["onchange"] = "";
-?>
-<span id="as_x<?php echo $t_04beli_list->RowIndex ?>_item_id" style="white-space: nowrap; z-index: <?php echo (9000 - $t_04beli_list->RowCnt * 10) ?>">
-	<input type="text" name="sv_x<?php echo $t_04beli_list->RowIndex ?>_item_id" id="sv_x<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->EditValue ?>" placeholder="<?php echo ew_HtmlEncode($t_04beli->item_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_04beli->item_id->getPlaceHolder()) ?>"<?php echo $t_04beli->item_id->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_item_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->item_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t_04beli_list->RowIndex ?>_item_id" id="x<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo ew_HtmlEncode($t_04beli->item_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
-<input type="hidden" name="q_x<?php echo $t_04beli_list->RowIndex ?>_item_id" id="q_x<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery(true) ?>">
-<script type="text/javascript">
-ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_item_id","forceSelect":true});
-</script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->item_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_item_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_item_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery(false) ?>">
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_list->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->item_id->FldCaption() ?></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_item_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery() ?>">
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_item_id" name="o<?php echo $t_04beli_list->RowIndex ?>_item_id" id="o<?php echo $t_04beli_list->RowIndex ?>_item_id" value="<?php echo ew_HtmlEncode($t_04beli->item_id->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_04beli->qty->Visible) { // qty ?>
-		<td data-name="qty">
-<span id="el$rowindex$_t_04beli_qty" class="form-group t_04beli_qty">
-<input type="text" data-table="t_04beli" data-field="x_qty" name="x<?php echo $t_04beli_list->RowIndex ?>_qty" id="x<?php echo $t_04beli_list->RowIndex ?>_qty" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->qty->getPlaceHolder()) ?>" value="<?php echo $t_04beli->qty->EditValue ?>"<?php echo $t_04beli->qty->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_qty" name="o<?php echo $t_04beli_list->RowIndex ?>_qty" id="o<?php echo $t_04beli_list->RowIndex ?>_qty" value="<?php echo ew_HtmlEncode($t_04beli->qty->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_04beli->satuan_id->Visible) { // satuan_id ?>
-		<td data-name="satuan_id">
-<span id="el$rowindex$_t_04beli_satuan_id" class="form-group t_04beli_satuan_id">
-<?php
-$wrkonchange = trim(" " . @$t_04beli->satuan_id->EditAttrs["onchange"]);
-if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
-$t_04beli->satuan_id->EditAttrs["onchange"] = "";
-?>
-<span id="as_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" style="white-space: nowrap; z-index: <?php echo (9000 - $t_04beli_list->RowCnt * 10) ?>">
-	<input type="text" name="sv_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="sv_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->EditValue ?>" placeholder="<?php echo ew_HtmlEncode($t_04beli->satuan_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_04beli->satuan_id->getPlaceHolder()) ?>"<?php echo $t_04beli->satuan_id->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_satuan_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->satuan_id->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo ew_HtmlEncode($t_04beli->satuan_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
-<input type="hidden" name="q_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="q_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery(true) ?>">
-<script type="text/javascript">
-ft_04belilist.CreateAutoSuggest({"id":"x<?php echo $t_04beli_list->RowIndex ?>_satuan_id","forceSelect":true});
-</script>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->satuan_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_satuan_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery(false) ?>">
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->satuan_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_list->RowIndex ?>_satuan_id',url:'t_03satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->satuan_id->FldCaption() ?></span></button>
-<input type="hidden" name="s_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="s_x<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery() ?>">
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_satuan_id" name="o<?php echo $t_04beli_list->RowIndex ?>_satuan_id" id="o<?php echo $t_04beli_list->RowIndex ?>_satuan_id" value="<?php echo ew_HtmlEncode($t_04beli->satuan_id->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_04beli->harga->Visible) { // harga ?>
-		<td data-name="harga">
-<span id="el$rowindex$_t_04beli_harga" class="form-group t_04beli_harga">
-<input type="text" data-table="t_04beli" data-field="x_harga" name="x<?php echo $t_04beli_list->RowIndex ?>_harga" id="x<?php echo $t_04beli_list->RowIndex ?>_harga" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->harga->getPlaceHolder()) ?>" value="<?php echo $t_04beli->harga->EditValue ?>"<?php echo $t_04beli->harga->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_harga" name="o<?php echo $t_04beli_list->RowIndex ?>_harga" id="o<?php echo $t_04beli_list->RowIndex ?>_harga" value="<?php echo ew_HtmlEncode($t_04beli->harga->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_04beli->sub_total->Visible) { // sub_total ?>
-		<td data-name="sub_total">
-<span id="el$rowindex$_t_04beli_sub_total" class="form-group t_04beli_sub_total">
-<input type="text" data-table="t_04beli" data-field="x_sub_total" name="x<?php echo $t_04beli_list->RowIndex ?>_sub_total" id="x<?php echo $t_04beli_list->RowIndex ?>_sub_total" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->sub_total->getPlaceHolder()) ?>" value="<?php echo $t_04beli->sub_total->EditValue ?>"<?php echo $t_04beli->sub_total->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_sub_total" name="o<?php echo $t_04beli_list->RowIndex ?>_sub_total" id="o<?php echo $t_04beli_list->RowIndex ?>_sub_total" value="<?php echo ew_HtmlEncode($t_04beli->sub_total->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_04beli->tgl_dp->Visible) { // tgl_dp ?>
-		<td data-name="tgl_dp">
-<span id="el$rowindex$_t_04beli_tgl_dp" class="form-group t_04beli_tgl_dp">
-<input type="text" data-table="t_04beli" data-field="x_tgl_dp" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_dp" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_dp" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_dp->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_dp->EditValue ?>"<?php echo $t_04beli->tgl_dp->EditAttributes() ?>>
-<?php if (!$t_04beli->tgl_dp->ReadOnly && !$t_04beli->tgl_dp->Disabled && !isset($t_04beli->tgl_dp->EditAttrs["readonly"]) && !isset($t_04beli->tgl_dp->EditAttrs["disabled"])) { ?>
-<script type="text/javascript">
-ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_dp", 7);
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_tgl_dp" name="o<?php echo $t_04beli_list->RowIndex ?>_tgl_dp" id="o<?php echo $t_04beli_list->RowIndex ?>_tgl_dp" value="<?php echo ew_HtmlEncode($t_04beli->tgl_dp->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_04beli->jml_dp->Visible) { // jml_dp ?>
-		<td data-name="jml_dp">
-<span id="el$rowindex$_t_04beli_jml_dp" class="form-group t_04beli_jml_dp">
-<input type="text" data-table="t_04beli" data-field="x_jml_dp" name="x<?php echo $t_04beli_list->RowIndex ?>_jml_dp" id="x<?php echo $t_04beli_list->RowIndex ?>_jml_dp" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->jml_dp->getPlaceHolder()) ?>" value="<?php echo $t_04beli->jml_dp->EditValue ?>"<?php echo $t_04beli->jml_dp->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_jml_dp" name="o<?php echo $t_04beli_list->RowIndex ?>_jml_dp" id="o<?php echo $t_04beli_list->RowIndex ?>_jml_dp" value="<?php echo ew_HtmlEncode($t_04beli->jml_dp->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_04beli->tgl_lunas->Visible) { // tgl_lunas ?>
-		<td data-name="tgl_lunas">
-<span id="el$rowindex$_t_04beli_tgl_lunas" class="form-group t_04beli_tgl_lunas">
-<input type="text" data-table="t_04beli" data-field="x_tgl_lunas" data-format="7" name="x<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas" id="x<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas" placeholder="<?php echo ew_HtmlEncode($t_04beli->tgl_lunas->getPlaceHolder()) ?>" value="<?php echo $t_04beli->tgl_lunas->EditValue ?>"<?php echo $t_04beli->tgl_lunas->EditAttributes() ?>>
-<?php if (!$t_04beli->tgl_lunas->ReadOnly && !$t_04beli->tgl_lunas->Disabled && !isset($t_04beli->tgl_lunas->EditAttrs["readonly"]) && !isset($t_04beli->tgl_lunas->EditAttrs["disabled"])) { ?>
-<script type="text/javascript">
-ew_CreateCalendar("ft_04belilist", "x<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas", 7);
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_tgl_lunas" name="o<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas" id="o<?php echo $t_04beli_list->RowIndex ?>_tgl_lunas" value="<?php echo ew_HtmlEncode($t_04beli->tgl_lunas->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_04beli->jml_lunas->Visible) { // jml_lunas ?>
-		<td data-name="jml_lunas">
-<span id="el$rowindex$_t_04beli_jml_lunas" class="form-group t_04beli_jml_lunas">
-<input type="text" data-table="t_04beli" data-field="x_jml_lunas" name="x<?php echo $t_04beli_list->RowIndex ?>_jml_lunas" id="x<?php echo $t_04beli_list->RowIndex ?>_jml_lunas" size="5" placeholder="<?php echo ew_HtmlEncode($t_04beli->jml_lunas->getPlaceHolder()) ?>" value="<?php echo $t_04beli->jml_lunas->EditValue ?>"<?php echo $t_04beli->jml_lunas->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_04beli" data-field="x_jml_lunas" name="o<?php echo $t_04beli_list->RowIndex ?>_jml_lunas" id="o<?php echo $t_04beli_list->RowIndex ?>_jml_lunas" value="<?php echo ew_HtmlEncode($t_04beli->jml_lunas->OldValue) ?>">
-</td>
-	<?php } ?>
-<?php
-
-// Render list options (body, right)
-$t_04beli_list->ListOptions->Render("body", "right", $t_04beli_list->RowCnt);
-?>
-<script type="text/javascript">
-ft_04belilist.UpdateOpts(<?php echo $t_04beli_list->RowIndex ?>);
-</script>
-	</tr>
-<?php
+		$t_04beli_list->Recordset->MoveNext();
 }
 ?>
 </tbody>
@@ -4808,18 +4217,8 @@ ft_04belilist.UpdateOpts(<?php echo $t_04beli_list->RowIndex ?>);
 <?php if ($t_04beli->CurrentAction == "add" || $t_04beli->CurrentAction == "copy") { ?>
 <input type="hidden" name="<?php echo $t_04beli_list->FormKeyCountName ?>" id="<?php echo $t_04beli_list->FormKeyCountName ?>" value="<?php echo $t_04beli_list->KeyCount ?>">
 <?php } ?>
-<?php if ($t_04beli->CurrentAction == "gridadd") { ?>
-<input type="hidden" name="a_list" id="a_list" value="gridinsert">
-<input type="hidden" name="<?php echo $t_04beli_list->FormKeyCountName ?>" id="<?php echo $t_04beli_list->FormKeyCountName ?>" value="<?php echo $t_04beli_list->KeyCount ?>">
-<?php echo $t_04beli_list->MultiSelectKey ?>
-<?php } ?>
 <?php if ($t_04beli->CurrentAction == "edit") { ?>
 <input type="hidden" name="<?php echo $t_04beli_list->FormKeyCountName ?>" id="<?php echo $t_04beli_list->FormKeyCountName ?>" value="<?php echo $t_04beli_list->KeyCount ?>">
-<?php } ?>
-<?php if ($t_04beli->CurrentAction == "gridedit") { ?>
-<input type="hidden" name="a_list" id="a_list" value="gridupdate">
-<input type="hidden" name="<?php echo $t_04beli_list->FormKeyCountName ?>" id="<?php echo $t_04beli_list->FormKeyCountName ?>" value="<?php echo $t_04beli_list->KeyCount ?>">
-<?php echo $t_04beli_list->MultiSelectKey ?>
 <?php } ?>
 <?php if ($t_04beli->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">
