@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_04beliinfo.php" ?>
+<?php include_once "t_14drop_cashinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -230,6 +231,9 @@ class ct_04beli_add extends ct_04beli {
 			$GLOBALS["Table"] = &$GLOBALS["t_04beli"];
 		}
 
+		// Table object (t_14drop_cash)
+		if (!isset($GLOBALS['t_14drop_cash'])) $GLOBALS['t_14drop_cash'] = new ct_14drop_cash();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'add', TRUE);
@@ -254,6 +258,7 @@ class ct_04beli_add extends ct_04beli {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
+		$this->dc_id->SetVisibility();
 		$this->tgl_beli->SetVisibility();
 		$this->tgl_kirim->SetVisibility();
 		$this->vendor_id->SetVisibility();
@@ -369,6 +374,9 @@ class ct_04beli_add extends ct_04beli {
 		if ($this->IsModal)
 			$gbSkipHeaderFooter = TRUE;
 
+		// Set up master/detail parameters
+		$this->SetUpMasterParms();
+
 		// Process form if post back
 		if (@$_POST["a_add"] <> "") {
 			$this->CurrentAction = $_POST["a_add"]; // Get form action
@@ -452,6 +460,7 @@ class ct_04beli_add extends ct_04beli {
 
 	// Load default values
 	function LoadDefaultValues() {
+		$this->dc_id->CurrentValue = 0;
 		$this->tgl_beli->CurrentValue = NULL;
 		$this->tgl_beli->OldValue = $this->tgl_beli->CurrentValue;
 		$this->tgl_kirim->CurrentValue = NULL;
@@ -483,6 +492,9 @@ class ct_04beli_add extends ct_04beli {
 
 		// Load from form
 		global $objForm;
+		if (!$this->dc_id->FldIsDetailKey) {
+			$this->dc_id->setFormValue($objForm->GetValue("x_dc_id"));
+		}
 		if (!$this->tgl_beli->FldIsDetailKey) {
 			$this->tgl_beli->setFormValue($objForm->GetValue("x_tgl_beli"));
 			$this->tgl_beli->CurrentValue = ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 7);
@@ -529,6 +541,7 @@ class ct_04beli_add extends ct_04beli {
 	function RestoreFormValues() {
 		global $objForm;
 		$this->LoadOldRecord();
+		$this->dc_id->CurrentValue = $this->dc_id->FormValue;
 		$this->tgl_beli->CurrentValue = $this->tgl_beli->FormValue;
 		$this->tgl_beli->CurrentValue = ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 7);
 		$this->tgl_kirim->CurrentValue = $this->tgl_kirim->FormValue;
@@ -577,6 +590,12 @@ class ct_04beli_add extends ct_04beli {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->beli_id->setDbValue($rs->fields('beli_id'));
+		$this->dc_id->setDbValue($rs->fields('dc_id'));
+		if (array_key_exists('EV__dc_id', $rs->fields)) {
+			$this->dc_id->VirtualValue = $rs->fields('EV__dc_id'); // Set up virtual field value
+		} else {
+			$this->dc_id->VirtualValue = ""; // Clear value
+		}
 		$this->tgl_beli->setDbValue($rs->fields('tgl_beli'));
 		$this->tgl_kirim->setDbValue($rs->fields('tgl_kirim'));
 		$this->vendor_id->setDbValue($rs->fields('vendor_id'));
@@ -611,6 +630,7 @@ class ct_04beli_add extends ct_04beli {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->beli_id->DbValue = $row['beli_id'];
+		$this->dc_id->DbValue = $row['dc_id'];
 		$this->tgl_beli->DbValue = $row['tgl_beli'];
 		$this->tgl_kirim->DbValue = $row['tgl_kirim'];
 		$this->vendor_id->DbValue = $row['vendor_id'];
@@ -679,6 +699,7 @@ class ct_04beli_add extends ct_04beli {
 
 		// Common render codes for all row types
 		// beli_id
+		// dc_id
 		// tgl_beli
 		// tgl_kirim
 		// vendor_id
@@ -697,6 +718,35 @@ class ct_04beli_add extends ct_04beli {
 		// beli_id
 		$this->beli_id->ViewValue = $this->beli_id->CurrentValue;
 		$this->beli_id->ViewCustomAttributes = "";
+
+		// dc_id
+		if ($this->dc_id->VirtualValue <> "") {
+			$this->dc_id->ViewValue = $this->dc_id->VirtualValue;
+		} else {
+		if (strval($this->dc_id->CurrentValue) <> "") {
+			$sFilterWrk = "`dc_id`" . ew_SearchString("=", $this->dc_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `dc_id`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_14drop_cash`";
+		$sWhereWrk = "";
+		$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
+				$arwrk[2] = ew_FormatNumber($rswrk->fields('Disp2Fld'), 0, -2, -2, -2);
+				$arwrk[3] = $rswrk->fields('Disp3Fld');
+				$this->dc_id->ViewValue = $this->dc_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->dc_id->ViewValue = $this->dc_id->CurrentValue;
+			}
+		} else {
+			$this->dc_id->ViewValue = NULL;
+		}
+		}
+		$this->dc_id->ViewCustomAttributes = "";
 
 		// tgl_beli
 		$this->tgl_beli->ViewValue = $this->tgl_beli->CurrentValue;
@@ -832,6 +882,11 @@ class ct_04beli_add extends ct_04beli {
 		$this->jml_lunas->CellCssStyle .= "text-align: right;";
 		$this->jml_lunas->ViewCustomAttributes = "";
 
+			// dc_id
+			$this->dc_id->LinkCustomAttributes = "";
+			$this->dc_id->HrefValue = "";
+			$this->dc_id->TooltipValue = "";
+
 			// tgl_beli
 			$this->tgl_beli->LinkCustomAttributes = "";
 			$this->tgl_beli->HrefValue = "";
@@ -892,6 +947,69 @@ class ct_04beli_add extends ct_04beli {
 			$this->jml_lunas->HrefValue = "";
 			$this->jml_lunas->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
+
+			// dc_id
+			$this->dc_id->EditCustomAttributes = "";
+			if ($this->dc_id->getSessionValue() <> "") {
+				$this->dc_id->CurrentValue = $this->dc_id->getSessionValue();
+			if ($this->dc_id->VirtualValue <> "") {
+				$this->dc_id->ViewValue = $this->dc_id->VirtualValue;
+			} else {
+			if (strval($this->dc_id->CurrentValue) <> "") {
+				$sFilterWrk = "`dc_id`" . ew_SearchString("=", $this->dc_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$sSqlWrk = "SELECT `dc_id`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_14drop_cash`";
+			$sWhereWrk = "";
+			$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
+					$arwrk[2] = ew_FormatNumber($rswrk->fields('Disp2Fld'), 0, -2, -2, -2);
+					$arwrk[3] = $rswrk->fields('Disp3Fld');
+					$this->dc_id->ViewValue = $this->dc_id->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->dc_id->ViewValue = $this->dc_id->CurrentValue;
+				}
+			} else {
+				$this->dc_id->ViewValue = NULL;
+			}
+			}
+			$this->dc_id->ViewCustomAttributes = "";
+			} else {
+			if (trim(strval($this->dc_id->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`dc_id`" . ew_SearchString("=", $this->dc_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			}
+			$sSqlWrk = "SELECT `dc_id`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t_14drop_cash`";
+			$sWhereWrk = "";
+			$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = ew_HtmlEncode(ew_FormatDateTime($rswrk->fields('DispFld'), 7));
+				$arwrk[2] = ew_HtmlEncode(ew_FormatNumber($rswrk->fields('Disp2Fld'), 0, -2, -2, -2));
+				$arwrk[3] = ew_HtmlEncode($rswrk->fields('Disp3Fld'));
+				$this->dc_id->ViewValue = $this->dc_id->DisplayValue($arwrk);
+			} else {
+				$this->dc_id->ViewValue = $Language->Phrase("PleaseSelect");
+			}
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			$rowswrk = count($arwrk);
+			for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+				$arwrk[$rowcntwrk][1] = ew_FormatDateTime($arwrk[$rowcntwrk][1], 7);
+				$arwrk[$rowcntwrk][2] = ew_FormatNumber($arwrk[$rowcntwrk][2], 0, -2, -2, -2);
+			}
+			$this->dc_id->EditValue = $arwrk;
+			}
 
 			// tgl_beli
 			$this->tgl_beli->EditAttrs["class"] = "form-control";
@@ -1031,8 +1149,12 @@ class ct_04beli_add extends ct_04beli {
 			if (strval($this->jml_lunas->EditValue) <> "" && is_numeric($this->jml_lunas->EditValue)) $this->jml_lunas->EditValue = ew_FormatNumber($this->jml_lunas->EditValue, -2, -2, -2, -2);
 
 			// Add refer script
-			// tgl_beli
+			// dc_id
 
+			$this->dc_id->LinkCustomAttributes = "";
+			$this->dc_id->HrefValue = "";
+
+			// tgl_beli
 			$this->tgl_beli->LinkCustomAttributes = "";
 			$this->tgl_beli->HrefValue = "";
 
@@ -1170,6 +1292,9 @@ class ct_04beli_add extends ct_04beli {
 		}
 		$rsnew = array();
 
+		// dc_id
+		$this->dc_id->SetDbValueDef($rsnew, $this->dc_id->CurrentValue, NULL, strval($this->dc_id->CurrentValue) == "");
+
 		// tgl_beli
 		$this->tgl_beli->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 7), NULL, FALSE);
 
@@ -1236,6 +1361,66 @@ class ct_04beli_add extends ct_04beli {
 		return $AddRow;
 	}
 
+	// Set up master/detail based on QueryString
+	function SetUpMasterParms() {
+		$bValidMaster = FALSE;
+
+		// Get the keys for master table
+		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "t_14drop_cash") {
+				$bValidMaster = TRUE;
+				if (@$_GET["fk_dc_id"] <> "") {
+					$GLOBALS["t_14drop_cash"]->dc_id->setQueryStringValue($_GET["fk_dc_id"]);
+					$this->dc_id->setQueryStringValue($GLOBALS["t_14drop_cash"]->dc_id->QueryStringValue);
+					$this->dc_id->setSessionValue($this->dc_id->QueryStringValue);
+					if (!is_numeric($GLOBALS["t_14drop_cash"]->dc_id->QueryStringValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "t_14drop_cash") {
+				$bValidMaster = TRUE;
+				if (@$_POST["fk_dc_id"] <> "") {
+					$GLOBALS["t_14drop_cash"]->dc_id->setFormValue($_POST["fk_dc_id"]);
+					$this->dc_id->setFormValue($GLOBALS["t_14drop_cash"]->dc_id->FormValue);
+					$this->dc_id->setSessionValue($this->dc_id->FormValue);
+					if (!is_numeric($GLOBALS["t_14drop_cash"]->dc_id->FormValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		}
+		if ($bValidMaster) {
+
+			// Save current master table
+			$this->setCurrentMasterTable($sMasterTblVar);
+
+			// Reset start record counter (new master key)
+			$this->StartRec = 1;
+			$this->setStartRecordNumber($this->StartRec);
+
+			// Clear previous master key from Session
+			if ($sMasterTblVar <> "t_14drop_cash") {
+				if ($this->dc_id->CurrentValue == "") $this->dc_id->setSessionValue("");
+			}
+		}
+		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
+		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
@@ -1251,6 +1436,18 @@ class ct_04beli_add extends ct_04beli {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_dc_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `dc_id` AS `LinkFld`, `tgl` AS `DispFld`, `jumlah` AS `Disp2Fld`, `tujuan` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_14drop_cash`";
+			$sWhereWrk = "{filter}";
+			$this->dc_id->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`tgl`', 7, "DB"), "dx2" => '`jumlah`', "dx3" => '`tujuan`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`dc_id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->dc_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		case "x_vendor_id":
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `vendor_id` AS `LinkFld`, `vendor_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_01vendor`";
@@ -1525,6 +1722,7 @@ ft_04beliadd.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
+ft_04beliadd.Lists["x_dc_id"] = {"LinkField":"x_dc_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_tgl","x_jumlah","x_tujuan",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_14drop_cash"};
 ft_04beliadd.Lists["x_vendor_id"] = {"LinkField":"x_vendor_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_vendor_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_01vendor"};
 ft_04beliadd.Lists["x_item_id"] = {"LinkField":"x_item_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_item_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_02item"};
 ft_04beliadd.Lists["x_satuan_id"] = {"LinkField":"x_satuan_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_satuan_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t_03satuan"};
@@ -1555,7 +1753,34 @@ $t_04beli_add->ShowMessage();
 <?php if ($t_04beli_add->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
+<?php if ($t_04beli->getCurrentMasterTable() == "t_14drop_cash") { ?>
+<input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="t_14drop_cash">
+<input type="hidden" name="fk_dc_id" value="<?php echo $t_04beli->dc_id->getSessionValue() ?>">
+<?php } ?>
 <div>
+<?php if ($t_04beli->dc_id->Visible) { // dc_id ?>
+	<div id="r_dc_id" class="form-group">
+		<label id="elh_t_04beli_dc_id" for="x_dc_id" class="col-sm-2 control-label ewLabel"><?php echo $t_04beli->dc_id->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t_04beli->dc_id->CellAttributes() ?>>
+<?php if ($t_04beli->dc_id->getSessionValue() <> "") { ?>
+<span id="el_t_04beli_dc_id">
+<span<?php echo $t_04beli->dc_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t_04beli->dc_id->ViewValue ?></p></span>
+</span>
+<input type="hidden" id="x_dc_id" name="x_dc_id" value="<?php echo ew_HtmlEncode($t_04beli->dc_id->CurrentValue) ?>">
+<?php } else { ?>
+<span id="el_t_04beli_dc_id">
+<span class="ewLookupList">
+	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_dc_id"><?php echo (strval($t_04beli->dc_id->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t_04beli->dc_id->ViewValue); ?></span>
+</span>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->dc_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_dc_id',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" data-table="t_04beli" data-field="x_dc_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->dc_id->DisplayValueSeparatorAttribute() ?>" name="x_dc_id" id="x_dc_id" value="<?php echo $t_04beli->dc_id->CurrentValue ?>"<?php echo $t_04beli->dc_id->EditAttributes() ?>>
+<input type="hidden" name="s_x_dc_id" id="s_x_dc_id" value="<?php echo $t_04beli->dc_id->LookupFilterQuery() ?>">
+</span>
+<?php } ?>
+<?php echo $t_04beli->dc_id->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
 <?php if ($t_04beli->tgl_beli->Visible) { // tgl_beli ?>
 	<div id="r_tgl_beli" class="form-group">
 		<label id="elh_t_04beli_tgl_beli" for="x_tgl_beli" class="col-sm-2 control-label ewLabel"><?php echo $t_04beli->tgl_beli->FldCaption() ?></label>
@@ -1596,7 +1821,7 @@ $wrkonchange = trim(" " . @$t_04beli->vendor_id->EditAttrs["onchange"]);
 if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
 $t_04beli->vendor_id->EditAttrs["onchange"] = "";
 ?>
-<span id="as_x_vendor_id" style="white-space: nowrap; z-index: 8960">
+<span id="as_x_vendor_id" style="white-space: nowrap; z-index: 8950">
 	<input type="text" name="sv_x_vendor_id" id="sv_x_vendor_id" value="<?php echo $t_04beli->vendor_id->EditValue ?>" placeholder="<?php echo ew_HtmlEncode($t_04beli->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_04beli->vendor_id->getPlaceHolder()) ?>"<?php echo $t_04beli->vendor_id->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_04beli" data-field="x_vendor_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->vendor_id->DisplayValueSeparatorAttribute() ?>" name="x_vendor_id" id="x_vendor_id" value="<?php echo ew_HtmlEncode($t_04beli->vendor_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
@@ -1622,7 +1847,7 @@ $wrkonchange = trim(" " . @$t_04beli->item_id->EditAttrs["onchange"]);
 if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
 $t_04beli->item_id->EditAttrs["onchange"] = "";
 ?>
-<span id="as_x_item_id" style="white-space: nowrap; z-index: 8950">
+<span id="as_x_item_id" style="white-space: nowrap; z-index: 8940">
 	<input type="text" name="sv_x_item_id" id="sv_x_item_id" value="<?php echo $t_04beli->item_id->EditValue ?>" placeholder="<?php echo ew_HtmlEncode($t_04beli->item_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_04beli->item_id->getPlaceHolder()) ?>"<?php echo $t_04beli->item_id->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_04beli" data-field="x_item_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->item_id->DisplayValueSeparatorAttribute() ?>" name="x_item_id" id="x_item_id" value="<?php echo ew_HtmlEncode($t_04beli->item_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
@@ -1658,7 +1883,7 @@ $wrkonchange = trim(" " . @$t_04beli->satuan_id->EditAttrs["onchange"]);
 if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
 $t_04beli->satuan_id->EditAttrs["onchange"] = "";
 ?>
-<span id="as_x_satuan_id" style="white-space: nowrap; z-index: 8930">
+<span id="as_x_satuan_id" style="white-space: nowrap; z-index: 8920">
 	<input type="text" name="sv_x_satuan_id" id="sv_x_satuan_id" value="<?php echo $t_04beli->satuan_id->EditValue ?>" placeholder="<?php echo ew_HtmlEncode($t_04beli->satuan_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t_04beli->satuan_id->getPlaceHolder()) ?>"<?php echo $t_04beli->satuan_id->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_04beli" data-field="x_satuan_id" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t_04beli->satuan_id->DisplayValueSeparatorAttribute() ?>" name="x_satuan_id" id="x_satuan_id" value="<?php echo ew_HtmlEncode($t_04beli->satuan_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>

@@ -2373,7 +2373,7 @@ class ct_04beli_grid extends ct_04beli {
 			$rsnew = array();
 
 			// dc_id
-			$this->dc_id->SetDbValueDef($rsnew, $this->dc_id->CurrentValue, 0, $this->dc_id->ReadOnly);
+			$this->dc_id->SetDbValueDef($rsnew, $this->dc_id->CurrentValue, NULL, $this->dc_id->ReadOnly);
 
 			// tgl_beli
 			$this->tgl_beli->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 7), NULL, $this->tgl_beli->ReadOnly);
@@ -2460,7 +2460,7 @@ class ct_04beli_grid extends ct_04beli {
 		$rsnew = array();
 
 		// dc_id
-		$this->dc_id->SetDbValueDef($rsnew, $this->dc_id->CurrentValue, 0, strval($this->dc_id->CurrentValue) == "");
+		$this->dc_id->SetDbValueDef($rsnew, $this->dc_id->CurrentValue, NULL, strval($this->dc_id->CurrentValue) == "");
 
 		// tgl_beli
 		$this->tgl_beli->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 7), NULL, FALSE);
@@ -2688,6 +2688,31 @@ class ct_04beli_grid extends ct_04beli {
 	function Page_Render() {
 
 		//echo "Page Render";
+		$is_master_table = CurrentMasterTable();
+		if(@$is_master_table == NULL){
+
+			//$this->OtherOptions["addedit"]->Items["inlineadd"]->Visible = true;
+			//$this->OtherOptions["action"]->Items["copy"]->Visible = true;
+			//$this->OtherOptions["action"]->Items["edit"]->Visible = true;
+
+		}
+		else {
+			$this->OtherOptions["addedit"]->Items["inlineadd"]->Visible = false;
+			$this->OtherOptions["action"]->Items["multidelete"]->Visible = false;
+
+			//$this->OtherOptions["action"]->Items["delete"]->Visible = FALSE;
+			//$this->OtherOptions["action"]->Items["copy"]->Body = "";
+			//$this->OtherOptions["action"]->Items["edit"]->Body = "";
+			//$this->OtherOptions['detail'] = new cListOptions();
+			//$this->OtherOptions['detail']->Body = "";
+			//$this->OtherOptions['addedit'] = new cListOptions();
+			//$this->OtherOptions['addedit']->Body = "";
+
+		}
+
+		//$this->OtherOptions['detail'] = new cListOptions();
+		//$this->OtherOptions['detail']->Body = "";
+
 	}
 
 	// Page Data Rendering event

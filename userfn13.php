@@ -5,6 +5,8 @@
 function Page_Loading() {
 
 	//echo "Page Loading";
+	//echo "mbeli";
+
 }
 
 // Page Rendering event

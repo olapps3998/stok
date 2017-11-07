@@ -2310,6 +2310,9 @@ class ct_14drop_cash_list extends ct_14drop_cash {
 	function Page_Render() {
 
 		//echo "Page Render";
+		//$this->OtherOptions['addedit'] = new cListOptions();
+		//$this->OtherOptions['addedit']->Body = "";
+
 		$this->OtherOptions['detail'] = new cListOptions();
 		$this->OtherOptions['detail']->Body = "";
 	}
