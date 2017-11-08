@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_08item_saldoinfo.php" ?>
+<?php include_once "t_97userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -215,6 +216,7 @@ class ct_08item_saldo_delete extends ct_08item_saldo {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -230,6 +232,9 @@ class ct_08item_saldo_delete extends ct_08item_saldo {
 			$GLOBALS["Table"] = &$GLOBALS["t_08item_saldo"];
 		}
 
+		// Table object (t_97user)
+		if (!isset($GLOBALS['t_97user'])) $GLOBALS['t_97user'] = new ct_97user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'delete', TRUE);
@@ -243,6 +248,12 @@ class ct_08item_saldo_delete extends ct_08item_saldo {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
+
+		// User table object (t_97user)
+		if (!isset($UserTable)) {
+			$UserTable = new ct_97user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 	}
 
 	//
@@ -250,6 +261,26 @@ class ct_08item_saldo_delete extends ct_08item_saldo {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanDelete()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			if ($Security->CanList())
+				$this->Page_Terminate(ew_GetUrl("t_08item_saldolist.php"));
+			else
+				$this->Page_Terminate(ew_GetUrl("login.php"));
+		}
+		if ($Security->IsLoggedIn()) {
+			$Security->UserID_Loading();
+			$Security->LoadUserID();
+			$Security->UserID_Loaded();
+		}
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 		$this->item_id->SetVisibility();
 		$this->tgl->SetVisibility();
@@ -549,6 +580,10 @@ class ct_08item_saldo_delete extends ct_08item_saldo {
 	//
 	function DeleteRows() {
 		global $Language, $Security;
+		if (!$Security->CanDelete()) {
+			$this->setFailureMessage($Language->Phrase("NoDeletePermission")); // No delete permission
+			return FALSE;
+		}
 		$DeleteRows = TRUE;
 		$sSql = $this->SQL();
 		$conn = &$this->Connection();

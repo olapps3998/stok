@@ -1,3 +1,4 @@
+<?php include_once "t_97userinfo.php" ?>
 <?php
 
 // Create page object
@@ -131,6 +132,8 @@ if ($t_07jual_detail->CurrentAction == "gridadd") {
 
 	// Set no record found message
 	if ($t_07jual_detail->CurrentAction == "" && $t_07jual_detail_grid->TotalRecs == 0) {
+		if (!$Security->CanList())
+			$t_07jual_detail_grid->setWarningMessage(ew_DeniedMsg());
 		if ($t_07jual_detail_grid->SearchWhere == "0=101")
 			$t_07jual_detail_grid->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
@@ -398,7 +401,9 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_07jual_detail->item_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_02item")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->item_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery() ?>">
 <input type="hidden" name="ln_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" id="ln_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" value="x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id,x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga">
 </span>
@@ -421,7 +426,9 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_07jual_detail->item_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_02item")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->item_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery() ?>">
 <input type="hidden" name="ln_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" id="ln_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" value="x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id,x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga">
 </span>
@@ -488,7 +495,9 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_07jual_detail->satuan_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" value="<?php echo $t_07jual_detail->satuan_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_03satuan")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->satuan_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id',url:'t_03satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->satuan_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" value="<?php echo $t_07jual_detail->satuan_id->LookupFilterQuery() ?>">
 </span>
 <input type="hidden" data-table="t_07jual_detail" data-field="x_satuan_id" name="o<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" id="o<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" value="<?php echo ew_HtmlEncode($t_07jual_detail->satuan_id->OldValue) ?>">
@@ -510,7 +519,9 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_07jual_detail->satuan_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" value="<?php echo $t_07jual_detail->satuan_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_03satuan")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->satuan_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id',url:'t_03satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->satuan_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" value="<?php echo $t_07jual_detail->satuan_id->LookupFilterQuery() ?>">
 </span>
 <?php } ?>
@@ -667,7 +678,9 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_07jual_detail->item_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_02item")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->item_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery() ?>">
 <input type="hidden" name="ln_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" id="ln_x<?php echo $t_07jual_detail_grid->RowIndex ?>_item_id" value="x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id,x<?php echo $t_07jual_detail_grid->RowIndex ?>_harga">
 </span>
@@ -716,7 +729,9 @@ ft_07jual_detailgrid.CreateAutoSuggest({"id":"x<?php echo $t_07jual_detail_grid-
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_07jual_detail->satuan_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" value="<?php echo $t_07jual_detail->satuan_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_03satuan")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->satuan_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id',url:'t_03satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->satuan_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_07jual_detail_grid->RowIndex ?>_satuan_id" value="<?php echo $t_07jual_detail->satuan_id->LookupFilterQuery() ?>">
 </span>
 <?php } else { ?>

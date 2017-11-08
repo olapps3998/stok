@@ -195,6 +195,7 @@ class crt_12retur_rpt extends crt_12retur {
 	//
 	function __construct() {
 		global $conn, $ReportLanguage;
+		global $UserTable, $UserTableConn;
 
 		// Language object
 		$ReportLanguage = new crLanguage();
@@ -228,6 +229,12 @@ class crt_12retur_rpt extends crt_12retur {
 		// Open connection
 		if (!isset($conn)) $conn = ewr_Connect($this->DBID);
 
+		// User table object (t_97user)
+		if (!isset($UserTable)) {
+			$UserTable = new crt_97user();
+			$UserTableConn = ReportConn($UserTable->DBID);
+		}
+
 		// Export options
 		$this->ExportOptions = new crListOptions();
 		$this->ExportOptions->Tag = "div";
@@ -255,6 +262,26 @@ class crt_12retur_rpt extends crt_12retur {
 	function Page_Init() {
 		global $gsExport, $gsExportFile, $gsEmailContentType, $ReportLanguage, $Security;
 		global $gsCustomExport;
+
+		// Security
+		$Security = new crAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin(); // Auto login
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . 't_12retur');
+		$Security->TablePermission_Loaded();
+		if (!$Security->CanList()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($ReportLanguage->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate(ewr_GetUrl("index.php"));
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
+		if ($Security->IsLoggedIn() && strval($Security->CurrentUserID()) == "") {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($ReportLanguage->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate(ewr_GetUrl("login.php"));
+		}
 
 		// Get export parameters
 		if (@$_GET["export"] <> "")
@@ -596,11 +623,15 @@ class crt_12retur_rpt extends crt_12retur {
 
 		// Set no record found message
 		if ($this->TotalGrps == 0) {
+			if ($Security->CanList()) {
 				if ($this->Filter == "0=101") {
 					$this->setWarningMessage($ReportLanguage->Phrase("EnterSearchCriteria"));
 				} else {
 					$this->setWarningMessage($ReportLanguage->Phrase("NoRecord"));
 				}
+			} else {
+				$this->setWarningMessage($ReportLanguage->Phrase("NoPermission"));
+			}
 		}
 
 		// Hide export options if export

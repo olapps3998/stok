@@ -7,6 +7,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_07jual_detailinfo.php" ?>
 <?php include_once "t_06jualinfo.php" ?>
+<?php include_once "t_97userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -216,6 +217,7 @@ class ct_07jual_detail_add extends ct_07jual_detail {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -234,6 +236,9 @@ class ct_07jual_detail_add extends ct_07jual_detail {
 		// Table object (t_06jual)
 		if (!isset($GLOBALS['t_06jual'])) $GLOBALS['t_06jual'] = new ct_06jual();
 
+		// Table object (t_97user)
+		if (!isset($GLOBALS['t_97user'])) $GLOBALS['t_97user'] = new ct_97user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'add', TRUE);
@@ -247,6 +252,12 @@ class ct_07jual_detail_add extends ct_07jual_detail {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
+
+		// User table object (t_97user)
+		if (!isset($UserTable)) {
+			$UserTable = new ct_97user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 	}
 
 	//
@@ -254,6 +265,26 @@ class ct_07jual_detail_add extends ct_07jual_detail {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanAdd()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			if ($Security->CanList())
+				$this->Page_Terminate(ew_GetUrl("t_07jual_detaillist.php"));
+			else
+				$this->Page_Terminate(ew_GetUrl("login.php"));
+		}
+		if ($Security->IsLoggedIn()) {
+			$Security->UserID_Loading();
+			$Security->LoadUserID();
+			$Security->UserID_Loaded();
+		}
 
 		// Create form object
 		$objForm = new cFormObj();
@@ -1316,7 +1347,9 @@ ft_07jual_detailadd.CreateAutoSuggest({"id":"x_item_id","forceSelect":true});
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_07jual_detail->item_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_item_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x_item_id" id="s_x_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_02item")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->item_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x_item_id" id="s_x_item_id" value="<?php echo $t_07jual_detail->item_id->LookupFilterQuery() ?>">
 <input type="hidden" name="ln_x_item_id" id="ln_x_item_id" value="x_satuan_id,x_harga">
 </span>
@@ -1353,7 +1386,9 @@ ft_07jual_detailadd.CreateAutoSuggest({"id":"x_satuan_id","forceSelect":true});
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_07jual_detail->satuan_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_satuan_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x_satuan_id" id="s_x_satuan_id" value="<?php echo $t_07jual_detail->satuan_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_03satuan")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_07jual_detail->satuan_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x_satuan_id',url:'t_03satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x_satuan_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_07jual_detail->satuan_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x_satuan_id" id="s_x_satuan_id" value="<?php echo $t_07jual_detail->satuan_id->LookupFilterQuery() ?>">
 </span>
 <?php echo $t_07jual_detail->satuan_id->CustomMsg ?></div></div>

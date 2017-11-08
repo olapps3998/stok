@@ -46,3 +46,6 @@ perlu dibuatkan modul MASTER > SALDO AWAL;
 10:44 AM 9/29/2017
 perlu ditambahi beli_id dan jual_detail_id untuk menjamin data benar2 urut sesuai urutan;
 
+
+12:37 PM 11/8/2017
+- tambah tabel :: t_97user;

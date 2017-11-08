@@ -1,3 +1,4 @@
+<?php include_once "t_97userinfo.php" ?>
 <?php
 
 // Create page object
@@ -173,6 +174,8 @@ if ($t_04beli->CurrentAction == "gridadd") {
 
 	// Set no record found message
 	if ($t_04beli->CurrentAction == "" && $t_04beli_grid->TotalRecs == 0) {
+		if (!$Security->CanList())
+			$t_04beli_grid->setWarningMessage(ew_DeniedMsg());
 		if ($t_04beli_grid->SearchWhere == "0=101")
 			$t_04beli_grid->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
@@ -595,7 +598,9 @@ ft_04beligrid.CreateAutoSuggest({"id":"x<?php echo $t_04beli_grid->RowIndex ?>_v
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->vendor_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_01vendor")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->vendor_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id',url:'t_01vendoraddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->vendor_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery() ?>">
 </span>
 <input type="hidden" data-table="t_04beli" data-field="x_vendor_id" name="o<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" id="o<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" value="<?php echo ew_HtmlEncode($t_04beli->vendor_id->OldValue) ?>">
@@ -617,7 +622,9 @@ ft_04beligrid.CreateAutoSuggest({"id":"x<?php echo $t_04beli_grid->RowIndex ?>_v
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->vendor_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_01vendor")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->vendor_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id',url:'t_01vendoraddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->vendor_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery() ?>">
 </span>
 <?php } ?>
@@ -655,7 +662,9 @@ ft_04beligrid.CreateAutoSuggest({"id":"x<?php echo $t_04beli_grid->RowIndex ?>_i
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->item_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_item_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_02item")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_grid->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->item_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery() ?>">
 </span>
 <input type="hidden" data-table="t_04beli" data-field="x_item_id" name="o<?php echo $t_04beli_grid->RowIndex ?>_item_id" id="o<?php echo $t_04beli_grid->RowIndex ?>_item_id" value="<?php echo ew_HtmlEncode($t_04beli->item_id->OldValue) ?>">
@@ -677,7 +686,9 @@ ft_04beligrid.CreateAutoSuggest({"id":"x<?php echo $t_04beli_grid->RowIndex ?>_i
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->item_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_item_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_02item")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_grid->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->item_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery() ?>">
 </span>
 <?php } ?>
@@ -743,7 +754,9 @@ ft_04beligrid.CreateAutoSuggest({"id":"x<?php echo $t_04beli_grid->RowIndex ?>_s
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->satuan_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_03satuan")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->satuan_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id',url:'t_03satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->satuan_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery() ?>">
 </span>
 <input type="hidden" data-table="t_04beli" data-field="x_satuan_id" name="o<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" id="o<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" value="<?php echo ew_HtmlEncode($t_04beli->satuan_id->OldValue) ?>">
@@ -765,7 +778,9 @@ ft_04beligrid.CreateAutoSuggest({"id":"x<?php echo $t_04beli_grid->RowIndex ?>_s
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->satuan_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_03satuan")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->satuan_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id',url:'t_03satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->satuan_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery() ?>">
 </span>
 <?php } ?>
@@ -1104,7 +1119,9 @@ ft_04beligrid.CreateAutoSuggest({"id":"x<?php echo $t_04beli_grid->RowIndex ?>_v
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->vendor_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_01vendor")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->vendor_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id',url:'t_01vendoraddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->vendor_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_vendor_id" value="<?php echo $t_04beli->vendor_id->LookupFilterQuery() ?>">
 </span>
 <?php } else { ?>
@@ -1136,7 +1153,9 @@ ft_04beligrid.CreateAutoSuggest({"id":"x<?php echo $t_04beli_grid->RowIndex ?>_i
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->item_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_item_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_02item")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->item_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_item_id',url:'t_02itemaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_grid->RowIndex ?>_item_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->item_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_item_id" value="<?php echo $t_04beli->item_id->LookupFilterQuery() ?>">
 </span>
 <?php } else { ?>
@@ -1184,7 +1203,9 @@ ft_04beligrid.CreateAutoSuggest({"id":"x<?php echo $t_04beli_grid->RowIndex ?>_s
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_04beli->satuan_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_03satuan")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_04beli->satuan_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id',url:'t_03satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_04beli->satuan_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" id="s_x<?php echo $t_04beli_grid->RowIndex ?>_satuan_id" value="<?php echo $t_04beli->satuan_id->LookupFilterQuery() ?>">
 </span>
 <?php } else { ?>

@@ -972,7 +972,7 @@ class ct_14drop_cash extends cTable {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 't_14drop_cash';
-		$usr = CurrentUserName();
+		$usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -990,7 +990,7 @@ class ct_14drop_cash extends cTable {
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
 		$id = ew_ScriptName();
-		$usr = CurrentUserName();
+		$usr = CurrentUserID();
 		foreach (array_keys($rs) as $fldname) {
 			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
 				if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") {
@@ -1024,7 +1024,7 @@ class ct_14drop_cash extends cTable {
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
 		$id = ew_ScriptName();
-		$usr = CurrentUserName();
+		$usr = CurrentUserID();
 		foreach (array_keys($rsnew) as $fldname) {
 			if (array_key_exists($fldname, $this->fields) && array_key_exists($fldname, $rsold) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
 				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_DATE) { // DateTime field
@@ -1072,7 +1072,7 @@ class ct_14drop_cash extends cTable {
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
 		$id = ew_ScriptName();
-		$curUser = CurrentUserName();
+		$curUser = CurrentUserID();
 		foreach (array_keys($rs) as $fldname) {
 			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
 				if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") {

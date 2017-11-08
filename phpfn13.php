@@ -3957,6 +3957,7 @@ class cAdvancedSecurity {
 	// Validate user
 	function ValidateUser(&$usr, &$pwd, $autologin, $encrypted = FALSE) {
 		global $Language;
+		global $UserTable, $UserTableConn;
 		$validateUser = FALSE;
 		$customValidateUser = FALSE;
 
@@ -3969,9 +3970,45 @@ class cAdvancedSecurity {
 				$this->setCurrentUserName($usr); // Load user name
 			}
 		}
-		if ($customValidateUser) {
-			$rs = NULL;
-			$customValidateUser = $this->User_Validated($rs) !== FALSE;
+
+		// Check other users
+		if (!$validateUser) {
+			$sFilter = str_replace("%u", ew_AdjustSql($usr, EW_USER_TABLE_DBID), EW_USER_NAME_FILTER);
+
+			// Set up filter (SQL WHERE clause) and get return SQL
+			// SQL constructor in <UserTable> class, <UserTable>info.php
+
+			$sSql = $UserTable->GetSQL($sFilter, "");
+			if ($rs = $UserTableConn->Execute($sSql)) {
+				if (!$rs->EOF) {
+					$validateUser = $customValidateUser || ew_ComparePassword($rs->fields('password'), $pwd, $encrypted);
+					if ($validateUser) {
+						$_SESSION[EW_SESSION_STATUS] = "login";
+						$_SESSION[EW_SESSION_SYS_ADMIN] = 0; // Non System Administrator
+						$this->setCurrentUserName($rs->fields('username')); // Load user name
+						$this->setSessionUserID($rs->fields('user_id')); // Load User ID
+						if (is_null($rs->fields('userlevel'))) {
+							$this->setSessionUserLevelID(0);
+						} else {
+							$this->setSessionUserLevelID(intval($rs->fields('userlevel'))); // Load User Level
+						}
+						$this->SetUpUserLevel();
+
+						// Call User Validated event
+						$row = $rs->fields;
+						$validateUser = $this->User_Validated($row) !== FALSE; // For backward compatibility
+					}
+				} else { // User not found in user table
+					if ($customValidateUser) { // Grant default permissions
+						$this->setSessionUserID($usr); // User name as User ID
+						$this->setSessionUserLevelID(-2); // Anonymous User Level
+						$this->SetUpUserLevel();
+						$row = NULL;
+						$customValidateUser = $this->User_Validated($row) !== FALSE;
+					}
+				}
+				$rs->Close();
+			}
 		}
 		if ($customValidateUser)
 			return $customValidateUser;
@@ -4078,8 +4115,161 @@ class cAdvancedSecurity {
 		}
 	}
 
-	// No User Level security
-	function SetUpUserLevel() {}
+	// Dynamic User Level security
+	var $anoymousUserLevelChecked = FALSE;
+
+	// Get User Level settings from database
+	function SetUpUserLevel() {
+		$this->SetUpUserLevelEx(); // Load all user levels
+
+		// User Level loaded event
+		$this->UserLevel_Loaded();
+
+		// Save the User Level to Session variable
+		$this->SaveUserLevel();
+	}
+
+	// Get all User Level settings from database
+	function SetUpUserLevelEx() {
+		global $Language;
+		global $Page;
+		global $EW_RELATED_PROJECT_ID;
+
+		// Load user level from config file first
+		$arTable = array();
+		$arUserLevel = array();
+		$arUserLevelPriv = array();
+		$this->LoadUserLevelFromConfigFile($arUserLevel, $arUserLevelPriv, $arTable);
+
+		// Add Anonymous user level
+		$conn = &Conn(EW_USER_LEVEL_DBID);
+		if (!$this->anoymousUserLevelChecked) {
+			$Sql = "SELECT COUNT(*) FROM " . EW_USER_LEVEL_TABLE . " WHERE " . EW_USER_LEVEL_ID_FIELD . " = -2";
+			if (ew_ExecuteScalar($Sql, $conn) == 0) {
+				$Sql = "INSERT INTO " . EW_USER_LEVEL_TABLE .
+					" (" . EW_USER_LEVEL_ID_FIELD . ", " . EW_USER_LEVEL_NAME_FIELD . ") VALUES (-2, '" . ew_AdjustSql($Language->Phrase("UserAnonymous"), EW_USER_LEVEL_DBID) . "')";
+				$conn->Execute($Sql);
+			}
+		}
+
+		// Get the User Level definitions
+		$Sql = "SELECT " . EW_USER_LEVEL_ID_FIELD . ", " . EW_USER_LEVEL_NAME_FIELD . " FROM " . EW_USER_LEVEL_TABLE;
+		if ($rs = $conn->Execute($Sql)) {
+			$this->UserLevel = $rs->GetRows();
+			$rs->Close();
+		}
+
+		// Add Anonymous user privileges
+		$conn = &Conn(EW_USER_LEVEL_PRIV_DBID);
+		if (!$this->anoymousUserLevelChecked) {
+			$Sql = "SELECT COUNT(*) FROM " . EW_USER_LEVEL_PRIV_TABLE . " WHERE " . EW_USER_LEVEL_PRIV_USER_LEVEL_ID_FIELD . " = -2";
+			if (ew_ExecuteScalar($Sql, $conn) == 0) {
+				$wrkUserLevel = array();
+				$wrkUserLevelPriv = array();
+				$wrkTable = array();
+				$this->LoadUserLevelFromConfigFile($wrkUserLevel, $wrkUserLevelPriv, $wrkTable, TRUE);
+				foreach ($wrkTable as $table) {
+					$wrkPriv = 0;
+					foreach ($wrkUserLevelPriv as $userpriv) {
+						if (@$userpriv[0] == @$table[4] . @$table[0] && @$userpriv[1] == -2) {
+							$wrkPriv = @$userpriv[2];
+							break;
+						}
+					}
+					$Sql = "INSERT INTO " . EW_USER_LEVEL_PRIV_TABLE .
+						" (" . EW_USER_LEVEL_PRIV_USER_LEVEL_ID_FIELD . ", " . EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD . ", " . EW_USER_LEVEL_PRIV_PRIV_FIELD .
+						") VALUES (-2, '" . ew_AdjustSql(@$table[4] . @$table[0], EW_USER_LEVEL_PRIV_DBID) . "', " . $wrkPriv . ")";
+					$conn->Execute($Sql);
+				}
+			}
+			$this->anoymousUserLevelChecked = TRUE;
+		}
+
+		// Get the User Level privileges
+		$sUserPrivSql = "SELECT " . EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD . ", " . EW_USER_LEVEL_PRIV_USER_LEVEL_ID_FIELD . ", " . EW_USER_LEVEL_PRIV_PRIV_FIELD . " FROM " . EW_USER_LEVEL_PRIV_TABLE;
+		if (!$this->IsAdmin() && count($this->UserLevelID) > 0) {
+			$sUserPrivSql .= " WHERE " . EW_USER_LEVEL_PRIV_USER_LEVEL_ID_FIELD . " IN (" . $this->UserLevelList() . ")";
+			$_SESSION[EW_SESSION_USER_LEVEL_LIST_LOADED] = $this->UserLevelList(); // Save last loaded list
+		} else {
+			$_SESSION[EW_SESSION_USER_LEVEL_LIST_LOADED] = ""; // Save last loaded list
+		}
+		if ($rs = $conn->Execute($sUserPrivSql)) {
+			$this->UserLevelPriv = $rs->GetRows();
+			$rs->Close();
+		}
+
+		// Increase table name field size if necessary
+		if (ew_GetConnectionType(EW_USER_LEVEL_PRIV_DBID) == "MYSQL") {
+			try {
+				if ($rs = $conn->Execute("SHOW COLUMNS FROM " . EW_USER_LEVEL_PRIV_TABLE . " LIKE '" . ew_AdjustSql(EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD_2, EW_USER_LEVEL_PRIV_DBID) . "'")) {
+					$type = $rs->fields("Type");
+					$rs->Close();
+					if (preg_match('/varchar\(([\d]+)\)/i', $type, $matches)) {
+						$size = intval($matches[1]);
+						if ($size < EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD_SIZE)
+							$conn->Execute("ALTER TABLE " . EW_USER_LEVEL_PRIV_TABLE . " MODIFY COLUMN " . EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD . " VARCHAR(" . EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD_SIZE . ")");
+					}
+				}
+			} catch (Exception $e) {}
+		}
+
+		// Update User Level privileges record if necessary
+		$ProjectID = CurrentProjectID();
+		$bReloadUserPriv = 0;
+
+		// Update table without prefix
+		$Sql = "SELECT COUNT(*) FROM " . EW_USER_LEVEL_PRIV_TABLE . " WHERE EXISTS(SELECT * FROM " .
+				EW_USER_LEVEL_PRIV_TABLE . " WHERE " . EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD . " NOT LIKE '{%')";
+		if (ew_ExecuteScalar($Sql, $conn) > 0) {
+			$ar = array_map(create_function('$t', 'return "\'" . ew_AdjustSql($t[0], EW_USER_LEVEL_PRIV_DBID) . "\'";'), $arTable);
+			$Sql = "UPDATE " . EW_USER_LEVEL_PRIV_TABLE . " SET " .
+				EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD . " = " . $conn->Concat("'" . ew_AdjustSql($ProjectID, EW_USER_LEVEL_PRIV_DBID) . "'", EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD) . " WHERE " .
+				EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD . " IN (" . implode(",", $ar) . ")";
+			if ($conn->Execute($Sql))
+				$bReloadUserPriv += $conn->Affected_Rows();
+		}
+
+		// Update table with report prefix
+		if ($EW_RELATED_PROJECT_ID <> "") {
+			$Sql = "SELECT COUNT(*) FROM " . EW_USER_LEVEL_PRIV_TABLE . " WHERE EXISTS(SELECT * FROM " .
+				EW_USER_LEVEL_PRIV_TABLE . " WHERE " . EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD . " LIKE '" .
+				ew_AdjustSql(EW_TABLE_PREFIX, EW_USER_LEVEL_PRIV_DBID) . "%')";
+			if (ew_ExecuteScalar($Sql, $conn) > 0) {
+				$ar = array_map(create_function('$t', 'return "\'" . ew_AdjustSql(EW_TABLE_PREFIX . $t[0], EW_USER_LEVEL_PRIV_DBID) . "\'";'), $arTable);
+				$Sql = "UPDATE " . EW_USER_LEVEL_PRIV_TABLE . " SET " .
+					EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD . " = REPLACE(" . EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD . "," .
+					"'" . ew_AdjustSql(EW_TABLE_PREFIX, EW_USER_LEVEL_PRIV_DBID) . "','" . ew_AdjustSql($EW_RELATED_PROJECT_ID, EW_USER_LEVEL_PRIV_DBID) . "') WHERE " .
+					EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD . " IN (" . implode(",", $ar) . ")";
+				if ($conn->Execute($Sql))
+					$bReloadUserPriv += $conn->Affected_Rows();
+			}
+		}
+
+		// Reload the User Level privileges
+		if ($bReloadUserPriv) {
+			if ($rs = $conn->Execute($sUserPrivSql)) {
+				$this->UserLevelPriv = $rs->GetRows();
+				$rs->Close();
+			}
+		}
+
+		// Warn user if user level not setup
+		if (count($this->UserLevelPriv) == 0 && $this->IsAdmin() && $Page != NULL && @$_SESSION[EW_SESSION_USER_LEVEL_MSG] == "") {
+			$Page->setFailureMessage($Language->Phrase("NoUserLevel"));
+			$_SESSION[EW_SESSION_USER_LEVEL_MSG] = "1"; // Show only once
+			$Page->Page_Terminate("userlevelslist.php");
+		}
+		return TRUE;
+	}
+
+	// Check if user level table exist
+	function UserLevelTableExist(&$ar, $projid, $table) {
+		foreach ($ar as $val) {
+			if ($val[0] == $table && $val[4] == $projid)
+				return TRUE;
+		}
+		return FALSE;
+	}
 
 	// Add user permission
 	function AddUserPermission($UserLevelName, $TableName, $UserPermission) {
@@ -4147,7 +4337,10 @@ class cAdvancedSecurity {
 	// Get current user privilege
 	function CurrentUserLevelPriv($TableName) {
 		if ($this->IsLoggedIn()) {
-			return 127;
+			$Priv = 0;
+			foreach ($this->UserLevelID as $UserLevelID)
+				$Priv |= $this->GetUserLevelPrivEx($TableName, $UserLevelID);
+			return $Priv;
 		} else { // Anonymous
 			return $this->GetUserLevelPrivEx($TableName, -2);
 		}
@@ -4347,6 +4540,10 @@ class cAdvancedSecurity {
 	// Check if user is administrator
 	function IsAdmin() {
 		$IsAdmin = $this->IsSysAdmin();
+		if (!$IsAdmin)
+			$IsAdmin = $this->CurrentUserLevelID == -1 || in_array(-1, $this->UserLevelID);
+		if (!$IsAdmin)
+    		$IsAdmin = $this->CurrentUserID == -1 || in_array(-1, $this->UserID);
 		return $IsAdmin;
 	}
 
@@ -4376,13 +4573,108 @@ class cAdvancedSecurity {
 	function CurrentUserInfo($fldname) {
 		global $UserTableConn;
 		$info = NULL;
-		if (defined("EW_USER_TABLE") && !$this->IsSysAdmin()) {
-			$user = $this->CurrentUserName();
-			if (strval($user) <> "")
-				return ew_ExecuteScalar("SELECT " . ew_QuotedName($fldname, EW_USER_TABLE_DBID) . " FROM " . EW_USER_TABLE . " WHERE " .
-					str_replace("%u", ew_AdjustSql($user, EW_USER_TABLE_DBID), EW_USER_NAME_FILTER), $UserTableConn);
-		}
+		$info = $this->GetUserInfo($fldname, $this->CurrentUserID);
 		return $info;
+	}
+
+	// Get user info
+	function GetUserInfo($FieldName, $UserID) {
+		global $UserTable, $UserTableConn;
+		if (strval($UserID) <> "") {
+
+			// Get SQL from GetSQL method in <UserTable> class, <UserTable>info.php
+			$sFilter = str_replace("%u", ew_AdjustSql($UserID, EW_USER_TABLE_DBID), EW_USER_ID_FILTER);
+			$sSql = $UserTable->GetSQL($sFilter, '');
+			if (($RsUser = $UserTableConn->Execute($sSql)) && !$RsUser->EOF) {
+				$info = $RsUser->fields($FieldName);
+				$RsUser->Close();
+				return $info;
+			}
+		}
+		return NULL;
+  }
+
+	// Get User ID by user name
+	function GetUserIDByUserName($UserName) {
+		global $UserTable, $UserTableConn;
+		if (strval($UserName) <> "") {
+			$sFilter = str_replace("%u", ew_AdjustSql($UserName, EW_USER_TABLE_DBID), EW_USER_NAME_FILTER);
+			$sSql = $UserTable->GetSQL($sFilter, '');
+			if (($RsUser = $UserTableConn->Execute($sSql)) && !$RsUser->EOF) {
+				$UserID = $RsUser->fields('user_id');
+				$RsUser->Close();
+				return $UserID;
+			}
+		}
+		return "";
+	}
+
+	// Load User ID
+	function LoadUserID() {
+		global $UserTable, $UserTableConn;
+		$this->UserID = array();
+		if (strval($this->CurrentUserID) == "") {
+
+			// Add codes to handle empty user id here
+		} elseif ($this->CurrentUserID <> "-1") {
+
+			// Get first level
+			$this->AddUserID($this->CurrentUserID);
+			$sFilter = $UserTable->UserIDFilter($this->CurrentUserID);
+			$sSql = $UserTable->GetSQL($sFilter, '');
+			if ($RsUser = $UserTableConn->Execute($sSql)) {
+				while (!$RsUser->EOF) {
+					$this->AddUserID($RsUser->fields('user_id'));
+					$RsUser->MoveNext();
+				}
+				$RsUser->Close();
+			}
+		}
+	}
+
+	// Add user name
+	function AddUserName($UserName) {
+		$this->AddUserID($this->GetUserIDByUserName($UserName));
+	}
+
+	// Add User ID
+	function AddUserID($userid) {
+		if (strval($userid) == "") return;
+		if (!is_numeric($userid)) return;
+		if (!in_array(trim(strval($userid)), $this->UserID))
+			$this->UserID[] = trim(strval($userid));
+	}
+
+	// Delete user name
+	function DeleteUserName($UserName) {
+		$this->DeleteUserID($this->GetUserIDByUserName($UserName));
+	}
+
+	// Delete User ID
+	function DeleteUserID($userid) {
+		if (strval($userid) == "") return;
+		if (!is_numeric($userid)) return;
+		$cnt = count($this->UserID);
+		for ($i = 0; $i < $cnt; $i++) {
+			if ($this->UserID[$i] == trim(strval($userid))) {
+				unset($this->UserID[$i]);
+				break;
+			}
+		}
+	}
+
+	// User ID list
+	function UserIDList() {
+		$ar = $this->UserID;
+		$len = count($ar);
+		for ($i = 0; $i < $len; $i++)
+			$ar[$i] =  ew_QuotedValue($ar[$i], EW_DATATYPE_NUMBER, EW_USER_TABLE_DBID);
+		return implode(", ", $ar);
+	}
+
+	// List of allowed User IDs for this user
+	function IsValidUserID($userid) {
+		return in_array(trim(strval($userid)), $this->UserID);
 	}
 
 	// UserID Loading event

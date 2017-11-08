@@ -79,7 +79,7 @@ define("EWR_SESSION_TIMEOUT_COUNTDOWN", 60, TRUE); // Session timeout count down
 // General
 $EWR_ROOT_RELATIVE_PATH = "."; // Relative path of app root
 define("EWR_UNFORMAT_YEAR", 50, TRUE); // Unformat year
-define("EWR_RANDOM_KEY", 'fIcVx9Cqc97ejT4z', TRUE); // Random key for encryption
+define("EWR_RANDOM_KEY", 'Ing166Mb2hAkYxhV', TRUE); // Random key for encryption
 define("EWR_PROJECT_STYLESHEET_FILENAME", "phprptcss/prj_stok.css", TRUE); // Project stylesheet file name
 define("EWR_CHART_WIDTH", 550, TRUE);
 define("EWR_CHART_HEIGHT", 440, TRUE);
@@ -197,17 +197,39 @@ define("EWR_ALLOW_LOGIN_BY_SESSION", FALSE, TRUE); // Allow login by session var
 define("EWR_PHPASS_ITERATION_COUNT_LOG2", "[10,8]", TRUE); // Note: Use JSON array syntax
 
 // User admin
-define("EWR_LOGIN_SELECT_SQL", "", TRUE);
+define("EWR_LOGIN_SELECT_SQL", "SELECT * FROM `t_97user`", TRUE);
 
 // User table filters
-// User level constants
+define("EWR_USER_TABLE_DBID", "DB", TRUE);
+define("EWR_USER_TABLE", "`t_97user`", TRUE);
+define("EWR_USER_NAME_FILTER", "`username` = '%u'", TRUE);
+define("EWR_USER_ID_FILTER", "`user_id` = %u",  TRUE);
+define("EWR_USER_ACTIVATE_FILTER", "",  TRUE);
 
+// User level constants
 define("EWR_ALLOW_LIST", 8, TRUE); // List
 define("EWR_ALLOW_REPORT", 8, TRUE); // Report
 define("EWR_ALLOW_ADMIN", 16, TRUE); // Admin
 
 // User id constants
 define("EWR_USER_ID_IS_HIERARCHICAL", TRUE, TRUE); // Hierarchical user id
+
+// Dynamic User Level settings
+// User level definition table/field names
+
+@define("EWR_USER_LEVEL_DBID", "DB", TRUE);
+@define("EWR_USER_LEVEL_TABLE", "`userlevels`", TRUE);
+@define("EWR_USER_LEVEL_ID_FIELD", "`userlevelid`", TRUE);
+@define("EWR_USER_LEVEL_NAME_FIELD", "`userlevelname`", TRUE);
+
+// User Level privileges table/field names
+define("EWR_USER_LEVEL_PRIV_DBID", "DB", TRUE);
+define("EWR_USER_LEVEL_PRIV_TABLE", "`userlevelpermissions`", TRUE);
+define("EWR_USER_LEVEL_PRIV_TABLE_NAME_FIELD", "`tablename`", TRUE);
+define("EWR_USER_LEVEL_PRIV_TABLE_NAME_FIELD_2", "tablename", TRUE);
+define("EWR_USER_LEVEL_PRIV_TABLE_NAME_FIELD_SIZE", 255, TRUE);
+define("EWR_USER_LEVEL_PRIV_USER_LEVEL_ID_FIELD", "`userlevelid`", TRUE);
+define("EWR_USER_LEVEL_PRIV_PRIV_FIELD", "`permission`", TRUE);
 
 // Save report on server for file output
 define("EWR_REPORT_SAVE_OUTPUT_ON_SERVER", FALSE, TRUE); // Change to TRUE to save on server

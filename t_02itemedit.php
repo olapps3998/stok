@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_02iteminfo.php" ?>
+<?php include_once "t_97userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -215,6 +216,7 @@ class ct_02item_edit extends ct_02item {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -230,6 +232,9 @@ class ct_02item_edit extends ct_02item {
 			$GLOBALS["Table"] = &$GLOBALS["t_02item"];
 		}
 
+		// Table object (t_97user)
+		if (!isset($GLOBALS['t_97user'])) $GLOBALS['t_97user'] = new ct_97user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'edit', TRUE);
@@ -243,6 +248,12 @@ class ct_02item_edit extends ct_02item {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
+
+		// User table object (t_97user)
+		if (!isset($UserTable)) {
+			$UserTable = new ct_97user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 	}
 
 	//
@@ -250,6 +261,26 @@ class ct_02item_edit extends ct_02item {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanEdit()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			if ($Security->CanList())
+				$this->Page_Terminate(ew_GetUrl("t_02itemlist.php"));
+			else
+				$this->Page_Terminate(ew_GetUrl("login.php"));
+		}
+		if ($Security->IsLoggedIn()) {
+			$Security->UserID_Loading();
+			$Security->LoadUserID();
+			$Security->UserID_Loaded();
+		}
 
 		// Create form object
 		$objForm = new cFormObj();
@@ -1288,7 +1319,9 @@ ft_02itemedit.CreateAutoSuggest({"id":"x_kat_id","forceSelect":true});
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_02item->kat_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_kat_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x_kat_id" id="s_x_kat_id" value="<?php echo $t_02item->kat_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_13kategori")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_02item->kat_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x_kat_id',url:'t_13kategoriaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x_kat_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_02item->kat_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x_kat_id" id="s_x_kat_id" value="<?php echo $t_02item->kat_id->LookupFilterQuery() ?>">
 </span>
 <?php echo $t_02item->kat_id->CustomMsg ?></div></div>
@@ -1336,7 +1369,9 @@ ft_02itemedit.CreateAutoSuggest({"id":"x_sat_id","forceSelect":true});
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_02item->sat_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_sat_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x_sat_id" id="s_x_sat_id" value="<?php echo $t_02item->sat_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_03satuan")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_02item->sat_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x_sat_id',url:'t_03satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x_sat_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_02item->sat_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x_sat_id" id="s_x_sat_id" value="<?php echo $t_02item->sat_id->LookupFilterQuery() ?>">
 </span>
 <?php echo $t_02item->sat_id->CustomMsg ?></div></div>

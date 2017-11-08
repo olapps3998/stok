@@ -1474,7 +1474,7 @@ function ewr_IsModalLookup(el) {
 // Check if hidden textbox (Auto-Suggest)
 function ewr_IsAutoSuggest(el) {
 	var $ = jQuery, $el = $(el);
-	return ($el[0] && $el.is(":hidden") && $el.data("autosuggest") || ewr_GetAutoSuggest(el));
+	return ($el[0] && $el.is(":hidden") && $el.data("autosuggest"));
 }
 
 // Get AutoSuggest instance

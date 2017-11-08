@@ -53,6 +53,14 @@ class crfile {
 		if ($table <> "" && EWR_ENCRYPT_FILE_PATH)
 			$table = ewr_Decrypt($table, $key);
 
+		// Security
+		$Security = new crAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel(CurrentProjectID() . $table);
+		$Security->TablePermission_Loaded();
+		if (!$Security->CanList()) exit(); // No permission
+
 		// Global Page Loading event (in userfn*.php)
 		//**Page_Loading();
 		// Get resize parameters

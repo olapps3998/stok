@@ -7,6 +7,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_07jual_detailinfo.php" ?>
 <?php include_once "t_06jualinfo.php" ?>
+<?php include_once "t_97userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -216,6 +217,7 @@ class ct_07jual_detail_delete extends ct_07jual_detail {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -234,6 +236,9 @@ class ct_07jual_detail_delete extends ct_07jual_detail {
 		// Table object (t_06jual)
 		if (!isset($GLOBALS['t_06jual'])) $GLOBALS['t_06jual'] = new ct_06jual();
 
+		// Table object (t_97user)
+		if (!isset($GLOBALS['t_97user'])) $GLOBALS['t_97user'] = new ct_97user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'delete', TRUE);
@@ -247,6 +252,12 @@ class ct_07jual_detail_delete extends ct_07jual_detail {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
+
+		// User table object (t_97user)
+		if (!isset($UserTable)) {
+			$UserTable = new ct_97user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 	}
 
 	//
@@ -254,6 +265,26 @@ class ct_07jual_detail_delete extends ct_07jual_detail {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanDelete()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			if ($Security->CanList())
+				$this->Page_Terminate(ew_GetUrl("t_07jual_detaillist.php"));
+			else
+				$this->Page_Terminate(ew_GetUrl("login.php"));
+		}
+		if ($Security->IsLoggedIn()) {
+			$Security->UserID_Loading();
+			$Security->LoadUserID();
+			$Security->UserID_Loaded();
+		}
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 		$this->tgl_kirim->SetVisibility();
 		$this->item_id->SetVisibility();
@@ -633,6 +664,10 @@ class ct_07jual_detail_delete extends ct_07jual_detail {
 	//
 	function DeleteRows() {
 		global $Language, $Security;
+		if (!$Security->CanDelete()) {
+			$this->setFailureMessage($Language->Phrase("NoDeletePermission")); // No delete permission
+			return FALSE;
+		}
 		$DeleteRows = TRUE;
 		$sSql = $this->SQL();
 		$conn = &$this->Connection();

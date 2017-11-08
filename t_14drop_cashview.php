@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_14drop_cashinfo.php" ?>
+<?php include_once "t_97userinfo.php" ?>
 <?php include_once "t_04beligridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -248,6 +249,7 @@ class ct_14drop_cash_view extends ct_14drop_cash {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -275,6 +277,9 @@ class ct_14drop_cash_view extends ct_14drop_cash {
 		$this->ExportCsvUrl = $this->PageUrl() . "export=csv" . $KeyUrl;
 		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf" . $KeyUrl;
 
+		// Table object (t_97user)
+		if (!isset($GLOBALS['t_97user'])) $GLOBALS['t_97user'] = new ct_97user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'view', TRUE);
@@ -288,6 +293,12 @@ class ct_14drop_cash_view extends ct_14drop_cash {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
+
+		// User table object (t_97user)
+		if (!isset($UserTable)) {
+			$UserTable = new ct_97user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 
 		// Export options
 		$this->ExportOptions = new cListOptions();
@@ -308,6 +319,26 @@ class ct_14drop_cash_view extends ct_14drop_cash {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanView()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			if ($Security->CanList())
+				$this->Page_Terminate(ew_GetUrl("t_14drop_cashlist.php"));
+			else
+				$this->Page_Terminate(ew_GetUrl("login.php"));
+		}
+		if ($Security->IsLoggedIn()) {
+			$Security->UserID_Loading();
+			$Security->LoadUserID();
+			$Security->UserID_Loaded();
+		}
 
 		// Get export parameters
 		$custom = "";
@@ -545,7 +576,7 @@ class ct_14drop_cash_view extends ct_14drop_cash {
 			$item->Body = "<a onclick=\"return ew_ConfirmDelete(this);\" class=\"ewAction ewDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" href=\"" . ew_HtmlEncode(ew_AddQueryStringToUrl($this->DeleteUrl, "a_delete=1")) . "\">" . $Language->Phrase("ViewPageDeleteLink") . "</a>";
 		else
 			$item->Body = "<a class=\"ewAction ewDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" href=\"" . ew_HtmlEncode($this->DeleteUrl) . "\">" . $Language->Phrase("ViewPageDeleteLink") . "</a>";
-		$item->Visible = ($this->DeleteUrl <> "");
+		$item->Visible = ($this->DeleteUrl <> "" && $Security->CanDelete());
 		$option = &$options["detail"];
 		$DetailTableLink = "";
 		$DetailViewTblVar = "";
@@ -557,7 +588,7 @@ class ct_14drop_cash_view extends ct_14drop_cash {
 		$body = $Language->Phrase("ViewPageDetailLink") . $Language->TablePhrase("t_04beli", "TblCaption");
 		$body = "<a class=\"btn btn-default btn-sm ewRowLink ewDetail\" data-action=\"list\" href=\"" . ew_HtmlEncode("t_04belilist.php?" . EW_TABLE_SHOW_MASTER . "=t_14drop_cash&fk_dc_id=" . urlencode(strval($this->dc_id->CurrentValue)) . "") . "\">" . $body . "</a>";
 		$links = "";
-		if ($GLOBALS["t_04beli_grid"] && $GLOBALS["t_04beli_grid"]->DetailView) {
+		if ($GLOBALS["t_04beli_grid"] && $GLOBALS["t_04beli_grid"]->DetailView && $Security->CanView() && $Security->AllowView(CurrentProjectID() . 't_04beli')) {
 			$links .= "<li><a class=\"ewRowLink ewDetailView\" data-action=\"view\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" href=\"" . ew_HtmlEncode($this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=t_04beli")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailViewLink")) . "</a></li>";
 			if ($DetailViewTblVar <> "") $DetailViewTblVar .= ",";
 			$DetailViewTblVar .= "t_04beli";
@@ -568,7 +599,7 @@ class ct_14drop_cash_view extends ct_14drop_cash {
 		}
 		$body = "<div class=\"btn-group\">" . $body . "</div>";
 		$item->Body = $body;
-		$item->Visible = TRUE;
+		$item->Visible = $Security->AllowList(CurrentProjectID() . 't_04beli');
 		if ($item->Visible) {
 			if ($DetailTableLink <> "") $DetailTableLink .= ",";
 			$DetailTableLink .= "t_04beli";

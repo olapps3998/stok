@@ -5,6 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
+<?php include_once "t_97userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -177,6 +178,7 @@ class cdefault {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -192,6 +194,12 @@ class cdefault {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect();
+
+		// User table object (t_97user)
+		if (!isset($UserTable)) {
+			$UserTable = new ct_97user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 	}
 
 	//
@@ -199,6 +207,9 @@ class cdefault {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -253,7 +264,59 @@ class cdefault {
 		// If session expired, show session expired message
 		if (@$_GET["expired"] == "1")
 			$this->setFailureMessage($Language->Phrase("SessionExpired"));
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		$Security->LoadUserLevel(); // Load User Level
+		if ($Security->AllowList(CurrentProjectID() . 'cf_03home2.php'))
 		$this->Page_Terminate("cf_03home2.php"); // Exit and go to default page
+		if ($Security->AllowList(CurrentProjectID() . 'cf_00home.php'))
+			$this->Page_Terminate("cf_00home.php");
+		if ($Security->AllowList(CurrentProjectID() . 'cf_01hitung_nilai_stok.php'))
+			$this->Page_Terminate("cf_01hitung_nilai_stok.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_00audit_trail'))
+			$this->Page_Terminate("t_00audit_traillist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_01vendor'))
+			$this->Page_Terminate("t_01vendorlist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_02item'))
+			$this->Page_Terminate("t_02itemlist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_03satuan'))
+			$this->Page_Terminate("t_03satuanlist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_04beli'))
+			$this->Page_Terminate("t_04belilist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_05customer'))
+			$this->Page_Terminate("t_05customerlist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_06jual'))
+			$this->Page_Terminate("t_06juallist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_07jual_detail'))
+			$this->Page_Terminate("t_07jual_detaillist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_08item_saldo'))
+			$this->Page_Terminate("t_08item_saldolist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'cf_02hitung_lr.php'))
+			$this->Page_Terminate("cf_02hitung_lr.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_11dead_stok'))
+			$this->Page_Terminate("t_11dead_stoklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_12retur'))
+			$this->Page_Terminate("t_12returlist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_99home'))
+			$this->Page_Terminate("t_99homelist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_98home_head'))
+			$this->Page_Terminate("t_98home_headlist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_13kategori'))
+			$this->Page_Terminate("t_13kategorilist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_14drop_cash'))
+			$this->Page_Terminate("t_14drop_cashlist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_15branch'))
+			$this->Page_Terminate("t_15branchlist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't_97user'))
+			$this->Page_Terminate("t_97userlist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'userlevelpermissions'))
+			$this->Page_Terminate("userlevelpermissionslist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'userlevels'))
+			$this->Page_Terminate("userlevelslist.php");
+		if ($Security->IsLoggedIn()) {
+			$this->setFailureMessage(ew_DeniedMsg() . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
+		} else {
+			$this->Page_Terminate("login.php"); // Exit and go to login page
+		}
 	}
 
 	// Page Load event

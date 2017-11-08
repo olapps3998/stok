@@ -1,4 +1,5 @@
 <?php include_once "t_04beliinfo.php" ?>
+<?php include_once "t_97userinfo.php" ?>
 <?php
 
 //
@@ -223,6 +224,7 @@ class ct_04beli_grid extends ct_04beli {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$this->FormActionName .= '_' . $this->FormName;
 		$this->FormKeyName .= '_' . $this->FormName;
 		$this->FormOldKeyName .= '_' . $this->FormName;
@@ -247,6 +249,9 @@ class ct_04beli_grid extends ct_04beli {
 		}
 		$this->AddUrl = "t_04beliadd.php";
 
+		// Table object (t_97user)
+		if (!isset($GLOBALS['t_97user'])) $GLOBALS['t_97user'] = new ct_97user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'grid', TRUE);
@@ -260,6 +265,12 @@ class ct_04beli_grid extends ct_04beli {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
+
+		// User table object (t_97user)
+		if (!isset($UserTable)) {
+			$UserTable = new ct_97user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 
 		// List options
 		$this->ListOptions = new cListOptions();
@@ -276,6 +287,23 @@ class ct_04beli_grid extends ct_04beli {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanList()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			$this->Page_Terminate(ew_GetUrl("index.php"));
+		}
+		if ($Security->IsLoggedIn()) {
+			$Security->UserID_Loading();
+			$Security->LoadUserID();
+			$Security->UserID_Loaded();
+		}
 
 		// Get grid add count
 		$gridaddcnt = @$_GET[EW_TABLE_GRID_ADD_ROW_COUNT];
@@ -474,6 +502,8 @@ class ct_04beli_grid extends ct_04beli {
 
 		// Build filter
 		$sFilter = "";
+		if (!$Security->CanList())
+			$sFilter = "(0=1)"; // Filter all records
 
 		// Restore master/detail filter
 		$this->DbMasterFilter = $this->GetMasterFilter(); // Restore master filter
@@ -1006,7 +1036,11 @@ class ct_04beli_grid extends ct_04beli {
 				$option->UseButtonGroup = TRUE; // Use button group for grid delete button
 				$option->UseImageAndText = TRUE; // Use image and text for grid delete button
 				$oListOpt = &$option->Items["griddelete"];
-				$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
+				if (!$Security->CanDelete() && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+					$oListOpt->Body = "&nbsp;";
+				} else {
+					$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
+				}
 			}
 		}
 
@@ -2276,6 +2310,10 @@ class ct_04beli_grid extends ct_04beli {
 	//
 	function DeleteRows() {
 		global $Language, $Security;
+		if (!$Security->CanDelete()) {
+			$this->setFailureMessage($Language->Phrase("NoDeletePermission")); // No delete permission
+			return FALSE;
+		}
 		$DeleteRows = TRUE;
 		$sSql = $this->SQL();
 		$conn = &$this->Connection();
@@ -2648,8 +2686,6 @@ class ct_04beli_grid extends ct_04beli {
 	function Page_Load() {
 
 		//echo "Page Load";
-		//$this->sub_total->ReadOnly = true;
-
 	}
 
 	// Page Unload event
@@ -2690,29 +2726,11 @@ class ct_04beli_grid extends ct_04beli {
 		//echo "Page Render";
 		$is_master_table = CurrentMasterTable();
 		if(@$is_master_table == NULL){
-
-			//$this->OtherOptions["addedit"]->Items["inlineadd"]->Visible = true;
-			//$this->OtherOptions["action"]->Items["copy"]->Visible = true;
-			//$this->OtherOptions["action"]->Items["edit"]->Visible = true;
-
 		}
 		else {
 			$this->OtherOptions["addedit"]->Items["inlineadd"]->Visible = false;
 			$this->OtherOptions["action"]->Items["multidelete"]->Visible = false;
-
-			//$this->OtherOptions["action"]->Items["delete"]->Visible = FALSE;
-			//$this->OtherOptions["action"]->Items["copy"]->Body = "";
-			//$this->OtherOptions["action"]->Items["edit"]->Body = "";
-			//$this->OtherOptions['detail'] = new cListOptions();
-			//$this->OtherOptions['detail']->Body = "";
-			//$this->OtherOptions['addedit'] = new cListOptions();
-			//$this->OtherOptions['addedit']->Body = "";
-
 		}
-
-		//$this->OtherOptions['detail'] = new cListOptions();
-		//$this->OtherOptions['detail']->Body = "";
-
 	}
 
 	// Page Data Rendering event

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/11/7" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/11/9" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -610,6 +610,24 @@
     <menu id="10018">
       <phrase id="menutext" value="Customer" />
     </menu>
+    <menu id="10142">
+      <phrase id="menutext" value="t 95userlevels" />
+    </menu>
+    <menu id="10231">
+      <phrase id="menutext" value="Hak Akses" />
+    </menu>
+    <menu id="10145">
+      <phrase id="menutext" value="Level" />
+    </menu>
+    <menu id="10141">
+      <phrase id="menutext" value="User" />
+    </menu>
+    <menu id="10144">
+      <phrase id="menutext" value="userlevelpermissions" />
+    </menu>
+    <menu id="10143">
+      <phrase id="menutext" value="t 96userlevelpermissions" />
+    </menu>
     <menu id="10016">
       <phrase id="menutext" value="Transaksi" />
     </menu>
@@ -627,9 +645,6 @@
     </menu>
     <menu id="10133">
       <phrase id="menutext" value="Retur Penjualan" />
-    </menu>
-    <menu id="10134">
-      <phrase id="menutext" value="Home" />
     </menu>
     <menu id="9">
       <phrase id="menutext" value="Laporan" />
@@ -673,11 +688,14 @@
     <menu id="10031">
       <phrase id="menutext" value="Piutang" />
     </menu>
+    <menu id="10134">
+      <phrase id="menutext" value="Home" />
+    </menu>
     <menu id="10129">
       <phrase id="menutext" value="v 02jual laporan" />
     </menu>
     <menu id="6">
-      <phrase id="menutext" value="Home" />
+      <phrase id="menutext" value="Home 0" />
     </menu>
     <menu id="10130">
       <phrase id="menutext" value="v 11piutang" />
@@ -848,7 +866,7 @@
       <phrase id="menutext" value="Pembelian" />
     </menu>
     <table id="cf_00home_php">
-      <phrase id="tblcaption" value="Home" />
+      <phrase id="tblcaption" value="Home 0" />
     </table>
     <table id="cf_01hitung_nilai_stok_php">
       <phrase id="tblcaption" value="Nilai Stok" />
@@ -1693,6 +1711,69 @@
       </field>
       <field id="branch_nama">
         <phrase id="fldcaption" value="Branch" />
+      </field>
+    </table>
+    <table id="t_97user">
+      <phrase id="tblcaption" value="User" />
+      <field id="user_id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="username">
+        <phrase id="fldcaption" value="User Name" />
+      </field>
+      <field id="password">
+        <phrase id="fldcaption" value="Password" />
+      </field>
+      <field id="userlevel">
+        <phrase id="fldcaption" value="Level" />
+        <phrase id="fldtagvalue1" value="-2" />
+        <phrase id="fldtagcaption1" value="Anonymous" />
+        <phrase id="fldtagvalue2" value="-1" />
+        <phrase id="fldtagcaption2" value="Administrator" />
+        <phrase id="fldtagvalue3" value="0" />
+        <phrase id="fldtagcaption3" value="Default" />
+      </field>
+    </table>
+    <table id="t_95userlevels">
+      <phrase id="tblcaption" value="t 95userlevels" />
+      <field id="userlevelid">
+        <phrase id="fldcaption" value="userlevelid" />
+      </field>
+      <field id="userlevelname">
+        <phrase id="fldcaption" value="userlevelname" />
+      </field>
+    </table>
+    <table id="t_96userlevelpermissions">
+      <phrase id="tblcaption" value="t 96userlevelpermissions" />
+      <field id="userlevelid">
+        <phrase id="fldcaption" value="userlevelid" />
+      </field>
+      <field id="_tablename">
+        <phrase id="fldcaption" value="tablename" />
+      </field>
+      <field id="permission">
+        <phrase id="fldcaption" value="permission" />
+      </field>
+    </table>
+    <table id="userlevelpermissions">
+      <phrase id="tblcaption" value="userlevelpermissions" />
+      <field id="userlevelid">
+        <phrase id="fldcaption" value="userlevelid" />
+      </field>
+      <field id="_tablename">
+        <phrase id="fldcaption" value="tablename" />
+      </field>
+      <field id="permission">
+        <phrase id="fldcaption" value="permission" />
+      </field>
+    </table>
+    <table id="userlevels">
+      <phrase id="tblcaption" value="Level" />
+      <field id="userlevelid">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="userlevelname">
+        <phrase id="fldcaption" value="Level" />
       </field>
     </table>
   </project>

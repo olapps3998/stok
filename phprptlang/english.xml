@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/10/20" version="10.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/11/9" version="10.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -350,6 +350,15 @@
   <project>
     <phrase id="bodytitle" value="L.A.B. STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="50">
+      <phrase id="menutext" value="t 97user" />
+    </menu>
+    <menu id="51">
+      <phrase id="menutext" value="userlevelpermissions" />
+    </menu>
+    <menu id="52">
+      <phrase id="menutext" value="userlevels" />
+    </menu>
     <menu id="49">
       <phrase id="menutext" value="Retur Penjualan" />
     </menu>
@@ -526,6 +535,15 @@
       <field id="item_nama">
         <phrase id="fldcaption" value="item nama" />
       </field>
+      <field id="kat_id">
+        <phrase id="fldcaption" value="kat id" />
+      </field>
+      <field id="sat_id">
+        <phrase id="fldcaption" value="sat id" />
+      </field>
+      <field id="hrg_jual">
+        <phrase id="fldcaption" value="hrg jual" />
+      </field>
     </table>
     <table id="t_03satuan">
       <phrase id="tblcaption" value="t 03satuan" />
@@ -576,6 +594,9 @@
       </field>
       <field id="jml_lunas">
         <phrase id="fldcaption" value="Jumlah Pelunasan" />
+      </field>
+      <field id="dc_id">
+        <phrase id="fldcaption" value="dc id" />
       </field>
     </table>
     <table id="v_01beli_laporan">
@@ -1536,6 +1557,42 @@
       </field>
       <field id="no_po">
         <phrase id="fldcaption" value="No. PO" />
+      </field>
+    </table>
+    <table id="t_97user">
+      <phrase id="tblcaption" value="t 97user" />
+      <field id="user_id">
+        <phrase id="fldcaption" value="user id" />
+      </field>
+      <field id="username">
+        <phrase id="fldcaption" value="username" />
+      </field>
+      <field id="password">
+        <phrase id="fldcaption" value="password" />
+      </field>
+      <field id="userlevel">
+        <phrase id="fldcaption" value="userlevel" />
+      </field>
+    </table>
+    <table id="userlevelpermissions">
+      <phrase id="tblcaption" value="userlevelpermissions" />
+      <field id="userlevelid">
+        <phrase id="fldcaption" value="userlevelid" />
+      </field>
+      <field id="_tablename">
+        <phrase id="fldcaption" value="tablename" />
+      </field>
+      <field id="permission">
+        <phrase id="fldcaption" value="permission" />
+      </field>
+    </table>
+    <table id="userlevels">
+      <phrase id="tblcaption" value="userlevels" />
+      <field id="userlevelid">
+        <phrase id="fldcaption" value="userlevelid" />
+      </field>
+      <field id="userlevelname">
+        <phrase id="fldcaption" value="userlevelname" />
       </field>
     </table>
   </project>

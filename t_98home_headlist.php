@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_98home_headinfo.php" ?>
+<?php include_once "t_97userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -255,6 +256,7 @@ class ct_98home_head_list extends ct_98home_head {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -285,6 +287,9 @@ class ct_98home_head_list extends ct_98home_head {
 		$this->MultiDeleteUrl = "t_98home_headdelete.php";
 		$this->MultiUpdateUrl = "t_98home_headupdate.php";
 
+		// Table object (t_97user)
+		if (!isset($GLOBALS['t_97user'])) $GLOBALS['t_97user'] = new ct_97user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'list', TRUE);
@@ -298,6 +303,12 @@ class ct_98home_head_list extends ct_98home_head {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
+
+		// User table object (t_97user)
+		if (!isset($UserTable)) {
+			$UserTable = new ct_97user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 
 		// List options
 		$this->ListOptions = new cListOptions();
@@ -333,6 +344,23 @@ class ct_98home_head_list extends ct_98home_head {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanList()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			$this->Page_Terminate(ew_GetUrl("index.php"));
+		}
+		if ($Security->IsLoggedIn()) {
+			$Security->UserID_Loading();
+			$Security->LoadUserID();
+			$Security->UserID_Loaded();
+		}
 
 		// Create form object
 		$objForm = new cFormObj();
@@ -706,6 +734,8 @@ class ct_98home_head_list extends ct_98home_head {
 
 		// Build filter
 		$sFilter = "";
+		if (!$Security->CanList())
+			$sFilter = "(0=1)"; // Filter all records
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
 
@@ -777,6 +807,8 @@ class ct_98home_head_list extends ct_98home_head {
 	// Switch to Inline Edit mode
 	function InlineEditMode() {
 		global $Security, $Language;
+		if (!$Security->CanEdit())
+			$this->Page_Terminate("login.php"); // Go to login page
 		$bInlineEdit = TRUE;
 		if (@$_GET["id"] <> "") {
 			$this->id->setQueryStringValue($_GET["id"]);
@@ -838,6 +870,8 @@ class ct_98home_head_list extends ct_98home_head {
 	// Switch to Inline Add mode
 	function InlineAddMode() {
 		global $Security, $Language;
+		if (!$Security->CanAdd())
+			$this->Page_Terminate("login.php"); // Return to login page
 		if ($this->CurrentAction == "copy") {
 			if (@$_GET["id"] <> "") {
 				$this->id->setQueryStringValue($_GET["id"]);
@@ -1354,6 +1388,7 @@ class ct_98home_head_list extends ct_98home_head {
 	function BasicSearchWhere($Default = FALSE) {
 		global $Security;
 		$sSearchStr = "";
+		if (!$Security->CanSearch()) return "";
 		$sSearchKeyword = ($Default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
 		$sSearchType = ($Default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 		if ($sSearchKeyword <> "") {
@@ -1513,19 +1548,19 @@ class ct_98home_head_list extends ct_98home_head {
 		// "view"
 		$item = &$this->ListOptions->Add("view");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
+		$item->Visible = $Security->CanView();
 		$item->OnLeft = TRUE;
 
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
+		$item->Visible = $Security->CanEdit();
 		$item->OnLeft = TRUE;
 
 		// "copy"
 		$item = &$this->ListOptions->Add("copy");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
+		$item->Visible = $Security->CanAdd();
 		$item->OnLeft = TRUE;
 
 		// List actions
@@ -1538,7 +1573,7 @@ class ct_98home_head_list extends ct_98home_head {
 
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
-		$item->Visible = TRUE;
+		$item->Visible = $Security->CanDelete();
 		$item->OnLeft = TRUE;
 		$item->Header = "<input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\">";
 		$item->MoveTo(0);
@@ -1598,7 +1633,11 @@ class ct_98home_head_list extends ct_98home_head {
 				$option->UseButtonGroup = TRUE; // Use button group for grid delete button
 				$option->UseImageAndText = TRUE; // Use image and text for grid delete button
 				$oListOpt = &$option->Items["griddelete"];
-				$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
+				if (!$Security->CanDelete() && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+					$oListOpt->Body = "&nbsp;";
+				} else {
+					$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
+				}
 			}
 		}
 
@@ -1634,7 +1673,7 @@ class ct_98home_head_list extends ct_98home_head {
 		// "view"
 		$oListOpt = &$this->ListOptions->Items["view"];
 		$viewcaption = ew_HtmlTitle($Language->Phrase("ViewLink"));
-		if (TRUE) {
+		if ($Security->CanView()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewView\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . ew_HtmlEncode($this->ViewUrl) . "\">" . $Language->Phrase("ViewLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -1643,7 +1682,7 @@ class ct_98home_head_list extends ct_98home_head {
 		// "edit"
 		$oListOpt = &$this->ListOptions->Items["edit"];
 		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
-		if (TRUE) {
+		if ($Security->CanEdit()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
 			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" href=\"" . ew_HtmlEncode(ew_GetHashUrl($this->InlineEditUrl, $this->PageObjName . "_row_" . $this->RowCnt)) . "\">" . $Language->Phrase("InlineEditLink") . "</a>";
 		} else {
@@ -1653,7 +1692,7 @@ class ct_98home_head_list extends ct_98home_head {
 		// "copy"
 		$oListOpt = &$this->ListOptions->Items["copy"];
 		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
-		if (TRUE) {
+		if ($Security->CanAdd()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
 			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineCopy\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineCopyUrl) . "\">" . $Language->Phrase("InlineCopyLink") . "</a>";
 		} else {
@@ -1711,27 +1750,27 @@ class ct_98home_head_list extends ct_98home_head {
 		$item = &$option->Add("add");
 		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
 		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "");
+		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
 
 		// Inline Add
 		$item = &$option->Add("inlineadd");
 		$item->Body = "<a class=\"ewAddEdit ewInlineAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineAddUrl) . "\">" .$Language->Phrase("InlineAddLink") . "</a>";
-		$item->Visible = ($this->InlineAddUrl <> "");
+		$item->Visible = ($this->InlineAddUrl <> "" && $Security->CanAdd());
 		$item = &$option->Add("gridadd");
 		$item->Body = "<a class=\"ewAddEdit ewGridAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" href=\"" . ew_HtmlEncode($this->GridAddUrl) . "\">" . $Language->Phrase("GridAddLink") . "</a>";
-		$item->Visible = ($this->GridAddUrl <> "");
+		$item->Visible = ($this->GridAddUrl <> "" && $Security->CanAdd());
 
 		// Add grid edit
 		$option = $options["addedit"];
 		$item = &$option->Add("gridedit");
 		$item->Body = "<a class=\"ewAddEdit ewGridEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GridEditUrl) . "\">" . $Language->Phrase("GridEditLink") . "</a>";
-		$item->Visible = ($this->GridEditUrl <> "");
+		$item->Visible = ($this->GridEditUrl <> "" && $Security->CanEdit());
 		$option = $options["action"];
 
 		// Add multi delete
 		$item = &$option->Add("multidelete");
 		$item->Body = "<a class=\"ewAction ewMultiDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" href=\"\" onclick=\"ew_SubmitAction(event,{f:document.ft_98home_headlist,url:'" . $this->MultiDeleteUrl . "'});return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
-		$item->Visible = (TRUE);
+		$item->Visible = ($Security->CanDelete());
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -1804,7 +1843,7 @@ class ct_98home_head_list extends ct_98home_head {
 					$option->UseImageAndText = TRUE;
 					$item = &$option->Add("addblankrow");
 					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = TRUE;
+					$item->Visible = $Security->CanAdd();
 				}
 				$option = &$options["action"];
 				$option->UseDropDownButton = FALSE;
@@ -1828,7 +1867,7 @@ class ct_98home_head_list extends ct_98home_head {
 					$option->UseImageAndText = TRUE;
 					$item = &$option->Add("addblankrow");
 					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = TRUE;
+					$item->Visible = $Security->CanAdd();
 				}
 				$option = &$options["action"];
 				$option->UseDropDownButton = FALSE;
@@ -1953,6 +1992,11 @@ class ct_98home_head_list extends ct_98home_head {
 		// Hide search options
 		if ($this->Export <> "" || $this->CurrentAction <> "")
 			$this->SearchOptions->HideAllOptions();
+		global $Security;
+		if (!$Security->CanSearch()) {
+			$this->SearchOptions->HideAllOptions();
+			$this->FilterOptions->HideAllOptions();
+		}
 	}
 
 	function SetupListOptionsExt() {
@@ -2264,6 +2308,10 @@ class ct_98home_head_list extends ct_98home_head {
 	//
 	function DeleteRows() {
 		global $Language, $Security;
+		if (!$Security->CanDelete()) {
+			$this->setFailureMessage($Language->Phrase("NoDeletePermission")); // No delete permission
+			return FALSE;
+		}
 		$DeleteRows = TRUE;
 		$sSql = $this->SQL();
 		$conn = &$this->Connection();
@@ -3006,6 +3054,8 @@ if ($t_98home_head->CurrentAction == "gridadd") {
 
 	// Set no record found message
 	if ($t_98home_head->CurrentAction == "" && $t_98home_head_list->TotalRecs == 0) {
+		if (!$Security->CanList())
+			$t_98home_head_list->setWarningMessage(ew_DeniedMsg());
 		if ($t_98home_head_list->SearchWhere == "0=101")
 			$t_98home_head_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
@@ -3021,6 +3071,7 @@ if ($t_98home_head->CurrentAction == "gridadd") {
 }
 $t_98home_head_list->RenderOtherOptions();
 ?>
+<?php if ($Security->CanSearch()) { ?>
 <?php if ($t_98home_head->Export == "" && $t_98home_head->CurrentAction == "") { ?>
 <form name="ft_98home_headlistsrch" id="ft_98home_headlistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
 <?php $SearchPanelClass = ($t_98home_head_list->SearchWhere <> "") ? " in" : " in"; ?>
@@ -3047,6 +3098,7 @@ $t_98home_head_list->RenderOtherOptions();
 	</div>
 </div>
 </form>
+<?php } ?>
 <?php } ?>
 <?php $t_98home_head_list->ShowPageHeader(); ?>
 <?php

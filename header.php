@@ -82,7 +82,7 @@ var EW_IS_LOGGEDIN = <?php echo IsLoggedIn() ? "true" : "false" ?>; // Is logged
 var EW_IS_SYS_ADMIN = <?php echo IsSysAdmin() ? "true" : "false" ?>; // Is sys admin
 var EW_CURRENT_USER_NAME = "<?php echo ew_JsEncode2(CurrentUserName()) ?>"; // Current user name
 var EW_IS_AUTOLOGIN = <?php echo IsAutoLogin() ? "true" : "false" ?>; // Is logged in with option "Auto login until I logout explicitly"
-var EW_TIMEOUT_URL = EW_RELATIVE_PATH + "index.php"; // Timeout URL
+var EW_TIMEOUT_URL = EW_RELATIVE_PATH + "logout.php"; // Timeout URL
 var EW_LOOKUP_FILE_NAME = "ewlookup13.php"; // Lookup file name
 var EW_LOOKUP_FILTER_VALUE_SEPARATOR = "<?php echo EW_LOOKUP_FILTER_VALUE_SEPARATOR ?>"; // Lookup filter value separator
 var EW_MODAL_LOOKUP_FILE_NAME = "ewmodallookup13.php"; // Modal lookup file name
@@ -120,6 +120,34 @@ var ewVar = <?php echo json_encode($EW_CLIENT_VAR); ?>;
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
+/*log='<?php echo CurrentUserName(); ?>';
+if (log!="") {
+document.write ('<div align="left"><b>Login:</b> ' + log + '</div>');
+}*/
+/*currentUsername='<?php echo CurrentUserName(); ?>';
+jQuery(document).ready(function() {
+if (currentUsername!="") { 
+jQuery("div.navbar-inner").append( '<div id="loggedinUser" style="line-height:40px;float:right;color:#999;font-size:12px;">Logged in as: <strong>'+currentUsername+'</strong></div>' ); 
+} 
+});*/
+/*currentUsername='<?php echo CurrentUserName(); ?>';
+jQuery(document).ready(function() {
+if (currentUsername!="") {
+$('<div id="loggedinUser" style="">&nbsp;Logged in as: <strong>'+currentUsername+'</strong></div>').insertBefore(".ewMenu");
+}
+});*/
+/*currentUsername='<?php echo CurrentUserName(); ?>';
+jQuery(document).ready(function() {
+if (currentUsername!="") {
+$(".ewMenu").prepend('<div id="loggedinUser" style="height: 40px;line-height: 40px;color: #FFFFFF;font-size: 12px;z-index: 999;background-color: #000;font-weight: bold;margin-top: 0px;margin-right: auto;margin-bottom: 0px;margin-left: auto;padding-right: 10px;padding-left: 10px;float: left;padding-top: 0px;padding-bottom: 0px;position: relative; width: 100%;">Welcome! <strong>'+currentUsername+'</strong></div>');
+}
+});*/
+currentUsername='<?php echo CurrentUserName(); ?>';
+jQuery(document).ready(function() {
+if (currentUsername!="") {
+$(".ewMenu").prepend('<div id="loggedinUser" style="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Welcome <strong>'+currentUsername+'</strong></div>');
+}
+});
 </script>
 <?php } ?>
 <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="<?php echo ew_ConvertFullUrl("favicon.ico") ?>"><link rel="icon" type="image/vnd.microsoft.icon" href="<?php echo ew_ConvertFullUrl("favicon.ico") ?>">

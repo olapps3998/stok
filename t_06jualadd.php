@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_06jualinfo.php" ?>
+<?php include_once "t_97userinfo.php" ?>
 <?php include_once "t_07jual_detailgridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -216,6 +217,7 @@ class ct_06jual_add extends ct_06jual {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -231,6 +233,9 @@ class ct_06jual_add extends ct_06jual {
 			$GLOBALS["Table"] = &$GLOBALS["t_06jual"];
 		}
 
+		// Table object (t_97user)
+		if (!isset($GLOBALS['t_97user'])) $GLOBALS['t_97user'] = new ct_97user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'add', TRUE);
@@ -244,6 +249,12 @@ class ct_06jual_add extends ct_06jual {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
+
+		// User table object (t_97user)
+		if (!isset($UserTable)) {
+			$UserTable = new ct_97user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 	}
 
 	//
@@ -251,6 +262,26 @@ class ct_06jual_add extends ct_06jual {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanAdd()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			if ($Security->CanList())
+				$this->Page_Terminate(ew_GetUrl("t_06juallist.php"));
+			else
+				$this->Page_Terminate(ew_GetUrl("login.php"));
+		}
+		if ($Security->IsLoggedIn()) {
+			$Security->UserID_Loading();
+			$Security->LoadUserID();
+			$Security->UserID_Loaded();
+		}
 
 		// Create form object
 		$objForm = new cFormObj();
@@ -1039,7 +1070,9 @@ class ct_06jual_add extends ct_06jual {
 			if (in_array("t_07jual_detail", $DetailTblVar) && $GLOBALS["t_07jual_detail"]->DetailAdd) {
 				$GLOBALS["t_07jual_detail"]->jual_id->setSessionValue($this->jual_id->CurrentValue); // Set master key
 				if (!isset($GLOBALS["t_07jual_detail_grid"])) $GLOBALS["t_07jual_detail_grid"] = new ct_07jual_detail_grid(); // Get detail page object
+				$Security->LoadCurrentUserLevel($this->ProjectID . "t_07jual_detail"); // Load user level of detail table
 				$AddRow = $GLOBALS["t_07jual_detail_grid"]->GridInsert();
+				$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
 				if (!$AddRow)
 					$GLOBALS["t_07jual_detail"]->jual_id->setSessionValue(""); // Clear master key if insert failed
 			}
@@ -1379,7 +1412,9 @@ ft_06jualadd.CreateAutoSuggest({"id":"x_customer_id","forceSelect":true});
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_06jual->customer_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_customer_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x_customer_id" id="s_x_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_05customer")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_06jual->customer_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x_customer_id',url:'t_05customeraddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x_customer_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_06jual->customer_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x_customer_id" id="s_x_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery() ?>">
 </span>
 <?php echo $t_06jual->customer_id->CustomMsg ?></div></div>

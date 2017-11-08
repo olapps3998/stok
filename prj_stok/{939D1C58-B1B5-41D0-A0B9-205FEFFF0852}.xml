@@ -1,45 +1,50 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<configuration date="2017/11/07" author="e.World Technology Ltd.">
-  <project id="{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}" file="D:\xampp3\htdocs\stok\prj_stok.pmp" name="prj_stok" product="PHPMaker" version="13.0" datetime="2017/11/07 14:31:47" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;">
-    <table id="cf_00home_php" name="cf_00home.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="cf_01hitung_nilai_stok_php" name="cf_01hitung_nilai_stok.php" caption="Nilai Stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_00audit_trail" name="t_00audit_trail" caption="t 00audit trail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_01vendor" name="t_01vendor" caption="Vendor" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_02item" name="t_02item" caption="Item" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_03satuan" name="t_03satuan" caption="Satuan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_04beli" name="t_04beli" caption="Pembelian" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_05customer" name="t_05customer" caption="Customer" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_06jual" name="t_06jual" caption="Penjualan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_07jual_detail" name="t_07jual_detail" caption="Detail Penjualan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_08item_saldo" name="t_08item_saldo" caption="Stok Awal" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_09nilai_stok" name="t_09nilai_stok" caption="t 09nilai stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_01beli_laporan" name="v_01beli_laporan" caption="v 01beli laporan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_02jual_laporan" name="v_02jual_laporan" caption="v 02jual laporan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_03masuk" name="v_03masuk" caption="v 03masuk" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_04keluar" name="v_04keluar" caption="v 04keluar" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_05stok" name="v_05stok" caption="v 05stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_06transaksi" name="v_06transaksi" caption="v 06transaksi" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_07mutasi" name="v_07mutasi" caption="v 07mutasi" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_08harga_jual_terakhir" name="v_08harga_jual_terakhir" caption="v 08harga jual terakhir" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_09margin" name="v_09margin" caption="v 09margin" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_10hutang" name="v_10hutang" caption="v 10hutang" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_11piutang" name="v_11piutang" caption="v 11piutang" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_12nilai_stok" name="v_12nilai_stok" caption="v 12nilai stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_13beli" name="v_13beli" caption="v 13beli" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_14jual_detail" name="v_14jual_detail" caption="v 14jual detail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_10sap" name="t_10sap" caption="t 10sap" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_15penjualan" name="v_15penjualan" caption="v 15penjualan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_16hpp" name="v_16hpp" caption="v 16hpp" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="cf_02hitung_lr_php" name="cf_02hitung_lr.php" caption="Laba / Rugi Kotor" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_11dead_stok" name="t_11dead_stok" caption="Dead-Stock" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_17mutasi_detail" name="v_17mutasi_detail" caption="v 17mutasi detail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="v_18dead_stok" name="v_18dead_stok" caption="v 18dead stok" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_12retur" name="t_12retur" caption="Retur Penjualan" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_99home" name="t_99home" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="cf_03home2_php" name="cf_03home2.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_98home_head" name="t_98home_head" caption="Home Head" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_13kategori" name="t_13kategori" caption="Item Kategori" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_14drop_cash" name="t_14drop_cash" caption="Drop Cash" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t_15branch" name="t_15branch" caption="Branch" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+<configuration date="2017/11/09" author="e.World Technology Ltd.">
+  <project id="{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}" file="D:\xampp3\htdocs\stok\prj_stok.pmp" name="prj_stok" product="PHPMaker" version="13.0" datetime="2017/11/09 05:33:42" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
+    <table id="cf_00home_php" name="cf_00home.php" caption="Home 0" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="cf_01hitung_nilai_stok_php" name="cf_01hitung_nilai_stok.php" caption="Nilai Stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_00audit_trail" name="t_00audit_trail" caption="t 00audit trail" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="t_01vendor" name="t_01vendor" caption="Vendor" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_02item" name="t_02item" caption="Item" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_03satuan" name="t_03satuan" caption="Satuan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_04beli" name="t_04beli" caption="Pembelian" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_05customer" name="t_05customer" caption="Customer" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_06jual" name="t_06jual" caption="Penjualan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_07jual_detail" name="t_07jual_detail" caption="Detail Penjualan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_08item_saldo" name="t_08item_saldo" caption="Stok Awal" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_09nilai_stok" name="t_09nilai_stok" caption="t 09nilai stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_01beli_laporan" name="v_01beli_laporan" caption="v 01beli laporan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_02jual_laporan" name="v_02jual_laporan" caption="v 02jual laporan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_03masuk" name="v_03masuk" caption="v 03masuk" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_04keluar" name="v_04keluar" caption="v 04keluar" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_05stok" name="v_05stok" caption="v 05stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_06transaksi" name="v_06transaksi" caption="v 06transaksi" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_07mutasi" name="v_07mutasi" caption="v 07mutasi" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_08harga_jual_terakhir" name="v_08harga_jual_terakhir" caption="v 08harga jual terakhir" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_09margin" name="v_09margin" caption="v 09margin" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_10hutang" name="v_10hutang" caption="v 10hutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_11piutang" name="v_11piutang" caption="v 11piutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_12nilai_stok" name="v_12nilai_stok" caption="v 12nilai stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_13beli" name="v_13beli" caption="v 13beli" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_14jual_detail" name="v_14jual_detail" caption="v 14jual detail" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="t_10sap" name="t_10sap" caption="t 10sap" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_15penjualan" name="v_15penjualan" caption="v 15penjualan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_16hpp" name="v_16hpp" caption="v 16hpp" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="cf_02hitung_lr_php" name="cf_02hitung_lr.php" caption="Laba / Rugi Kotor" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_11dead_stok" name="t_11dead_stok" caption="Dead-Stock" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="v_17mutasi_detail" name="v_17mutasi_detail" caption="v 17mutasi detail" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="v_18dead_stok" name="v_18dead_stok" caption="v 18dead stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="t_12retur" name="t_12retur" caption="Retur Penjualan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_99home" name="t_99home" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="cf_03home2_php" name="cf_03home2.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_98home_head" name="t_98home_head" caption="Home Head" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="t_13kategori" name="t_13kategori" caption="Item Kategori" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_14drop_cash" name="t_14drop_cash" caption="Drop Cash" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_15branch" name="t_15branch" caption="Branch" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_97user" name="t_97user" caption="User" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="t_95userlevels" name="t_95userlevels" caption="t 95userlevels" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="t_96userlevelpermissions" name="t_96userlevelpermissions" caption="t 96userlevelpermissions" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="userlevelpermissions" name="userlevelpermissions" caption="userlevelpermissions" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="userlevels" name="userlevels" caption="Level" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
   </project>
 </configuration>

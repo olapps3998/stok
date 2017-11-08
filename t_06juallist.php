@@ -6,6 +6,7 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_06jualinfo.php" ?>
+<?php include_once "t_97userinfo.php" ?>
 <?php include_once "t_07jual_detailgridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -256,6 +257,7 @@ class ct_06jual_list extends ct_06jual {
 	//
 	function __construct() {
 		global $conn, $Language;
+		global $UserTable, $UserTableConn;
 		$GLOBALS["Page"] = &$this;
 		$this->TokenTimeout = ew_SessionTimeoutTime();
 
@@ -286,6 +288,9 @@ class ct_06jual_list extends ct_06jual {
 		$this->MultiDeleteUrl = "t_06jualdelete.php";
 		$this->MultiUpdateUrl = "t_06jualupdate.php";
 
+		// Table object (t_97user)
+		if (!isset($GLOBALS['t_97user'])) $GLOBALS['t_97user'] = new ct_97user();
+
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'list', TRUE);
@@ -299,6 +304,12 @@ class ct_06jual_list extends ct_06jual {
 
 		// Open connection
 		if (!isset($conn)) $conn = ew_Connect($this->DBID);
+
+		// User table object (t_97user)
+		if (!isset($UserTable)) {
+			$UserTable = new ct_97user();
+			$UserTableConn = Conn($UserTable->DBID);
+		}
 
 		// List options
 		$this->ListOptions = new cListOptions();
@@ -334,6 +345,23 @@ class ct_06jual_list extends ct_06jual {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Security
+		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanList()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			$this->Page_Terminate(ew_GetUrl("index.php"));
+		}
+		if ($Security->IsLoggedIn()) {
+			$Security->UserID_Loading();
+			$Security->LoadUserID();
+			$Security->UserID_Loaded();
+		}
 
 		// Create form object
 		$objForm = new cFormObj();
@@ -722,6 +750,8 @@ class ct_06jual_list extends ct_06jual {
 
 		// Build filter
 		$sFilter = "";
+		if (!$Security->CanList())
+			$sFilter = "(0=1)"; // Filter all records
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
 
@@ -796,6 +826,8 @@ class ct_06jual_list extends ct_06jual {
 	// Switch to Inline Edit mode
 	function InlineEditMode() {
 		global $Security, $Language;
+		if (!$Security->CanEdit())
+			$this->Page_Terminate("login.php"); // Go to login page
 		$bInlineEdit = TRUE;
 		if (@$_GET["jual_id"] <> "") {
 			$this->jual_id->setQueryStringValue($_GET["jual_id"]);
@@ -857,6 +889,8 @@ class ct_06jual_list extends ct_06jual {
 	// Switch to Inline Add mode
 	function InlineAddMode() {
 		global $Security, $Language;
+		if (!$Security->CanAdd())
+			$this->Page_Terminate("login.php"); // Return to login page
 		if ($this->CurrentAction == "copy") {
 			if (@$_GET["jual_id"] <> "") {
 				$this->jual_id->setQueryStringValue($_GET["jual_id"]);
@@ -1451,6 +1485,7 @@ class ct_06jual_list extends ct_06jual {
 	function BasicSearchWhere($Default = FALSE) {
 		global $Security;
 		$sSearchStr = "";
+		if (!$Security->CanSearch()) return "";
 		$sSearchKeyword = ($Default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
 		$sSearchType = ($Default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 		if ($sSearchKeyword <> "") {
@@ -1625,25 +1660,25 @@ class ct_06jual_list extends ct_06jual {
 		// "view"
 		$item = &$this->ListOptions->Add("view");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
+		$item->Visible = $Security->CanView();
 		$item->OnLeft = TRUE;
 
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
+		$item->Visible = $Security->CanEdit();
 		$item->OnLeft = TRUE;
 
 		// "copy"
 		$item = &$this->ListOptions->Add("copy");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
+		$item->Visible = $Security->CanAdd();
 		$item->OnLeft = TRUE;
 
 		// "detail_t_07jual_detail"
 		$item = &$this->ListOptions->Add("detail_t_07jual_detail");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE && !$this->ShowMultipleDetails;
+		$item->Visible = $Security->AllowList(CurrentProjectID() . 't_07jual_detail') && !$this->ShowMultipleDetails;
 		$item->OnLeft = TRUE;
 		$item->ShowInButtonGroup = FALSE;
 		if (!isset($GLOBALS["t_07jual_detail_grid"])) $GLOBALS["t_07jual_detail_grid"] = new ct_07jual_detail_grid;
@@ -1672,7 +1707,7 @@ class ct_06jual_list extends ct_06jual {
 
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
-		$item->Visible = TRUE;
+		$item->Visible = $Security->CanDelete();
 		$item->OnLeft = TRUE;
 		$item->Header = "<input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\">";
 		$item->MoveTo(0);
@@ -1732,7 +1767,11 @@ class ct_06jual_list extends ct_06jual {
 				$option->UseButtonGroup = TRUE; // Use button group for grid delete button
 				$option->UseImageAndText = TRUE; // Use image and text for grid delete button
 				$oListOpt = &$option->Items["griddelete"];
-				$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
+				if (!$Security->CanDelete() && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+					$oListOpt->Body = "&nbsp;";
+				} else {
+					$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
+				}
 			}
 		}
 
@@ -1768,7 +1807,7 @@ class ct_06jual_list extends ct_06jual {
 		// "view"
 		$oListOpt = &$this->ListOptions->Items["view"];
 		$viewcaption = ew_HtmlTitle($Language->Phrase("ViewLink"));
-		if (TRUE) {
+		if ($Security->CanView()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewView\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . ew_HtmlEncode($this->ViewUrl) . "\">" . $Language->Phrase("ViewLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -1777,7 +1816,7 @@ class ct_06jual_list extends ct_06jual {
 		// "edit"
 		$oListOpt = &$this->ListOptions->Items["edit"];
 		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
-		if (TRUE) {
+		if ($Security->CanEdit()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
 			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" href=\"" . ew_HtmlEncode(ew_GetHashUrl($this->InlineEditUrl, $this->PageObjName . "_row_" . $this->RowCnt)) . "\">" . $Language->Phrase("InlineEditLink") . "</a>";
 		} else {
@@ -1787,7 +1826,7 @@ class ct_06jual_list extends ct_06jual {
 		// "copy"
 		$oListOpt = &$this->ListOptions->Items["copy"];
 		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
-		if (TRUE) {
+		if ($Security->CanAdd()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
 			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineCopy\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineCopyUrl) . "\">" . $Language->Phrase("InlineCopyLink") . "</a>";
 		} else {
@@ -1828,21 +1867,21 @@ class ct_06jual_list extends ct_06jual {
 
 		// "detail_t_07jual_detail"
 		$oListOpt = &$this->ListOptions->Items["detail_t_07jual_detail"];
-		if (TRUE) {
+		if ($Security->AllowList(CurrentProjectID() . 't_07jual_detail')) {
 			$body = $Language->Phrase("DetailLink") . $Language->TablePhrase("t_07jual_detail", "TblCaption");
 			$body = "<a class=\"btn btn-default btn-sm ewRowLink ewDetail\" data-action=\"list\" href=\"" . ew_HtmlEncode("t_07jual_detaillist.php?" . EW_TABLE_SHOW_MASTER . "=t_06jual&fk_jual_id=" . urlencode(strval($this->jual_id->CurrentValue)) . "") . "\">" . $body . "</a>";
 			$links = "";
-			if ($GLOBALS["t_07jual_detail_grid"]->DetailView) {
+			if ($GLOBALS["t_07jual_detail_grid"]->DetailView && $Security->CanView() && $Security->AllowView(CurrentProjectID() . 't_07jual_detail')) {
 				$links .= "<li><a class=\"ewRowLink ewDetailView\" data-action=\"view\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" href=\"" . ew_HtmlEncode($this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=t_07jual_detail")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailViewLink")) . "</a></li>";
 				if ($DetailViewTblVar <> "") $DetailViewTblVar .= ",";
 				$DetailViewTblVar .= "t_07jual_detail";
 			}
-			if ($GLOBALS["t_07jual_detail_grid"]->DetailEdit) {
+			if ($GLOBALS["t_07jual_detail_grid"]->DetailEdit && $Security->CanEdit() && $Security->AllowEdit(CurrentProjectID() . 't_07jual_detail')) {
 				$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=t_07jual_detail")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
 				if ($DetailEditTblVar <> "") $DetailEditTblVar .= ",";
 				$DetailEditTblVar .= "t_07jual_detail";
 			}
-			if ($GLOBALS["t_07jual_detail_grid"]->DetailAdd) {
+			if ($GLOBALS["t_07jual_detail_grid"]->DetailAdd && $Security->CanAdd() && $Security->AllowAdd(CurrentProjectID() . 't_07jual_detail')) {
 				$links .= "<li><a class=\"ewRowLink ewDetailCopy\" data-action=\"add\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->GetCopyUrl(EW_TABLE_SHOW_DETAIL . "=t_07jual_detail")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailCopyLink")) . "</a></li>";
 				if ($DetailCopyTblVar <> "") $DetailCopyTblVar .= ",";
 				$DetailCopyTblVar .= "t_07jual_detail";
@@ -1901,22 +1940,22 @@ class ct_06jual_list extends ct_06jual {
 		$item = &$option->Add("add");
 		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
 		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "");
+		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
 
 		// Inline Add
 		$item = &$option->Add("inlineadd");
 		$item->Body = "<a class=\"ewAddEdit ewInlineAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineAddUrl) . "\">" .$Language->Phrase("InlineAddLink") . "</a>";
-		$item->Visible = ($this->InlineAddUrl <> "");
+		$item->Visible = ($this->InlineAddUrl <> "" && $Security->CanAdd());
 		$item = &$option->Add("gridadd");
 		$item->Body = "<a class=\"ewAddEdit ewGridAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" href=\"" . ew_HtmlEncode($this->GridAddUrl) . "\">" . $Language->Phrase("GridAddLink") . "</a>";
-		$item->Visible = ($this->GridAddUrl <> "");
+		$item->Visible = ($this->GridAddUrl <> "" && $Security->CanAdd());
 		$option = $options["detail"];
 		$DetailTableLink = "";
 		$item = &$option->Add("detailadd_t_07jual_detail");
 		$url = $this->GetAddUrl(EW_TABLE_SHOW_DETAIL . "=t_07jual_detail");
 		$caption = $Language->Phrase("Add") . "&nbsp;" . $this->TableCaption() . "/" . $GLOBALS["t_07jual_detail"]->TableCaption();
 		$item->Body = "<a class=\"ewDetailAddGroup ewDetailAdd\" title=\"" . ew_HtmlTitle($caption) . "\" data-caption=\"" . ew_HtmlTitle($caption) . "\" href=\"" . ew_HtmlEncode($url) . "\">" . $caption . "</a>";
-		$item->Visible = ($GLOBALS["t_07jual_detail"]->DetailAdd);
+		$item->Visible = ($GLOBALS["t_07jual_detail"]->DetailAdd && $Security->AllowAdd(CurrentProjectID() . 't_07jual_detail') && $Security->CanAdd());
 		if ($item->Visible) {
 			if ($DetailTableLink <> "") $DetailTableLink .= ",";
 			$DetailTableLink .= "t_07jual_detail";
@@ -1927,7 +1966,7 @@ class ct_06jual_list extends ct_06jual {
 			$item = &$option->Add("detailsadd");
 			$url = $this->GetAddUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailTableLink);
 			$item->Body = "<a class=\"ewDetailAddGroup ewDetailAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("AddMasterDetailLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddMasterDetailLink")) . "\" href=\"" . ew_HtmlEncode($url) . "\">" . $Language->Phrase("AddMasterDetailLink") . "</a>";
-			$item->Visible = ($DetailTableLink <> "");
+			$item->Visible = ($DetailTableLink <> "" && $Security->CanAdd());
 
 			// Hide single master/detail items
 			$ar = explode(",", $DetailTableLink);
@@ -1942,13 +1981,13 @@ class ct_06jual_list extends ct_06jual {
 		$option = $options["addedit"];
 		$item = &$option->Add("gridedit");
 		$item->Body = "<a class=\"ewAddEdit ewGridEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GridEditUrl) . "\">" . $Language->Phrase("GridEditLink") . "</a>";
-		$item->Visible = ($this->GridEditUrl <> "");
+		$item->Visible = ($this->GridEditUrl <> "" && $Security->CanEdit());
 		$option = $options["action"];
 
 		// Add multi delete
 		$item = &$option->Add("multidelete");
 		$item->Body = "<a class=\"ewAction ewMultiDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" href=\"\" onclick=\"ew_SubmitAction(event,{f:document.ft_06juallist,url:'" . $this->MultiDeleteUrl . "'});return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
-		$item->Visible = (TRUE);
+		$item->Visible = ($Security->CanDelete());
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -2021,7 +2060,7 @@ class ct_06jual_list extends ct_06jual {
 					$option->UseImageAndText = TRUE;
 					$item = &$option->Add("addblankrow");
 					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = TRUE;
+					$item->Visible = $Security->CanAdd();
 				}
 				$option = &$options["action"];
 				$option->UseDropDownButton = FALSE;
@@ -2045,7 +2084,7 @@ class ct_06jual_list extends ct_06jual {
 					$option->UseImageAndText = TRUE;
 					$item = &$option->Add("addblankrow");
 					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = TRUE;
+					$item->Visible = $Security->CanAdd();
 				}
 				$option = &$options["action"];
 				$option->UseDropDownButton = FALSE;
@@ -2170,6 +2209,11 @@ class ct_06jual_list extends ct_06jual {
 		// Hide search options
 		if ($this->Export <> "" || $this->CurrentAction <> "")
 			$this->SearchOptions->HideAllOptions();
+		global $Security;
+		if (!$Security->CanSearch()) {
+			$this->SearchOptions->HideAllOptions();
+			$this->FilterOptions->HideAllOptions();
+		}
 	}
 
 	function SetupListOptionsExt() {
@@ -2889,6 +2933,10 @@ class ct_06jual_list extends ct_06jual {
 	//
 	function DeleteRows() {
 		global $Language, $Security;
+		if (!$Security->CanDelete()) {
+			$this->setFailureMessage($Language->Phrase("NoDeletePermission")); // No delete permission
+			return FALSE;
+		}
 		$DeleteRows = TRUE;
 		$sSql = $this->SQL();
 		$conn = &$this->Connection();
@@ -3749,6 +3797,8 @@ if ($t_06jual->CurrentAction == "gridadd") {
 
 	// Set no record found message
 	if ($t_06jual->CurrentAction == "" && $t_06jual_list->TotalRecs == 0) {
+		if (!$Security->CanList())
+			$t_06jual_list->setWarningMessage(ew_DeniedMsg());
 		if ($t_06jual_list->SearchWhere == "0=101")
 			$t_06jual_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
@@ -3764,6 +3814,7 @@ if ($t_06jual->CurrentAction == "gridadd") {
 }
 $t_06jual_list->RenderOtherOptions();
 ?>
+<?php if ($Security->CanSearch()) { ?>
 <?php if ($t_06jual->Export == "" && $t_06jual->CurrentAction == "") { ?>
 <form name="ft_06juallistsrch" id="ft_06juallistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
 <?php $SearchPanelClass = ($t_06jual_list->SearchWhere <> "") ? " in" : " in"; ?>
@@ -3790,6 +3841,7 @@ $t_06jual_list->RenderOtherOptions();
 	</div>
 </div>
 </form>
+<?php } ?>
 <?php } ?>
 <?php $t_06jual_list->ShowPageHeader(); ?>
 <?php
@@ -4047,7 +4099,9 @@ ft_06juallist.CreateAutoSuggest({"id":"x<?php echo $t_06jual_list->RowIndex ?>_c
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_06jual->customer_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_06jual_list->RowIndex ?>_customer_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" id="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_05customer")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_06jual->customer_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_06jual_list->RowIndex ?>_customer_id',url:'t_05customeraddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_06jual_list->RowIndex ?>_customer_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_06jual->customer_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" id="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery() ?>">
 </span>
 <input type="hidden" data-table="t_06jual" data-field="x_customer_id" name="o<?php echo $t_06jual_list->RowIndex ?>_customer_id" id="o<?php echo $t_06jual_list->RowIndex ?>_customer_id" value="<?php echo ew_HtmlEncode($t_06jual->customer_id->OldValue) ?>">
@@ -4314,7 +4368,9 @@ ft_06juallist.CreateAutoSuggest({"id":"x<?php echo $t_06jual_list->RowIndex ?>_c
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_06jual->customer_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_06jual_list->RowIndex ?>_customer_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" id="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_05customer")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_06jual->customer_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_06jual_list->RowIndex ?>_customer_id',url:'t_05customeraddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_06jual_list->RowIndex ?>_customer_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_06jual->customer_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" id="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery() ?>">
 </span>
 <input type="hidden" data-table="t_06jual" data-field="x_customer_id" name="o<?php echo $t_06jual_list->RowIndex ?>_customer_id" id="o<?php echo $t_06jual_list->RowIndex ?>_customer_id" value="<?php echo ew_HtmlEncode($t_06jual->customer_id->OldValue) ?>">
@@ -4336,7 +4392,9 @@ ft_06juallist.CreateAutoSuggest({"id":"x<?php echo $t_06jual_list->RowIndex ?>_c
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_06jual->customer_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_06jual_list->RowIndex ?>_customer_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" id="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_05customer")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_06jual->customer_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_06jual_list->RowIndex ?>_customer_id',url:'t_05customeraddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_06jual_list->RowIndex ?>_customer_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_06jual->customer_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" id="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery() ?>">
 </span>
 <?php } ?>
@@ -4575,7 +4633,9 @@ ft_06juallist.CreateAutoSuggest({"id":"x<?php echo $t_06jual_list->RowIndex ?>_c
 </script>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t_06jual->customer_id->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t_06jual_list->RowIndex ?>_customer_id',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" id="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery(false) ?>">
+<?php if (AllowAdd(CurrentProjectID() . "t_05customer")) { ?>
 <button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t_06jual->customer_id->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t_06jual_list->RowIndex ?>_customer_id',url:'t_05customeraddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t_06jual_list->RowIndex ?>_customer_id"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t_06jual->customer_id->FldCaption() ?></span></button>
+<?php } ?>
 <input type="hidden" name="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" id="s_x<?php echo $t_06jual_list->RowIndex ?>_customer_id" value="<?php echo $t_06jual->customer_id->LookupFilterQuery() ?>">
 </span>
 <input type="hidden" data-table="t_06jual" data-field="x_customer_id" name="o<?php echo $t_06jual_list->RowIndex ?>_customer_id" id="o<?php echo $t_06jual_list->RowIndex ?>_customer_id" value="<?php echo ew_HtmlEncode($t_06jual->customer_id->OldValue) ?>">
