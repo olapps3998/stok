@@ -18,7 +18,8 @@ From ((t_04beli
   Join t_03satuan On t_04beli.satuan_id = t_03satuan.satuan_id;
 
 create view v_02jual_laporan as  
-Select t_06jual.no_po As no_po,
+Select t_06jual.jual_id As jual_id,
+  t_06jual.no_po As no_po,
   t_06jual.tgl As tgl,
   t_05customer.customer_nama As customer_nama,
   t_06jual.total As total,

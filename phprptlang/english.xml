@@ -787,6 +787,9 @@
       <field id="sub_total">
         <phrase id="fldcaption" value="sub total" />
       </field>
+      <field id="jual_id">
+        <phrase id="fldcaption" value="jual id" />
+      </field>
     </table>
     <table id="r_jual">
       <phrase id="tblcaption" value="Penjualan" />
@@ -819,6 +822,9 @@
       </field>
       <field id="sub_total">
         <phrase id="fldcaption" value="Sub Total" />
+      </field>
+      <field id="jual_id">
+        <phrase id="fldcaption" value="jual id" />
       </field>
     </table>
     <table id="v_03masuk">

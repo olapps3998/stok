@@ -544,12 +544,13 @@ class crr_jual_summary extends crr_jual {
 		$this->satuan_nama->SetVisibility();
 		$this->harga->SetVisibility();
 		$this->sub_total->SetVisibility();
+		$this->jual_id->SetVisibility();
 
 		// Aggregate variables
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 7;
+		$nDtls = 8;
 		$nGrps = 5;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -562,7 +563,7 @@ class crr_jual_summary extends crr_jual {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -890,6 +891,7 @@ class crr_jual_summary extends crr_jual {
 				$this->FirstRowData['satuan_nama'] = ewr_Conv($rs->fields('satuan_nama'), 200);
 				$this->FirstRowData['harga'] = ewr_Conv($rs->fields('harga'), 4);
 				$this->FirstRowData['sub_total'] = ewr_Conv($rs->fields('sub_total'), 4);
+				$this->FirstRowData['jual_id'] = ewr_Conv($rs->fields('jual_id'), 3);
 			}
 		} else { // Get next row
 			$rs->MoveNext();
@@ -910,12 +912,14 @@ class crr_jual_summary extends crr_jual {
 			$this->satuan_nama->setDbValue($rs->fields('satuan_nama'));
 			$this->harga->setDbValue($rs->fields('harga'));
 			$this->sub_total->setDbValue($rs->fields('sub_total'));
+			$this->jual_id->setDbValue($rs->fields('jual_id'));
 			$this->Val[1] = $this->tgl_kirim->CurrentValue;
 			$this->Val[2] = $this->item_nama->CurrentValue;
 			$this->Val[3] = $this->qty->CurrentValue;
 			$this->Val[4] = $this->satuan_nama->CurrentValue;
 			$this->Val[5] = $this->harga->CurrentValue;
 			$this->Val[6] = $this->sub_total->CurrentValue;
+			$this->Val[7] = $this->jual_id->CurrentValue;
 		} else {
 			$this->no_po->setDbValue("");
 			$this->tgl->setDbValue("");
@@ -927,6 +931,7 @@ class crr_jual_summary extends crr_jual {
 			$this->satuan_nama->setDbValue("");
 			$this->harga->setDbValue("");
 			$this->sub_total->setDbValue("");
+			$this->jual_id->setDbValue("");
 		}
 	}
 
@@ -1106,6 +1111,7 @@ class crr_jual_summary extends crr_jual {
 				$this->GrandCnt[5] = $this->TotCount;
 				$this->GrandCnt[6] = $this->TotCount;
 				$this->GrandSmry[6] = $rsagg->fields("sum_sub_total");
+				$this->GrandCnt[7] = $this->TotCount;
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -1210,6 +1216,9 @@ class crr_jual_summary extends crr_jual {
 
 			// sub_total
 			$this->sub_total->HrefValue = "";
+
+			// jual_id
+			$this->jual_id->HrefValue = "";
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
 			$this->RowAttrs["data-group"] = $this->no_po->GroupValue(); // Set up group attribute
@@ -1285,6 +1294,10 @@ class crr_jual_summary extends crr_jual {
 			$this->sub_total->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 			$this->sub_total->CellAttrs["style"] = "text-align:right;";
 
+			// jual_id
+			$this->jual_id->ViewValue = $this->jual_id->CurrentValue;
+			$this->jual_id->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
 			// no_po
 			$this->no_po->HrefValue = "";
 
@@ -1314,6 +1327,9 @@ class crr_jual_summary extends crr_jual {
 
 			// sub_total
 			$this->sub_total->HrefValue = "";
+
+			// jual_id
+			$this->jual_id->HrefValue = "";
 		}
 
 		// Call Cell_Rendered event
@@ -1454,6 +1470,15 @@ class crr_jual_summary extends crr_jual {
 			$HrefValue = &$this->sub_total->HrefValue;
 			$LinkAttrs = &$this->sub_total->LinkAttrs;
 			$this->Cell_Rendered($this->sub_total, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// jual_id
+			$CurrentValue = $this->jual_id->CurrentValue;
+			$ViewValue = &$this->jual_id->ViewValue;
+			$ViewAttrs = &$this->jual_id->ViewAttrs;
+			$CellAttrs = &$this->jual_id->CellAttrs;
+			$HrefValue = &$this->jual_id->HrefValue;
+			$LinkAttrs = &$this->jual_id->LinkAttrs;
+			$this->Cell_Rendered($this->jual_id, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		}
 
 		// Call Row_Rendered event
@@ -1476,6 +1501,7 @@ class crr_jual_summary extends crr_jual {
 		if ($this->satuan_nama->Visible) $this->DtlColumnCount += 1;
 		if ($this->harga->Visible) $this->DtlColumnCount += 1;
 		if ($this->sub_total->Visible) $this->DtlColumnCount += 1;
+		if ($this->jual_id->Visible) $this->DtlColumnCount += 1;
 	}
 
 	// Set up Breadcrumb
@@ -2130,6 +2156,7 @@ class crr_jual_summary extends crr_jual {
 			$this->satuan_nama->setSort("");
 			$this->harga->setSort("");
 			$this->sub_total->setSort("");
+			$this->jual_id->setSort("");
 
 		// Check for an Order parameter
 		} elseif ($orderBy <> "") {
@@ -2145,6 +2172,7 @@ class crr_jual_summary extends crr_jual {
 			$this->UpdateSort($this->satuan_nama, $bCtrl); // satuan_nama
 			$this->UpdateSort($this->harga, $bCtrl); // harga
 			$this->UpdateSort($this->sub_total, $bCtrl); // sub_total
+			$this->UpdateSort($this->jual_id, $bCtrl); // jual_id
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
 			$this->setStartGroup(1);
@@ -2933,6 +2961,24 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	</td>
 <?php } ?>
 <?php } ?>
+<?php if ($Page->jual_id->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="jual_id"><div class="r_jual_jual_id"><span class="ewTableHeaderCaption"><?php echo $Page->jual_id->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="jual_id">
+<?php if ($Page->SortUrl($Page->jual_id) == "") { ?>
+		<div class="ewTableHeaderBtn r_jual_jual_id">
+			<span class="ewTableHeaderCaption"><?php echo $Page->jual_id->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r_jual_jual_id" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->jual_id) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->jual_id->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->jual_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->jual_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 	</tr>
 </thead>
 <tbody>
@@ -3189,6 +3235,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="sub_total"<?php echo $Page->sub_total->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->GrpCounter[2] ?>_<?php echo $Page->RecCount ?>_r_jual_sub_total"<?php echo $Page->sub_total->ViewAttributes() ?>><?php echo $Page->sub_total->ListViewValue() ?></span></td>
 <?php } ?>
+<?php if ($Page->jual_id->Visible) { ?>
+		<td data-field="jual_id"<?php echo $Page->jual_id->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->GrpCounter[2] ?>_<?php echo $Page->RecCount ?>_r_jual_jual_id"<?php echo $Page->jual_id->ViewAttributes() ?>><?php echo $Page->jual_id->ListViewValue() ?></span></td>
+<?php } ?>
 	</tr>
 <?php
 
@@ -3284,11 +3334,14 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->sub_total->Visible) { ?>
 		<td data-field="sub_total"<?php echo $Page->no_po->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_jual_sub_total"<?php echo $Page->sub_total->ViewAttributes() ?>><?php echo $Page->sub_total->SumViewValue ?></span></span></td>
 <?php } ?>
+<?php if ($Page->jual_id->Visible) { ?>
+		<td data-field="jual_id"<?php echo $Page->no_po->CellAttributes() ?>></td>
+<?php } ?>
 	</tr>
 <?php } else { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->GrpColumnCount + $Page->DtlColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->sub_total->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->no_po->GroupViewValue, $Page->no_po->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->jual_id->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->no_po->GroupViewValue, $Page->no_po->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
 <?php } ?>
 	</tr>
 	<tr<?php echo $Page->RowAttributes(); ?>>
@@ -3311,8 +3364,11 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="harga"<?php echo $Page->no_po->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->sub_total->Visible) { ?>
-		<td data-field="sub_total"<?php echo $Page->sub_total->CellAttributes() ?>>
+		<td data-field="sub_total"<?php echo $Page->jual_id->CellAttributes() ?>>
 <span data-class="tpgs<?php echo $Page->GrpCount ?>_r_jual_sub_total"<?php echo $Page->sub_total->ViewAttributes() ?>><?php echo $Page->sub_total->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->jual_id->Visible) { ?>
+		<td data-field="jual_id"<?php echo $Page->no_po->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 	</tr>
 <?php } ?>
@@ -3381,6 +3437,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->sub_total->Visible) { ?>
 		<td data-field="sub_total"<?php echo $Page->sub_total->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?>=<span data-class="tpts_r_jual_sub_total"<?php echo $Page->sub_total->ViewAttributes() ?>><?php echo $Page->sub_total->SumViewValue ?></span></td>
 <?php } ?>
+<?php if ($Page->jual_id->Visible) { ?>
+		<td data-field="jual_id"<?php echo $Page->jual_id->CellAttributes() ?>></td>
+<?php } ?>
 	</tr>
 <?php } else { ?>
 	<tr<?php echo $Page->RowAttributes() ?>><td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"><?php echo $ReportLanguage->Phrase("RptGrandSummary") ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->TotCount,0,-2,-2,-2); ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td></tr>
@@ -3406,6 +3465,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->sub_total->Visible) { ?>
 		<td data-field="sub_total"<?php echo $Page->sub_total->CellAttributes() ?>>
 <span data-class="tpts_r_jual_sub_total"<?php echo $Page->sub_total->ViewAttributes() ?>><?php echo $Page->sub_total->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->jual_id->Visible) { ?>
+		<td data-field="jual_id"<?php echo $Page->jual_id->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 	</tr>
 <?php } ?>

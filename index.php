@@ -312,6 +312,8 @@ class cdefault {
 			$this->Page_Terminate("userlevelpermissionslist.php");
 		if ($Security->AllowList(CurrentProjectID() . 'userlevels'))
 			$this->Page_Terminate("userlevelslist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'cf_04cetak_inv01.php'))
+			$this->Page_Terminate("cf_04cetak_inv01.php");
 		if ($Security->IsLoggedIn()) {
 			$this->setFailureMessage(ew_DeniedMsg() . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
 		} else {

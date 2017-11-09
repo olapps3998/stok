@@ -19,6 +19,7 @@ class crr_jual extends crTableBase {
 	var $satuan_nama;
 	var $harga;
 	var $sub_total;
+	var $jual_id;
 
 	//
 	// Table class constructor
@@ -141,6 +142,15 @@ class crr_jual extends crTableBase {
 		$this->sub_total->DateFilter = "";
 		$this->sub_total->SqlSelect = "";
 		$this->sub_total->SqlOrderBy = "";
+
+		// jual_id
+		$this->jual_id = new crField('r_jual', 'r_jual', 'x_jual_id', 'jual_id', '`jual_id`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->jual_id->Sortable = TRUE; // Allow sort
+		$this->jual_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['jual_id'] = &$this->jual_id;
+		$this->jual_id->DateFilter = "";
+		$this->jual_id->SqlSelect = "";
+		$this->jual_id->SqlOrderBy = "";
 	}
 
 	// Set Field Visibility
