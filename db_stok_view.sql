@@ -295,7 +295,7 @@ Select a.item_id As item_id,
   a.tgl As tgl,
   'Retur Penjualan' As `Retur Penjualan`,
   a.qty As qty,
-  'M' As M,
+  'K' As K,
   c.satuan_nama As satuan_nama,
   0 As `0`,
   0 As `0`
