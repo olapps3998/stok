@@ -588,14 +588,6 @@ class ct_98home_head_list extends ct_98home_head {
 				// Switch to grid edit mode
 				if ($this->CurrentAction == "gridedit")
 					$this->GridEditMode();
-
-				// Switch to inline edit mode
-				if ($this->CurrentAction == "edit")
-					$this->InlineEditMode();
-
-				// Switch to inline add mode
-				if ($this->CurrentAction == "add" || $this->CurrentAction == "copy")
-					$this->InlineAddMode();
 			} else {
 				if (@$_POST["a_list"] <> "") {
 					$this->CurrentAction = $_POST["a_list"]; // Get action
@@ -613,14 +605,6 @@ class ct_98home_head_list extends ct_98home_head {
 							$this->CurrentAction = "gridedit"; // Stay in Grid Edit mode
 						}
 					}
-
-					// Inline Update
-					if (($this->CurrentAction == "update" || $this->CurrentAction == "overwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "edit")
-						$this->InlineUpdate();
-
-					// Insert Inline
-					if ($this->CurrentAction == "insert" && @$_SESSION[EW_SESSION_INLINE_MODE] == "add")
-						$this->InlineInsert();
 				}
 			}
 
@@ -770,7 +754,6 @@ class ct_98home_head_list extends ct_98home_head {
 
 	//  Exit inline mode
 	function ClearInlineMode() {
-		$this->setKey("id", ""); // Clear inline edit key
 		$this->LastAction = $this->CurrentAction; // Save last action
 		$this->CurrentAction = ""; // Clear action
 		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
@@ -779,111 +762,6 @@ class ct_98home_head_list extends ct_98home_head {
 	// Switch to Grid Edit mode
 	function GridEditMode() {
 		$_SESSION[EW_SESSION_INLINE_MODE] = "gridedit"; // Enable grid edit
-	}
-
-	// Switch to Inline Edit mode
-	function InlineEditMode() {
-		global $Security, $Language;
-		if (!$Security->CanEdit())
-			$this->Page_Terminate("login.php"); // Go to login page
-		$bInlineEdit = TRUE;
-		if (@$_GET["id"] <> "") {
-			$this->id->setQueryStringValue($_GET["id"]);
-		} else {
-			$bInlineEdit = FALSE;
-		}
-		if ($bInlineEdit) {
-			if ($this->LoadRow()) {
-				$this->setKey("id", $this->id->CurrentValue); // Set up inline edit key
-				$_SESSION[EW_SESSION_INLINE_MODE] = "edit"; // Enable inline edit
-			}
-		}
-	}
-
-	// Perform update to Inline Edit record
-	function InlineUpdate() {
-		global $Language, $objForm, $gsFormError;
-		$objForm->Index = 1; 
-		$this->LoadFormValues(); // Get form values
-
-		// Validate form
-		$bInlineUpdate = TRUE;
-		if (!$this->ValidateForm()) {	
-			$bInlineUpdate = FALSE; // Form error, reset action
-			$this->setFailureMessage($gsFormError);
-		} else {
-			$bInlineUpdate = FALSE;
-			$rowkey = strval($objForm->GetValue($this->FormKeyName));
-			if ($this->SetupKeyValues($rowkey)) { // Set up key values
-				if ($this->CheckInlineEditKey()) { // Check key
-					$this->SendEmail = TRUE; // Send email on update success
-					$bInlineUpdate = $this->EditRow(); // Update record
-				} else {
-					$bInlineUpdate = FALSE;
-				}
-			}
-		}
-		if ($bInlineUpdate) { // Update success
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up success message
-			$this->ClearInlineMode(); // Clear inline edit mode
-		} else {
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
-			$this->EventCancelled = TRUE; // Cancel event
-			$this->CurrentAction = "edit"; // Stay in edit mode
-		}
-	}
-
-	// Check Inline Edit key
-	function CheckInlineEditKey() {
-
-		//CheckInlineEditKey = True
-		if (strval($this->getKey("id")) <> strval($this->id->CurrentValue))
-			return FALSE;
-		return TRUE;
-	}
-
-	// Switch to Inline Add mode
-	function InlineAddMode() {
-		global $Security, $Language;
-		if (!$Security->CanAdd())
-			$this->Page_Terminate("login.php"); // Return to login page
-		if ($this->CurrentAction == "copy") {
-			if (@$_GET["id"] <> "") {
-				$this->id->setQueryStringValue($_GET["id"]);
-				$this->setKey("id", $this->id->CurrentValue); // Set up key
-			} else {
-				$this->setKey("id", ""); // Clear key
-				$this->CurrentAction = "add";
-			}
-		}
-		$_SESSION[EW_SESSION_INLINE_MODE] = "add"; // Enable inline add
-	}
-
-	// Perform update to Inline Add/Copy record
-	function InlineInsert() {
-		global $Language, $objForm, $gsFormError;
-		$this->LoadOldRecord(); // Load old recordset
-		$objForm->Index = 0;
-		$this->LoadFormValues(); // Get form values
-
-		// Validate form
-		if (!$this->ValidateForm()) {
-			$this->setFailureMessage($gsFormError); // Set validation error message
-			$this->EventCancelled = TRUE; // Set event cancelled
-			$this->CurrentAction = "add"; // Stay in add mode
-			return;
-		}
-		$this->SendEmail = TRUE; // Send email on add success
-		if ($this->AddRow($this->OldRecordset)) { // Add record
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up add success message
-			$this->ClearInlineMode(); // Clear inline add mode
-		} else { // Add failed
-			$this->EventCancelled = TRUE; // Set event cancelled
-			$this->CurrentAction = "add"; // Stay in add mode
-		}
 	}
 
 	// Perform update to grid
@@ -1428,18 +1306,6 @@ class ct_98home_head_list extends ct_98home_head {
 		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 
-		// "edit"
-		$item = &$this->ListOptions->Add("edit");
-		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->CanEdit();
-		$item->OnLeft = TRUE;
-
-		// "copy"
-		$item = &$this->ListOptions->Add("copy");
-		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->CanAdd();
-		$item->OnLeft = TRUE;
-
 		// List actions
 		$item = &$this->ListOptions->Add("listactions");
 		$item->CssStyle = "white-space: nowrap;";
@@ -1522,49 +1388,6 @@ class ct_98home_head_list extends ct_98home_head {
 		$oListOpt = &$this->ListOptions->Items["sequence"];
 		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
 
-		// "copy"
-		$oListOpt = &$this->ListOptions->Items["copy"];
-		if (($this->CurrentAction == "add" || $this->CurrentAction == "copy") && $this->RowType == EW_ROWTYPE_ADD) { // Inline Add/Copy
-			$this->ListOptions->CustomItem = "copy"; // Show copy column only
-			$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-			$oListOpt->Body = "<div" . (($oListOpt->OnLeft) ? " style=\"text-align: right\"" : "") . ">" .
-				"<a class=\"ewGridLink ewInlineInsert\" title=\"" . ew_HtmlTitle($Language->Phrase("InsertLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InsertLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("InsertLink") . "</a>&nbsp;" .
-				"<a class=\"ewGridLink ewInlineCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("CancelLink") . "</a>" .
-				"<input type=\"hidden\" name=\"a_list\" id=\"a_list\" value=\"insert\"></div>";
-			return;
-		}
-
-		// "edit"
-		$oListOpt = &$this->ListOptions->Items["edit"];
-		if ($this->CurrentAction == "edit" && $this->RowType == EW_ROWTYPE_EDIT) { // Inline-Edit
-			$this->ListOptions->CustomItem = "edit"; // Show edit column only
-			$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-				$oListOpt->Body = "<div" . (($oListOpt->OnLeft) ? " style=\"text-align: right\"" : "") . ">" .
-					"<a class=\"ewGridLink ewInlineUpdate\" title=\"" . ew_HtmlTitle($Language->Phrase("UpdateLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("UpdateLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . ew_GetHashUrl($this->PageName(), $this->PageObjName . "_row_" . $this->RowCnt) . "');\">" . $Language->Phrase("UpdateLink") . "</a>&nbsp;" .
-					"<a class=\"ewGridLink ewInlineCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("CancelLink") . "</a>" .
-					"<input type=\"hidden\" name=\"a_list\" id=\"a_list\" value=\"update\"></div>";
-			$oListOpt->Body .= "<input type=\"hidden\" name=\"k" . $this->RowIndex . "_key\" id=\"k" . $this->RowIndex . "_key\" value=\"" . ew_HtmlEncode($this->id->CurrentValue) . "\">";
-			return;
-		}
-
-		// "edit"
-		$oListOpt = &$this->ListOptions->Items["edit"];
-		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
-		if ($Security->CanEdit()) {
-			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" href=\"" . ew_HtmlEncode(ew_GetHashUrl($this->InlineEditUrl, $this->PageObjName . "_row_" . $this->RowCnt)) . "\">" . $Language->Phrase("InlineEditLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
-		}
-
-		// "copy"
-		$oListOpt = &$this->ListOptions->Items["copy"];
-		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
-		if ($Security->CanAdd()) {
-			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineCopy\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineCopyUrl) . "\">" . $Language->Phrase("InlineCopyLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
-		}
-
 		// Set up list action buttons
 		$oListOpt = &$this->ListOptions->GetItem("listactions");
 		if ($oListOpt && $this->Export == "" && $this->CurrentAction == "") {
@@ -1610,12 +1433,6 @@ class ct_98home_head_list extends ct_98home_head {
 	function SetupOtherOptions() {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
-		$option = $options["addedit"];
-
-		// Inline Add
-		$item = &$option->Add("inlineadd");
-		$item->Body = "<a class=\"ewAddEdit ewInlineAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineAddUrl) . "\">" .$Language->Phrase("InlineAddLink") . "</a>";
-		$item->Visible = ($this->InlineAddUrl <> "" && $Security->CanAdd());
 
 		// Add grid edit
 		$option = $options["addedit"];
@@ -2985,7 +2802,7 @@ $t_98home_head_list->ShowMessage();
 <?php } ?>
 <input type="hidden" name="t" value="t_98home_head">
 <div id="gmp_t_98home_head" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
-<?php if ($t_98home_head_list->TotalRecs > 0 || $t_98home_head->CurrentAction == "add" || $t_98home_head->CurrentAction == "copy" || $t_98home_head->CurrentAction == "gridedit") { ?>
+<?php if ($t_98home_head_list->TotalRecs > 0 || $t_98home_head->CurrentAction == "gridedit") { ?>
 <table id="tbl_t_98home_headlist" class="table ewTable">
 <?php echo $t_98home_head->TableCustomInnerHtml ?>
 <thead><!-- Table header -->
@@ -3028,66 +2845,6 @@ $t_98home_head_list->ListOptions->Render("header", "right");
 </thead>
 <tbody>
 <?php
-	if ($t_98home_head->CurrentAction == "add" || $t_98home_head->CurrentAction == "copy") {
-		$t_98home_head_list->RowIndex = 0;
-		$t_98home_head_list->KeyCount = $t_98home_head_list->RowIndex;
-		if ($t_98home_head->CurrentAction == "copy" && !$t_98home_head_list->LoadRow())
-				$t_98home_head->CurrentAction = "add";
-		if ($t_98home_head->CurrentAction == "add")
-			$t_98home_head_list->LoadDefaultValues();
-		if ($t_98home_head->EventCancelled) // Insert failed
-			$t_98home_head_list->RestoreFormValues(); // Restore form values
-
-		// Set row properties
-		$t_98home_head->ResetAttrs();
-		$t_98home_head->RowAttrs = array_merge($t_98home_head->RowAttrs, array('data-rowindex'=>0, 'id'=>'r0_t_98home_head', 'data-rowtype'=>EW_ROWTYPE_ADD));
-		$t_98home_head->RowType = EW_ROWTYPE_ADD;
-
-		// Render row
-		$t_98home_head_list->RenderRow();
-
-		// Render list options
-		$t_98home_head_list->RenderListOptions();
-		$t_98home_head_list->StartRowCnt = 0;
-?>
-	<tr<?php echo $t_98home_head->RowAttributes() ?>>
-<?php
-
-// Render list options (body, left)
-$t_98home_head_list->ListOptions->Render("body", "left", $t_98home_head_list->RowCnt);
-?>
-	<?php if ($t_98home_head->kode->Visible) { // kode ?>
-		<td data-name="kode">
-<span id="el<?php echo $t_98home_head_list->RowCnt ?>_t_98home_head_kode" class="form-group t_98home_head_kode">
-<input type="text" data-table="t_98home_head" data-field="x_kode" name="x<?php echo $t_98home_head_list->RowIndex ?>_kode" id="x<?php echo $t_98home_head_list->RowIndex ?>_kode" size="30" maxlength="25" placeholder="<?php echo ew_HtmlEncode($t_98home_head->kode->getPlaceHolder()) ?>" value="<?php echo $t_98home_head->kode->EditValue ?>"<?php echo $t_98home_head->kode->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t_98home_head" data-field="x_kode" name="o<?php echo $t_98home_head_list->RowIndex ?>_kode" id="o<?php echo $t_98home_head_list->RowIndex ?>_kode" value="<?php echo ew_HtmlEncode($t_98home_head->kode->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t_98home_head->flag->Visible) { // flag ?>
-		<td data-name="flag">
-<span id="el<?php echo $t_98home_head_list->RowCnt ?>_t_98home_head_flag" class="form-group t_98home_head_flag">
-<div id="tp_x<?php echo $t_98home_head_list->RowIndex ?>_flag" class="ewTemplate"><input type="radio" data-table="t_98home_head" data-field="x_flag" data-value-separator="<?php echo $t_98home_head->flag->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t_98home_head_list->RowIndex ?>_flag" id="x<?php echo $t_98home_head_list->RowIndex ?>_flag" value="{value}"<?php echo $t_98home_head->flag->EditAttributes() ?>></div>
-<div id="dsl_x<?php echo $t_98home_head_list->RowIndex ?>_flag" data-repeatcolumn="5" class="ewItemList" style="display: none;"><div>
-<?php echo $t_98home_head->flag->RadioButtonListHtml(FALSE, "x{$t_98home_head_list->RowIndex}_flag") ?>
-</div></div>
-</span>
-<input type="hidden" data-table="t_98home_head" data-field="x_flag" name="o<?php echo $t_98home_head_list->RowIndex ?>_flag" id="o<?php echo $t_98home_head_list->RowIndex ?>_flag" value="<?php echo ew_HtmlEncode($t_98home_head->flag->OldValue) ?>">
-</td>
-	<?php } ?>
-<?php
-
-// Render list options (body, right)
-$t_98home_head_list->ListOptions->Render("body", "right", $t_98home_head_list->RowCnt);
-?>
-<script type="text/javascript">
-ft_98home_headlist.UpdateOpts(<?php echo $t_98home_head_list->RowIndex ?>);
-</script>
-	</tr>
-<?php
-}
-?>
-<?php
 if ($t_98home_head->ExportAll && $t_98home_head->Export <> "") {
 	$t_98home_head_list->StopRec = $t_98home_head_list->TotalRecs;
 } else {
@@ -3121,9 +2878,6 @@ if ($t_98home_head_list->Recordset && !$t_98home_head_list->Recordset->EOF) {
 $t_98home_head->RowType = EW_ROWTYPE_AGGREGATEINIT;
 $t_98home_head->ResetAttrs();
 $t_98home_head_list->RenderRow();
-$t_98home_head_list->EditRowCnt = 0;
-if ($t_98home_head->CurrentAction == "edit")
-	$t_98home_head_list->RowIndex = 1;
 if ($t_98home_head->CurrentAction == "gridedit")
 	$t_98home_head_list->RowIndex = 0;
 while ($t_98home_head_list->RecCnt < $t_98home_head_list->StopRec) {
@@ -3153,11 +2907,6 @@ while ($t_98home_head_list->RecCnt < $t_98home_head_list->StopRec) {
 			$t_98home_head_list->LoadRowValues($t_98home_head_list->Recordset); // Load row values
 		}
 		$t_98home_head->RowType = EW_ROWTYPE_VIEW; // Render view
-		if ($t_98home_head->CurrentAction == "edit") {
-			if ($t_98home_head_list->CheckInlineEditKey() && $t_98home_head_list->EditRowCnt == 0) { // Inline edit
-				$t_98home_head->RowType = EW_ROWTYPE_EDIT; // Render edit
-			}
-		}
 		if ($t_98home_head->CurrentAction == "gridedit") { // Grid edit
 			if ($t_98home_head->EventCancelled) {
 				$t_98home_head_list->RestoreCurrentRowFormValues($t_98home_head_list->RowIndex); // Restore form values
@@ -3166,10 +2915,6 @@ while ($t_98home_head_list->RecCnt < $t_98home_head_list->StopRec) {
 				$t_98home_head->RowType = EW_ROWTYPE_ADD; // Render add
 			else
 				$t_98home_head->RowType = EW_ROWTYPE_EDIT; // Render edit
-		}
-		if ($t_98home_head->CurrentAction == "edit" && $t_98home_head->RowType == EW_ROWTYPE_EDIT && $t_98home_head->EventCancelled) { // Update failed
-			$objForm->Index = 1;
-			$t_98home_head_list->RestoreFormValues(); // Restore form values
 		}
 		if ($t_98home_head->CurrentAction == "gridedit" && ($t_98home_head->RowType == EW_ROWTYPE_EDIT || $t_98home_head->RowType == EW_ROWTYPE_ADD) && $t_98home_head->EventCancelled) // Update failed
 			$t_98home_head_list->RestoreCurrentRowFormValues($t_98home_head_list->RowIndex); // Restore form values
@@ -3324,12 +3069,6 @@ ft_98home_headlist.UpdateOpts(<?php echo $t_98home_head_list->RowIndex ?>);
 ?>
 </tbody>
 </table>
-<?php } ?>
-<?php if ($t_98home_head->CurrentAction == "add" || $t_98home_head->CurrentAction == "copy") { ?>
-<input type="hidden" name="<?php echo $t_98home_head_list->FormKeyCountName ?>" id="<?php echo $t_98home_head_list->FormKeyCountName ?>" value="<?php echo $t_98home_head_list->KeyCount ?>">
-<?php } ?>
-<?php if ($t_98home_head->CurrentAction == "edit") { ?>
-<input type="hidden" name="<?php echo $t_98home_head_list->FormKeyCountName ?>" id="<?php echo $t_98home_head_list->FormKeyCountName ?>" value="<?php echo $t_98home_head_list->KeyCount ?>">
 <?php } ?>
 <?php if ($t_98home_head->CurrentAction == "gridedit") { ?>
 <input type="hidden" name="a_list" id="a_list" value="gridupdate">
