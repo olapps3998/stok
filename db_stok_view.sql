@@ -385,3 +385,30 @@ Select a.dead_stok_id As dead_stok_id,
 From (t_11dead_stok a
   Left Join t_02item b On a.item_id = b.item_id)
   Left Join t_03satuan c On a.satuan_id = c.satuan_id;
+  
+create view v_19drop_cash as
+    SELECT 
+        `a`.`tgl` AS `tgl`,
+        `a`.`jumlah` AS `jumlah`,
+        `a`.`tujuan` AS `tujuan`,
+        `a`.`pemakaian_total` AS `pemakaian_total`,
+        `a`.`sisa` AS `sisa`,
+        `b`.`beli_id` AS `beli_id`,
+        `b`.`tgl_beli` AS `tgl_beli`,
+        `b`.`tgl_kirim` AS `tgl_kirim`,
+        `b`.`vendor_nama` AS `vendor_nama`,
+        `b`.`item_nama` AS `item_nama`,
+        `b`.`qty` AS `qty`,
+        `b`.`satuan_nama` AS `satuan_nama`,
+        `b`.`harga` AS `harga`,
+        `b`.`sub_total` AS `sub_total`,
+        `b`.`tgl_dp` AS `tgl_dp`,
+        `b`.`jml_dp` AS `jml_dp`,
+        `b`.`tgl_lunas` AS `tgl_lunas`,
+        `b`.`jml_lunas` AS `jml_lunas`,
+        `b`.`dc_id` AS `dc_id`,
+        `c`.`branch_nama` AS `branch_nama`
+    FROM
+        ((`t_14drop_cash` `a`
+        LEFT JOIN `v_01beli_laporan` `b` ON ((`a`.`dc_id` = `b`.`dc_id`)))
+        LEFT JOIN `t_15branch` `c` ON ((`a`.`tujuan` = `c`.`branch_id`)));

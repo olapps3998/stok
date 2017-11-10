@@ -23,6 +23,7 @@ $RootMenu->AddMenuItem(10019, "mi_t_06jual", $Language->MenuPhrase("10019", "Men
 $RootMenu->AddMenuItem(10121, "mi_t_11dead_stok", $Language->MenuPhrase("10121", "MenuText"), "t_11dead_stoklist.php", 10016, "", AllowListMenu('{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}t_11dead_stok'), FALSE, FALSE);
 $RootMenu->AddMenuItem(10133, "mi_t_12retur", $Language->MenuPhrase("10133", "MenuText"), "t_12returlist.php", 10016, "", AllowListMenu('{939D1C58-B1B5-41D0-A0B9-205FEFFF0852}t_12retur'), FALSE, FALSE);
 $RootMenu->AddMenuItem(9, "mci_Laporan", $Language->MenuPhrase("9", "MenuText"), "", -1, "", TRUE, FALSE, TRUE);
+$RootMenu->AddMenuItem(10056, "mri_r5fdrop5fcash", $Language->MenuPhrase("10056", "MenuText"), "r_drop_cashsmry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", AllowListMenu('{060B3204-5918-44AF-94F8-5E569EA4DD7D}r_drop_cash'), FALSE, FALSE);
 $RootMenu->AddMenuItem(10008, "mri_r5fbeli", $Language->MenuPhrase("10008", "MenuText"), "r_belismry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", AllowListMenu('{060B3204-5918-44AF-94F8-5E569EA4DD7D}r_beli'), FALSE, FALSE);
 $RootMenu->AddMenuItem(10013, "mri_r5fjual", $Language->MenuPhrase("10013", "MenuText"), "r_jualsmry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", AllowListMenu('{060B3204-5918-44AF-94F8-5E569EA4DD7D}r_jual'), FALSE, FALSE);
 $RootMenu->AddMenuItem(10125, "mri_r5fdead5fstok", $Language->MenuPhrase("10125", "MenuText"), "r_dead_stoksmry.php", 9, "{060B3204-5918-44AF-94F8-5E569EA4DD7D}", AllowListMenu('{060B3204-5918-44AF-94F8-5E569EA4DD7D}r_dead_stok'), FALSE, FALSE);
