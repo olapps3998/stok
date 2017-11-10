@@ -50,16 +50,31 @@ Group By t_07jual_detail.item_id;
 create view v_05stok as
 Select a.item_id As item_id,
   a.item_nama As item_nama,
-  ((Case When isnull(b.masuk) Then 0 Else b.masuk End) + (Case
-    When isnull(d.qty) Then 0 Else d.qty End)) As masuk,
-  (((Case When isnull(c.keluar) Then 0 Else c.keluar End) + (Case
-    When isnull(e.qty) Then 0 Else e.qty End)) - (Case When isnull(f.qty) Then 0
-    Else f.qty End)) As keluar,
-  (((((Case When isnull(b.masuk) Then 0 Else b.masuk End) + (Case
-    When isnull(d.qty) Then 0 Else d.qty End)) - (Case
-    When isnull(c.keluar) Then 0 Else c.keluar End)) - (Case
-    When isnull(e.qty) Then 0 Else e.qty End)) + (Case When isnull(f.qty) Then 0
-    Else f.qty End)) As saldo
+  (
+    (Case When isnull(b.masuk) Then 0 Else b.masuk End)
+    +
+    (Case When isnull(d.qty) Then 0 Else d.qty End)
+  ) As masuk,
+  (
+    (Case When isnull(c.keluar) Then 0 Else c.keluar End)
+    +
+    (Case When isnull(e.qty) Then 0 Else e.qty End)
+    +
+    (Case When isnull(f.qty) Then 0 Else f.qty End)
+  ) As keluar,
+  (
+    (Case When isnull(b.masuk) Then 0 Else b.masuk End)
+    +
+    (Case When isnull(d.qty) Then 0 Else d.qty End)
+  )
+  -
+  (
+    (Case When isnull(c.keluar) Then 0 Else c.keluar End)
+    +
+    (Case When isnull(e.qty) Then 0 Else e.qty End)
+    +
+    (Case When isnull(f.qty) Then 0 Else f.qty End)
+  ) As saldo
 From ((((t_02item a
   Left Join v_03masuk b On a.item_id = b.item_id)
   Left Join v_04keluar c On a.item_id = c.item_id)
