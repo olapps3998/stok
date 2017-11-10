@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <configuration date="2017/11/10" author="e.World Technology Ltd.">
-  <project id="{060B3204-5918-44AF-94F8-5E569EA4DD7D}" file="D:\xampp3\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="10.0" datetime="2017/11/10 13:23:05" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
+  <project id="{060B3204-5918-44AF-94F8-5E569EA4DD7D}" file="D:\xampp3\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="10.0" datetime="2017/11/10 14:39:57" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
     <table id="t_00audit_trail" name="t_00audit_trail" caption="t 00audit trail" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
     <table id="t_01vendor" name="t_01vendor" caption="t 01vendor" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
     <table id="t_02item" name="t_02item" caption="t 02item" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
@@ -43,8 +43,10 @@
     <table id="v_18dead_stok" name="v_18dead_stok" caption="v 18dead stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
     <table id="r_dead_stok" name="r_dead_stok" caption="Dead Stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t_12retur" name="t_12retur" caption="Retur Penjualan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t_95userlevels" name="t_95userlevels" caption="t 95userlevels" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t_97user" name="t_97user" caption="t 97user" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
     <table id="userlevelpermissions" name="userlevelpermissions" caption="userlevelpermissions" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
     <table id="userlevels" name="userlevels" caption="userlevels" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="0" />
+    <table id="r_htg_int" name="r_htg_int" caption="Hutang Internal" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
   </project>
 </configuration>

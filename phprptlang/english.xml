@@ -350,6 +350,12 @@
   <project>
     <phrase id="bodytitle" value="L.A.B. STOK" />
     <phrase id="footertext" value="&amp;copy;2017 AIMP. All rights reserved." />
+    <menu id="53">
+      <phrase id="menutext" value="t 95userlevels" />
+    </menu>
+    <menu id="54">
+      <phrase id="menutext" value="Hutang Internal" />
+    </menu>
     <menu id="50">
       <phrase id="menutext" value="t 97user" />
     </menu>
@@ -640,6 +646,9 @@
       <field id="jml_lunas">
         <phrase id="fldcaption" value="Jumlah Pelunasan" />
       </field>
+      <field id="dc_id">
+        <phrase id="fldcaption" value="dc id" />
+      </field>
     </table>
     <table id="r_beli">
       <phrase id="tblcaption" value="Pembelian" />
@@ -681,6 +690,9 @@
       </field>
       <field id="jml_lunas">
         <phrase id="fldcaption" value="Jumlah Pelunasan" />
+      </field>
+      <field id="dc_id">
+        <phrase id="fldcaption" value="dc id" />
       </field>
     </table>
     <table id="t_05customer">
@@ -1565,6 +1577,15 @@
         <phrase id="fldcaption" value="No. PO" />
       </field>
     </table>
+    <table id="t_95userlevels">
+      <phrase id="tblcaption" value="t 95userlevels" />
+      <field id="userlevelid">
+        <phrase id="fldcaption" value="userlevelid" />
+      </field>
+      <field id="userlevelname">
+        <phrase id="fldcaption" value="userlevelname" />
+      </field>
+    </table>
     <table id="t_97user">
       <phrase id="tblcaption" value="t 97user" />
       <field id="user_id">
@@ -1599,6 +1620,51 @@
       </field>
       <field id="userlevelname">
         <phrase id="fldcaption" value="userlevelname" />
+      </field>
+    </table>
+    <table id="r_htg_int">
+      <phrase id="tblcaption" value="Hutang Internal" />
+      <field id="beli_id">
+        <phrase id="fldcaption" value="beli id" />
+      </field>
+      <field id="tgl_beli">
+        <phrase id="fldcaption" value="Tgl. Beli" />
+      </field>
+      <field id="tgl_kirim">
+        <phrase id="fldcaption" value="Tgl. Kirim" />
+      </field>
+      <field id="vendor_nama">
+        <phrase id="fldcaption" value="vendor nama" />
+      </field>
+      <field id="item_nama">
+        <phrase id="fldcaption" value="item nama" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty." />
+      </field>
+      <field id="satuan_nama">
+        <phrase id="fldcaption" value="satuan nama" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="Harga" />
+      </field>
+      <field id="sub_total">
+        <phrase id="fldcaption" value="sub total" />
+      </field>
+      <field id="tgl_dp">
+        <phrase id="fldcaption" value="Tgl. DP" />
+      </field>
+      <field id="jml_dp">
+        <phrase id="fldcaption" value="Jumlah DP" />
+      </field>
+      <field id="tgl_lunas">
+        <phrase id="fldcaption" value="Tgl. Pelunasan" />
+      </field>
+      <field id="jml_lunas">
+        <phrase id="fldcaption" value="Jumlah Pelunasan" />
+      </field>
+      <field id="dc_id">
+        <phrase id="fldcaption" value="dc id" />
       </field>
     </table>
   </project>

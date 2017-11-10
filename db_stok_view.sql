@@ -11,7 +11,8 @@ Select t_04beli.beli_id As beli_id,
   t_04beli.tgl_dp As tgl_dp,
   t_04beli.jml_dp As jml_dp,
   t_04beli.tgl_lunas As tgl_lunas,
-  t_04beli.jml_lunas As jml_lunas
+  t_04beli.jml_lunas As jml_lunas,
+  t_04beli.dc_id As dc_id
 From ((t_04beli
   Join t_01vendor On t_04beli.vendor_id = t_01vendor.vendor_id)
   Join t_02item On t_04beli.item_id = t_02item.item_id)

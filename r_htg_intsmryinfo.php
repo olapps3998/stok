@@ -1,12 +1,12 @@
 <?php
 
 // Global variable for table object
-$r_beli = NULL;
+$r_htg_int = NULL;
 
 //
-// Table class for r_beli
+// Table class for r_htg_int
 //
-class crr_beli extends crTableBase {
+class crr_htg_int extends crTableBase {
 	var $ShowGroupHeaderAsRow = FALSE;
 	var $ShowCompactSummaryFooter = TRUE;
 	var $beli_id;
@@ -29,15 +29,15 @@ class crr_beli extends crTableBase {
 	//
 	function __construct() {
 		global $ReportLanguage, $gsLanguage;
-		$this->TableVar = 'r_beli';
-		$this->TableName = 'r_beli';
+		$this->TableVar = 'r_htg_int';
+		$this->TableName = 'r_htg_int';
 		$this->TableType = 'REPORT';
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0;
 
 		// beli_id
-		$this->beli_id = new crField('r_beli', 'r_beli', 'x_beli_id', 'beli_id', '`beli_id`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->beli_id = new crField('r_htg_int', 'r_htg_int', 'x_beli_id', 'beli_id', '`beli_id`', 3, EWR_DATATYPE_NUMBER, -1);
 		$this->beli_id->Sortable = TRUE; // Allow sort
 		$this->beli_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->fields['beli_id'] = &$this->beli_id;
@@ -46,16 +46,16 @@ class crr_beli extends crTableBase {
 		$this->beli_id->SqlOrderBy = "";
 
 		// tgl_beli
-		$this->tgl_beli = new crField('r_beli', 'r_beli', 'x_tgl_beli', 'tgl_beli', '`tgl_beli`', 133, EWR_DATATYPE_DATE, 7);
+		$this->tgl_beli = new crField('r_htg_int', 'r_htg_int', 'x_tgl_beli', 'tgl_beli', '`tgl_beli`', 133, EWR_DATATYPE_DATE, 7);
 		$this->tgl_beli->Sortable = TRUE; // Allow sort
-		$this->tgl_beli->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_SEPARATOR"], $ReportLanguage->Phrase("IncorrectDateDMY"));
+		$this->tgl_beli->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectField");
 		$this->fields['tgl_beli'] = &$this->tgl_beli;
 		$this->tgl_beli->DateFilter = "";
 		$this->tgl_beli->SqlSelect = "";
 		$this->tgl_beli->SqlOrderBy = "";
 
 		// tgl_kirim
-		$this->tgl_kirim = new crField('r_beli', 'r_beli', 'x_tgl_kirim', 'tgl_kirim', '`tgl_kirim`', 133, EWR_DATATYPE_DATE, 7);
+		$this->tgl_kirim = new crField('r_htg_int', 'r_htg_int', 'x_tgl_kirim', 'tgl_kirim', '`tgl_kirim`', 133, EWR_DATATYPE_DATE, 7);
 		$this->tgl_kirim->Sortable = TRUE; // Allow sort
 		$this->tgl_kirim->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectField");
 		$this->fields['tgl_kirim'] = &$this->tgl_kirim;
@@ -64,7 +64,7 @@ class crr_beli extends crTableBase {
 		$this->tgl_kirim->SqlOrderBy = "";
 
 		// vendor_nama
-		$this->vendor_nama = new crField('r_beli', 'r_beli', 'x_vendor_nama', 'vendor_nama', '`vendor_nama`', 200, EWR_DATATYPE_STRING, -1);
+		$this->vendor_nama = new crField('r_htg_int', 'r_htg_int', 'x_vendor_nama', 'vendor_nama', '`vendor_nama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->vendor_nama->Sortable = TRUE; // Allow sort
 		$this->fields['vendor_nama'] = &$this->vendor_nama;
 		$this->vendor_nama->DateFilter = "";
@@ -72,7 +72,7 @@ class crr_beli extends crTableBase {
 		$this->vendor_nama->SqlOrderBy = "";
 
 		// item_nama
-		$this->item_nama = new crField('r_beli', 'r_beli', 'x_item_nama', 'item_nama', '`item_nama`', 200, EWR_DATATYPE_STRING, -1);
+		$this->item_nama = new crField('r_htg_int', 'r_htg_int', 'x_item_nama', 'item_nama', '`item_nama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->item_nama->Sortable = TRUE; // Allow sort
 		$this->fields['item_nama'] = &$this->item_nama;
 		$this->item_nama->DateFilter = "";
@@ -80,7 +80,7 @@ class crr_beli extends crTableBase {
 		$this->item_nama->SqlOrderBy = "";
 
 		// qty
-		$this->qty = new crField('r_beli', 'r_beli', 'x_qty', 'qty', '`qty`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->qty = new crField('r_htg_int', 'r_htg_int', 'x_qty', 'qty', '`qty`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->qty->Sortable = TRUE; // Allow sort
 		$this->qty->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->fields['qty'] = &$this->qty;
@@ -89,7 +89,7 @@ class crr_beli extends crTableBase {
 		$this->qty->SqlOrderBy = "";
 
 		// satuan_nama
-		$this->satuan_nama = new crField('r_beli', 'r_beli', 'x_satuan_nama', 'satuan_nama', '`satuan_nama`', 200, EWR_DATATYPE_STRING, -1);
+		$this->satuan_nama = new crField('r_htg_int', 'r_htg_int', 'x_satuan_nama', 'satuan_nama', '`satuan_nama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->satuan_nama->Sortable = TRUE; // Allow sort
 		$this->fields['satuan_nama'] = &$this->satuan_nama;
 		$this->satuan_nama->DateFilter = "";
@@ -97,7 +97,7 @@ class crr_beli extends crTableBase {
 		$this->satuan_nama->SqlOrderBy = "";
 
 		// harga
-		$this->harga = new crField('r_beli', 'r_beli', 'x_harga', 'harga', '`harga`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->harga = new crField('r_htg_int', 'r_htg_int', 'x_harga', 'harga', '`harga`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->harga->Sortable = TRUE; // Allow sort
 		$this->harga->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->fields['harga'] = &$this->harga;
@@ -106,7 +106,7 @@ class crr_beli extends crTableBase {
 		$this->harga->SqlOrderBy = "";
 
 		// sub_total
-		$this->sub_total = new crField('r_beli', 'r_beli', 'x_sub_total', 'sub_total', '`sub_total`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->sub_total = new crField('r_htg_int', 'r_htg_int', 'x_sub_total', 'sub_total', '`sub_total`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->sub_total->Sortable = TRUE; // Allow sort
 		$this->sub_total->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->fields['sub_total'] = &$this->sub_total;
@@ -115,7 +115,7 @@ class crr_beli extends crTableBase {
 		$this->sub_total->SqlOrderBy = "";
 
 		// tgl_dp
-		$this->tgl_dp = new crField('r_beli', 'r_beli', 'x_tgl_dp', 'tgl_dp', '`tgl_dp`', 133, EWR_DATATYPE_DATE, 7);
+		$this->tgl_dp = new crField('r_htg_int', 'r_htg_int', 'x_tgl_dp', 'tgl_dp', '`tgl_dp`', 133, EWR_DATATYPE_DATE, 7);
 		$this->tgl_dp->Sortable = TRUE; // Allow sort
 		$this->tgl_dp->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectField");
 		$this->fields['tgl_dp'] = &$this->tgl_dp;
@@ -124,7 +124,7 @@ class crr_beli extends crTableBase {
 		$this->tgl_dp->SqlOrderBy = "";
 
 		// jml_dp
-		$this->jml_dp = new crField('r_beli', 'r_beli', 'x_jml_dp', 'jml_dp', '`jml_dp`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->jml_dp = new crField('r_htg_int', 'r_htg_int', 'x_jml_dp', 'jml_dp', '`jml_dp`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->jml_dp->Sortable = TRUE; // Allow sort
 		$this->jml_dp->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['jml_dp'] = &$this->jml_dp;
@@ -133,7 +133,7 @@ class crr_beli extends crTableBase {
 		$this->jml_dp->SqlOrderBy = "";
 
 		// tgl_lunas
-		$this->tgl_lunas = new crField('r_beli', 'r_beli', 'x_tgl_lunas', 'tgl_lunas', '`tgl_lunas`', 133, EWR_DATATYPE_DATE, 7);
+		$this->tgl_lunas = new crField('r_htg_int', 'r_htg_int', 'x_tgl_lunas', 'tgl_lunas', '`tgl_lunas`', 133, EWR_DATATYPE_DATE, 7);
 		$this->tgl_lunas->Sortable = TRUE; // Allow sort
 		$this->tgl_lunas->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectField");
 		$this->fields['tgl_lunas'] = &$this->tgl_lunas;
@@ -142,7 +142,7 @@ class crr_beli extends crTableBase {
 		$this->tgl_lunas->SqlOrderBy = "";
 
 		// jml_lunas
-		$this->jml_lunas = new crField('r_beli', 'r_beli', 'x_jml_lunas', 'jml_lunas', '`jml_lunas`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->jml_lunas = new crField('r_htg_int', 'r_htg_int', 'x_jml_lunas', 'jml_lunas', '`jml_lunas`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->jml_lunas->Sortable = TRUE; // Allow sort
 		$this->jml_lunas->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['jml_lunas'] = &$this->jml_lunas;
@@ -151,13 +151,13 @@ class crr_beli extends crTableBase {
 		$this->jml_lunas->SqlOrderBy = "";
 
 		// dc_id
-		$this->dc_id = new crField('r_beli', 'r_beli', 'x_dc_id', 'dc_id', '`dc_id`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->dc_id = new crField('r_htg_int', 'r_htg_int', 'x_dc_id', 'dc_id', '`dc_id`', 3, EWR_DATATYPE_NUMBER, -1);
 		$this->dc_id->Sortable = TRUE; // Allow sort
 		$this->dc_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->fields['dc_id'] = &$this->dc_id;
 		$this->dc_id->DateFilter = "";
-		$this->dc_id->SqlSelect = "";
-		$this->dc_id->SqlOrderBy = "";
+		$this->dc_id->SqlSelect = "SELECT DISTINCT `dc_id`, `dc_id` AS `DispFld` FROM " . $this->getSqlFrom();
+		$this->dc_id->SqlOrderBy = "`dc_id`";
 	}
 
 	// Set Field Visibility
@@ -442,32 +442,6 @@ class crr_beli extends crTableBase {
 	function SetupLookupFilters($fld) {
 		global $gsLanguage;
 		switch ($fld->FldVar) {
-		case "x_vendor_nama":
-			$sSqlWrk = "";
-		$sSqlWrk = "SELECT DISTINCT `vendor_nama`, `vendor_nama` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v_01beli_laporan`";
-		$sWhereWrk = "";
-		$this->vendor_nama->LookupFilters = array();
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "DB", "f0" => '`vendor_nama` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter));
-			$sSqlWrk = "";
-		$this->Lookup_Selecting($this->vendor_nama, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-		$sSqlWrk .= " ORDER BY `vendor_nama` ASC";
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
-		case "x_item_nama":
-			$sSqlWrk = "";
-		$sSqlWrk = "SELECT DISTINCT `item_nama`, `item_nama` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v_01beli_laporan`";
-		$sWhereWrk = "";
-		$this->item_nama->LookupFilters = array();
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "DB", "f0" => '`item_nama` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter));
-			$sSqlWrk = "";
-		$this->Lookup_Selecting($this->item_nama, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-		$sSqlWrk .= " ORDER BY `item_nama` ASC";
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
 		}
 	}
 

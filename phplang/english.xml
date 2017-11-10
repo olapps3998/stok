@@ -688,6 +688,9 @@
     <menu id="10031">
       <phrase id="menutext" value="Piutang" />
     </menu>
+    <menu id="10054">
+      <phrase id="menutext" value="Hutang Internal" />
+    </menu>
     <menu id="10134">
       <phrase id="menutext" value="Home" />
     </menu>
@@ -772,13 +775,25 @@
     <menu id="10033">
       <phrase id="menutext" value="t 99beli" />
     </menu>
-    <menu id="10126">
-      <phrase id="menutext" value="v 03masuk" />
-    </menu>
     <menu id="10136">
       <phrase id="menutext" value="Home Head" />
     </menu>
-    <menu id="10137">
+    <menu id="10053">
+      <phrase id="menutext" value="t 95userlevels" />
+    </menu>
+    <menu id="10050">
+      <phrase id="menutext" value="t 97user" />
+    </menu>
+    <menu id="10051">
+      <phrase id="menutext" value="userlevelpermissions" />
+    </menu>
+    <menu id="10052">
+      <phrase id="menutext" value="userlevels" />
+    </menu>
+    <menu id="10317">
+      <phrase id="menutext" value="v 03masuk" />
+    </menu>
+    <menu id="10318">
       <phrase id="menutext" value="v 04keluar" />
     </menu>
     <menu id="10045">
@@ -1169,6 +1184,9 @@
       </field>
       <field id="jml_lunas">
         <phrase id="fldcaption" value="jml lunas" />
+      </field>
+      <field id="dc_id">
+        <phrase id="fldcaption" value="dc id" />
       </field>
     </table>
     <table id="v_02jual_laporan">
