@@ -658,14 +658,14 @@
     <menu id="10013">
       <phrase id="menutext" value="Penjualan" />
     </menu>
+    <menu id="10125">
+      <phrase id="menutext" value="Dead-Stok" />
+    </menu>
     <menu id="10049">
       <phrase id="menutext" value="Retur Penjualan" />
     </menu>
     <menu id="10015">
       <phrase id="menutext" value="Stok" />
-    </menu>
-    <menu id="10125">
-      <phrase id="menutext" value="Dead Stok" />
     </menu>
     <menu id="10048">
       <phrase id="menutext" value="Nilai Stok" />
@@ -790,12 +790,6 @@
     <menu id="10052">
       <phrase id="menutext" value="userlevels" />
     </menu>
-    <menu id="10317">
-      <phrase id="menutext" value="v 03masuk" />
-    </menu>
-    <menu id="10318">
-      <phrase id="menutext" value="v 04keluar" />
-    </menu>
     <menu id="10045">
       <phrase id="menutext" value="t 11dead stok" />
     </menu>
@@ -852,6 +846,12 @@
     </menu>
     <menu id="10023">
       <phrase id="menutext" value="v 07mutasi" />
+    </menu>
+    <menu id="10317">
+      <phrase id="menutext" value="v 03masuk" />
+    </menu>
+    <menu id="10318">
+      <phrase id="menutext" value="v 04keluar" />
     </menu>
     <menu id="10020">
       <phrase id="menutext" value="v 05stok" />
