@@ -157,6 +157,20 @@ Select a.item_id As item_id,
 From (t_11dead_stok b
   Left Join t_02item a On a.item_id = b.item_id)
   Left Join t_03satuan c On b.satuan_id = c.satuan_id
+union All
+Select a.item_id As item_id,
+  a.item_nama As item_nama,
+  b.tgl As tgl,
+  'Retur Penjualan' As `Retur Penjualan`,
+  b.qty As qty,
+  'K' As K,
+  c.satuan_nama As satuan_nama,
+  0 As `0`,
+  0 As `0`,
+  b.retur_id As retur_id
+From (t_12retur b
+  Left Join t_02item a On a.item_id = b.item_id)
+  Left Join t_03satuan c On b.satuan_id = c.satuan_id
 Order By item_id,
   tgl,
   jenis Desc,

@@ -2411,7 +2411,7 @@ class ct_04beli_grid extends ct_04beli {
 			$rsnew = array();
 
 			// dc_id
-			$this->dc_id->SetDbValueDef($rsnew, $this->dc_id->CurrentValue, NULL, $this->dc_id->ReadOnly);
+			$this->dc_id->SetDbValueDef($rsnew, $this->dc_id->CurrentValue, 0, $this->dc_id->ReadOnly);
 
 			// tgl_beli
 			$this->tgl_beli->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 7), NULL, $this->tgl_beli->ReadOnly);
@@ -2498,7 +2498,7 @@ class ct_04beli_grid extends ct_04beli {
 		$rsnew = array();
 
 		// dc_id
-		$this->dc_id->SetDbValueDef($rsnew, $this->dc_id->CurrentValue, NULL, strval($this->dc_id->CurrentValue) == "");
+		$this->dc_id->SetDbValueDef($rsnew, $this->dc_id->CurrentValue, 0, strval($this->dc_id->CurrentValue) == "");
 
 		// tgl_beli
 		$this->tgl_beli->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl_beli->CurrentValue, 7), NULL, FALSE);
