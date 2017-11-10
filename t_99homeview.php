@@ -569,6 +569,11 @@ class ct_99home_view extends ct_99home {
 		$options = &$this->OtherOptions;
 		$option = &$options["action"];
 
+		// Delete
+		$item = &$option->Add("delete");
+		$item->Body = "<a onclick=\"return ew_ConfirmDelete(this);\" class=\"ewAction ewDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" href=\"" . ew_HtmlEncode($this->DeleteUrl) . "\">" . $Language->Phrase("ViewPageDeleteLink") . "</a>";
+		$item->Visible = ($this->DeleteUrl <> "" && $Security->CanDelete());
+
 		// Set up action default
 		$option = &$options["action"];
 		$option->DropDownButtonPhrase = $Language->Phrase("ButtonActions");
