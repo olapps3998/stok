@@ -591,10 +591,6 @@ class ct_99home_list extends ct_99home {
 				if ($this->CurrentAction == "cancel")
 					$this->ClearInlineMode();
 
-				// Switch to grid edit mode
-				if ($this->CurrentAction == "gridedit")
-					$this->GridEditMode();
-
 				// Switch to inline edit mode
 				if ($this->CurrentAction == "edit")
 					$this->InlineEditMode();
@@ -609,20 +605,6 @@ class ct_99home_list extends ct_99home {
 			} else {
 				if (@$_POST["a_list"] <> "") {
 					$this->CurrentAction = $_POST["a_list"]; // Get action
-
-					// Grid Update
-					if (($this->CurrentAction == "gridupdate" || $this->CurrentAction == "gridoverwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridedit") {
-						if ($this->ValidateGridForm()) {
-							$bGridUpdate = $this->GridUpdate();
-						} else {
-							$bGridUpdate = FALSE;
-							$this->setFailureMessage($gsFormError);
-						}
-						if (!$bGridUpdate) {
-							$this->EventCancelled = TRUE;
-							$this->CurrentAction = "gridedit"; // Stay in Grid Edit mode
-						}
-					}
 
 					// Inline Update
 					if (($this->CurrentAction == "update" || $this->CurrentAction == "overwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "edit")
@@ -805,11 +787,6 @@ class ct_99home_list extends ct_99home {
 		$_SESSION[EW_SESSION_INLINE_MODE] = "gridadd"; // Enabled grid add
 	}
 
-	// Switch to Grid Edit mode
-	function GridEditMode() {
-		$_SESSION[EW_SESSION_INLINE_MODE] = "gridedit"; // Enable grid edit
-	}
-
 	// Switch to Inline Edit mode
 	function InlineEditMode() {
 		global $Security, $Language;
@@ -913,111 +890,6 @@ class ct_99home_list extends ct_99home {
 			$this->EventCancelled = TRUE; // Set event cancelled
 			$this->CurrentAction = "add"; // Stay in add mode
 		}
-	}
-
-	// Perform update to grid
-	function GridUpdate() {
-		global $Language, $objForm, $gsFormError;
-		$bGridUpdate = TRUE;
-
-		// Get old recordset
-		$this->CurrentFilter = $this->BuildKeyFilter();
-		if ($this->CurrentFilter == "")
-			$this->CurrentFilter = "0=1";
-		$sSql = $this->SQL();
-		$conn = &$this->Connection();
-		if ($rs = $conn->Execute($sSql)) {
-			$rsold = $rs->GetRows();
-			$rs->Close();
-		}
-
-		// Call Grid Updating event
-		if (!$this->Grid_Updating($rsold)) {
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("GridEditCancelled")); // Set grid edit cancelled message
-			return FALSE;
-		}
-
-		// Begin transaction
-		$conn->BeginTrans();
-		if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateBegin")); // Batch update begin
-		$sKey = "";
-
-		// Update row index and get row key
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Update all rows based on key
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-			$objForm->Index = $rowindex;
-			$rowkey = strval($objForm->GetValue($this->FormKeyName));
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-
-			// Load all values and keys
-			if ($rowaction <> "insertdelete") { // Skip insert then deleted rows
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
-					$bGridUpdate = $this->SetupKeyValues($rowkey); // Set up key values
-				} else {
-					$bGridUpdate = TRUE;
-				}
-
-				// Skip empty row
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// No action required
-				// Validate form and insert/update/delete record
-
-				} elseif ($bGridUpdate) {
-					if ($rowaction == "delete") {
-						$this->CurrentFilter = $this->KeyFilter();
-						$bGridUpdate = $this->DeleteRows(); // Delete this row
-					} else if (!$this->ValidateForm()) {
-						$bGridUpdate = FALSE; // Form error, reset action
-						$this->setFailureMessage($gsFormError);
-					} else {
-						if ($rowaction == "insert") {
-							$bGridUpdate = $this->AddRow(); // Insert this row
-						} else {
-							if ($rowkey <> "") {
-								$this->SendEmail = FALSE; // Do not send email on update success
-								$bGridUpdate = $this->EditRow(); // Update this row
-							}
-						} // End update
-					}
-				}
-				if ($bGridUpdate) {
-					if ($sKey <> "") $sKey .= ", ";
-					$sKey .= $rowkey;
-				} else {
-					break;
-				}
-			}
-		}
-		if ($bGridUpdate) {
-			$conn->CommitTrans(); // Commit transaction
-
-			// Get new recordset
-			if ($rs = $conn->Execute($sSql)) {
-				$rsnew = $rs->GetRows();
-				$rs->Close();
-			}
-
-			// Call Grid_Updated event
-			$this->Grid_Updated($rsold, $rsnew);
-			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateSuccess")); // Batch update success
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up update success message
-			$this->ClearInlineMode(); // Clear inline edit mode
-		} else {
-			$conn->RollbackTrans(); // Rollback transaction
-			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateRollback")); // Batch update rollback
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
-		}
-		return $bGridUpdate;
 	}
 
 	// Build filter for all keys
@@ -1639,7 +1511,7 @@ class ct_99home_list extends ct_99home {
 
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
-		$item->Visible = $Security->CanDelete();
+		$item->Visible = FALSE;
 		$item->OnLeft = TRUE;
 		$item->Header = "<input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\">";
 		$item->MoveTo(0);
@@ -1699,7 +1571,7 @@ class ct_99home_list extends ct_99home {
 				$option->UseButtonGroup = TRUE; // Use button group for grid delete button
 				$option->UseImageAndText = TRUE; // Use image and text for grid delete button
 				$oListOpt = &$option->Items["griddelete"];
-				if (!$Security->CanDelete() && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+				if (is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
 					$oListOpt->Body = "&nbsp;";
 				} else {
 					$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
@@ -1749,7 +1621,6 @@ class ct_99home_list extends ct_99home {
 		$oListOpt = &$this->ListOptions->Items["edit"];
 		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
 		if ($Security->CanEdit()) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
 			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" href=\"" . ew_HtmlEncode(ew_GetHashUrl($this->InlineEditUrl, $this->PageObjName . "_row_" . $this->RowCnt)) . "\">" . $Language->Phrase("InlineEditLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -1759,7 +1630,6 @@ class ct_99home_list extends ct_99home {
 		$oListOpt = &$this->ListOptions->Items["copy"];
 		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
 		if ($Security->CanAdd()) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
 			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineCopy\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineCopyUrl) . "\">" . $Language->Phrase("InlineCopyLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -1797,9 +1667,6 @@ class ct_99home_list extends ct_99home {
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
 		$oListOpt->Body = "<input type=\"checkbox\" name=\"key_m[]\" value=\"" . ew_HtmlEncode($this->home_id->CurrentValue) . "\" onclick='ew_ClickMultiCheckbox(event);'>";
-		if ($this->CurrentAction == "gridedit" && is_numeric($this->RowIndex)) {
-			$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $KeyName . "\" id=\"" . $KeyName . "\" value=\"" . $this->home_id->CurrentValue . "\">";
-		}
 		$this->RenderListOptionsExt();
 
 		// Call ListOptions_Rendered event
@@ -1812,12 +1679,6 @@ class ct_99home_list extends ct_99home {
 		$options = &$this->OtherOptions;
 		$option = $options["addedit"];
 
-		// Add
-		$item = &$option->Add("add");
-		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
-		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
-
 		// Inline Add
 		$item = &$option->Add("inlineadd");
 		$item->Body = "<a class=\"ewAddEdit ewInlineAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineAddUrl) . "\">" .$Language->Phrase("InlineAddLink") . "</a>";
@@ -1825,18 +1686,7 @@ class ct_99home_list extends ct_99home {
 		$item = &$option->Add("gridadd");
 		$item->Body = "<a class=\"ewAddEdit ewGridAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" href=\"" . ew_HtmlEncode($this->GridAddUrl) . "\">" . $Language->Phrase("GridAddLink") . "</a>";
 		$item->Visible = ($this->GridAddUrl <> "" && $Security->CanAdd());
-
-		// Add grid edit
-		$option = $options["addedit"];
-		$item = &$option->Add("gridedit");
-		$item->Body = "<a class=\"ewAddEdit ewGridEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GridEditUrl) . "\">" . $Language->Phrase("GridEditLink") . "</a>";
-		$item->Visible = ($this->GridEditUrl <> "" && $Security->CanEdit());
 		$option = $options["action"];
-
-		// Add multi delete
-		$item = &$option->Add("multidelete");
-		$item->Body = "<a class=\"ewAction ewMultiDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" href=\"\" onclick=\"ew_SubmitAction(event,{f:document.ft_99homelist,url:'" . $this->MultiDeleteUrl . "'});return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
-		$item->Visible = ($Security->CanDelete());
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -1909,7 +1759,7 @@ class ct_99home_list extends ct_99home {
 					$option->UseImageAndText = TRUE;
 					$item = &$option->Add("addblankrow");
 					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = $Security->CanAdd();
+					$item->Visible = FALSE;
 				}
 				$option = &$options["action"];
 				$option->UseDropDownButton = FALSE;
@@ -1923,26 +1773,6 @@ class ct_99home_list extends ct_99home {
 				$item = &$option->Add("gridcancel");
 				$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
 				$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
-			}
-			if ($this->CurrentAction == "gridedit") {
-				if ($this->AllowAddDeleteRow) {
-
-					// Add add blank row
-					$option = &$options["addedit"];
-					$option->UseDropDownButton = FALSE;
-					$option->UseImageAndText = TRUE;
-					$item = &$option->Add("addblankrow");
-					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = $Security->CanAdd();
-				}
-				$option = &$options["action"];
-				$option->UseDropDownButton = FALSE;
-				$option->UseImageAndText = TRUE;
-					$item = &$option->Add("gridsave");
-					$item->Body = "<a class=\"ewAction ewGridSave\" title=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("GridSaveLink") . "</a>";
-					$item = &$option->Add("gridcancel");
-					$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-					$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
 			}
 		}
 	}
@@ -3700,8 +3530,6 @@ if ($t_99home->CurrentAction == "edit")
 	$t_99home_list->RowIndex = 1;
 if ($t_99home->CurrentAction == "gridadd")
 	$t_99home_list->RowIndex = 0;
-if ($t_99home->CurrentAction == "gridedit")
-	$t_99home_list->RowIndex = 0;
 while ($t_99home_list->RecCnt < $t_99home_list->StopRec) {
 	$t_99home_list->RecCnt++;
 	if (intval($t_99home_list->RecCnt) >= intval($t_99home_list->StartRec)) {
@@ -3738,21 +3566,10 @@ while ($t_99home_list->RecCnt < $t_99home_list->StopRec) {
 				$t_99home->RowType = EW_ROWTYPE_EDIT; // Render edit
 			}
 		}
-		if ($t_99home->CurrentAction == "gridedit") { // Grid edit
-			if ($t_99home->EventCancelled) {
-				$t_99home_list->RestoreCurrentRowFormValues($t_99home_list->RowIndex); // Restore form values
-			}
-			if ($t_99home_list->RowAction == "insert")
-				$t_99home->RowType = EW_ROWTYPE_ADD; // Render add
-			else
-				$t_99home->RowType = EW_ROWTYPE_EDIT; // Render edit
-		}
 		if ($t_99home->CurrentAction == "edit" && $t_99home->RowType == EW_ROWTYPE_EDIT && $t_99home->EventCancelled) { // Update failed
 			$objForm->Index = 1;
 			$t_99home_list->RestoreFormValues(); // Restore form values
 		}
-		if ($t_99home->CurrentAction == "gridedit" && ($t_99home->RowType == EW_ROWTYPE_EDIT || $t_99home->RowType == EW_ROWTYPE_ADD) && $t_99home->EventCancelled) // Update failed
-			$t_99home_list->RestoreCurrentRowFormValues($t_99home_list->RowIndex); // Restore form values
 		if ($t_99home->RowType == EW_ROWTYPE_EDIT) // Edit row
 			$t_99home_list->EditRowCnt++;
 
@@ -4061,11 +3878,6 @@ ft_99homelist.UpdateOpts(<?php echo $t_99home_list->RowIndex ?>);
 <?php } ?>
 <?php if ($t_99home->CurrentAction == "edit") { ?>
 <input type="hidden" name="<?php echo $t_99home_list->FormKeyCountName ?>" id="<?php echo $t_99home_list->FormKeyCountName ?>" value="<?php echo $t_99home_list->KeyCount ?>">
-<?php } ?>
-<?php if ($t_99home->CurrentAction == "gridedit") { ?>
-<input type="hidden" name="a_list" id="a_list" value="gridupdate">
-<input type="hidden" name="<?php echo $t_99home_list->FormKeyCountName ?>" id="<?php echo $t_99home_list->FormKeyCountName ?>" value="<?php echo $t_99home_list->KeyCount ?>">
-<?php echo $t_99home_list->MultiSelectKey ?>
 <?php } ?>
 <?php if ($t_99home->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">
