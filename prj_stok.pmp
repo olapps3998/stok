@@ -1082,6 +1082,7 @@ function Page_Render() {
 	}
 	else {
 		$this->OtherOptions["addedit"]->Items["inlineadd"]->Visible = false;
+		$this->OtherOptions["addedit"]->Items["gridedit"]->Visible = false;
 		$this->OtherOptions["action"]->Items["multidelete"]->Visible = false;
 	}
 }
@@ -1174,6 +1175,19 @@ $(".ewMenu").prepend('<div id="loggedinUser" style="">&nbsp;&nbsp;&nbsp;&nbsp;&n
 	</select>
 	<input type="submit" name="msubmit" value="Submit">&nbsp;<input type="button" name="mback" value="Back" onclick="window.location.href='.'">
 </form>
+]]></CustomScript>
+  <CustomScript ScriptType="Server" ScriptCodeType="Table" ScriptName="Page_Render" ScriptCtrlID="list" ScriptL1Key="cf_04cetak_inv01.php" ScriptL2Key=""><![CDATA[// Page Render event
+function Page_Render() {
+	//echo "Page Render";
+	$is_master_table = CurrentMasterTable();
+	if(@$is_master_table == NULL){
+	}
+	else {
+		$this->OtherOptions["addedit"]->Items["inlineadd"]->Visible = false;
+		$this->OtherOptions["addedit"]->Items["gridedit"]->Visible = false;
+		$this->OtherOptions["action"]->Items["multidelete"]->Visible = false;
+	}
+}
 ]]></CustomScript>
   <Menu MenuID="10135" MenuText="Home" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="cf_03home2.php" MenuCustomUrl="0" MenuLevel="0" MenuShow="1" MenuDisplayOrder="100" />
   <Menu MenuID="7" MenuText="Master" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="8" MenuSecurity="" MenuUrl="" MenuCustomUrl="1" MenuLevel="0" MenuShow="1" MenuDisplayOrder="200" />

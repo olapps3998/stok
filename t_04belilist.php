@@ -3548,6 +3548,7 @@ class ct_04beli_list extends ct_04beli {
 		}
 		else {
 			$this->OtherOptions["addedit"]->Items["inlineadd"]->Visible = false;
+			$this->OtherOptions["addedit"]->Items["gridedit"]->Visible = false;
 			$this->OtherOptions["action"]->Items["multidelete"]->Visible = false;
 		}
 	}
