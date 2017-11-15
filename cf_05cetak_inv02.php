@@ -180,11 +180,11 @@ $html .= '
 	<tr>
 		<th width="30" align="center"><b>No.</b></th>
 		<th width="75" align="center"><b>Tgl. Kirim</b></th>
-		<th width="300" align="center"><b>Nama Item</b></th>
+		<th width="270" align="center"><b>Nama Item</b></th>
 		<th width="50" align="center"><b>Qty.</b></th>
 		<th width="50" align="center"><b>Satuan</b></th>
-		<th width="65" align="center"><b>Harga</b></th>
-		<th width="75" align="center"><b>Sub Total</b></th>
+		<th width="85" align="center"><b>Harga</b></th>
+		<th width="90" align="center"><b>Sub Total</b></th>
 	</tr>
 	';
 while(!$r->EOF) {
@@ -193,11 +193,11 @@ while(!$r->EOF) {
 	<tr>
 		<td width="30" align="right">'.++$no.'. &nbsp;</td>
 		<td width="75"> '.date("d", $tgl_kirim).' '.$anamabln_[intval(date("m", $tgl_kirim))].' '.date("Y", $tgl_kirim).'</td>
-		<td width="300"> '.$r->fields["item_nama"].'</td>
+		<td width="270"> '.$r->fields["item_nama"].'</td>
 		<td width="50" align="right">'.$r->fields["qty"].' &nbsp;</td>
 		<td width="50"> '.$r->fields["satuan_nama"].'</td>
-		<td width="65" align="right">'.number_format($r->fields["harga"]).' &nbsp;</td>
-		<td width="75" align="right">'.number_format($r->fields["sub_total"]).' &nbsp;</td>
+		<td width="85"><table border="0" width="100%"><tr><td width="25"> Rp.</td><td width="55" align="right">'.number_format($r->fields["harga"]).' &nbsp;</td></tr></table></td>
+		<td width="90"><table border="0" width="100%"><tr><td width="25"> Rp.</td><td width="65" align="right">'.number_format($r->fields["sub_total"]).' &nbsp;</td></tr></table></td>
 	</tr>
 	';
 	$r->MoveNext();
@@ -206,7 +206,7 @@ while(!$r->EOF) {
 $html .= '
 	<tr>
 		<td colspan="6" align="right">Total &nbsp;</td>
-		<td width="75" align="right"> '.number_format($total).' &nbsp;</td>
+		<td width="90"><table border="0" width="100%"><tr><td width="25"> Rp.</td><td width="65" align="right">'.number_format($total).' &nbsp;</td></tr></table></td>
 	</tr>
 	<tr>
 		<td colspan="7"> Terbilang : '.$terbilang.' rupiah</td>
