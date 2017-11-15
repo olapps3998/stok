@@ -545,12 +545,14 @@ class crr_jual_summary extends crr_jual {
 		$this->harga->SetVisibility();
 		$this->sub_total->SetVisibility();
 		$this->jual_id->SetVisibility();
+		$this->inv_no->SetVisibility();
+		$this->inv_tgl->SetVisibility();
 
 		// Aggregate variables
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 8;
+		$nDtls = 10;
 		$nGrps = 5;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -563,7 +565,7 @@ class crr_jual_summary extends crr_jual {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -892,6 +894,8 @@ class crr_jual_summary extends crr_jual {
 				$this->FirstRowData['harga'] = ewr_Conv($rs->fields('harga'), 4);
 				$this->FirstRowData['sub_total'] = ewr_Conv($rs->fields('sub_total'), 4);
 				$this->FirstRowData['jual_id'] = ewr_Conv($rs->fields('jual_id'), 3);
+				$this->FirstRowData['inv_no'] = ewr_Conv($rs->fields('inv_no'), 200);
+				$this->FirstRowData['inv_tgl'] = ewr_Conv($rs->fields('inv_tgl'), 133);
 			}
 		} else { // Get next row
 			$rs->MoveNext();
@@ -913,6 +917,8 @@ class crr_jual_summary extends crr_jual {
 			$this->harga->setDbValue($rs->fields('harga'));
 			$this->sub_total->setDbValue($rs->fields('sub_total'));
 			$this->jual_id->setDbValue($rs->fields('jual_id'));
+			$this->inv_no->setDbValue($rs->fields('inv_no'));
+			$this->inv_tgl->setDbValue($rs->fields('inv_tgl'));
 			$this->Val[1] = $this->tgl_kirim->CurrentValue;
 			$this->Val[2] = $this->item_nama->CurrentValue;
 			$this->Val[3] = $this->qty->CurrentValue;
@@ -920,6 +926,8 @@ class crr_jual_summary extends crr_jual {
 			$this->Val[5] = $this->harga->CurrentValue;
 			$this->Val[6] = $this->sub_total->CurrentValue;
 			$this->Val[7] = $this->jual_id->CurrentValue;
+			$this->Val[8] = $this->inv_no->CurrentValue;
+			$this->Val[9] = $this->inv_tgl->CurrentValue;
 		} else {
 			$this->no_po->setDbValue("");
 			$this->tgl->setDbValue("");
@@ -932,6 +940,8 @@ class crr_jual_summary extends crr_jual {
 			$this->harga->setDbValue("");
 			$this->sub_total->setDbValue("");
 			$this->jual_id->setDbValue("");
+			$this->inv_no->setDbValue("");
+			$this->inv_tgl->setDbValue("");
 		}
 	}
 
@@ -1112,6 +1122,8 @@ class crr_jual_summary extends crr_jual {
 				$this->GrandCnt[6] = $this->TotCount;
 				$this->GrandSmry[6] = $rsagg->fields("sum_sub_total");
 				$this->GrandCnt[7] = $this->TotCount;
+				$this->GrandCnt[8] = $this->TotCount;
+				$this->GrandCnt[9] = $this->TotCount;
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -1219,6 +1231,12 @@ class crr_jual_summary extends crr_jual {
 
 			// jual_id
 			$this->jual_id->HrefValue = "";
+
+			// inv_no
+			$this->inv_no->HrefValue = "";
+
+			// inv_tgl
+			$this->inv_tgl->HrefValue = "";
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
 			$this->RowAttrs["data-group"] = $this->no_po->GroupValue(); // Set up group attribute
@@ -1298,6 +1316,15 @@ class crr_jual_summary extends crr_jual {
 			$this->jual_id->ViewValue = $this->jual_id->CurrentValue;
 			$this->jual_id->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
+			// inv_no
+			$this->inv_no->ViewValue = $this->inv_no->CurrentValue;
+			$this->inv_no->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
+			// inv_tgl
+			$this->inv_tgl->ViewValue = $this->inv_tgl->CurrentValue;
+			$this->inv_tgl->ViewValue = ewr_FormatDateTime($this->inv_tgl->ViewValue, 0);
+			$this->inv_tgl->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
 			// no_po
 			$this->no_po->HrefValue = "";
 
@@ -1330,6 +1357,12 @@ class crr_jual_summary extends crr_jual {
 
 			// jual_id
 			$this->jual_id->HrefValue = "";
+
+			// inv_no
+			$this->inv_no->HrefValue = "";
+
+			// inv_tgl
+			$this->inv_tgl->HrefValue = "";
 		}
 
 		// Call Cell_Rendered event
@@ -1479,6 +1512,24 @@ class crr_jual_summary extends crr_jual {
 			$HrefValue = &$this->jual_id->HrefValue;
 			$LinkAttrs = &$this->jual_id->LinkAttrs;
 			$this->Cell_Rendered($this->jual_id, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// inv_no
+			$CurrentValue = $this->inv_no->CurrentValue;
+			$ViewValue = &$this->inv_no->ViewValue;
+			$ViewAttrs = &$this->inv_no->ViewAttrs;
+			$CellAttrs = &$this->inv_no->CellAttrs;
+			$HrefValue = &$this->inv_no->HrefValue;
+			$LinkAttrs = &$this->inv_no->LinkAttrs;
+			$this->Cell_Rendered($this->inv_no, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// inv_tgl
+			$CurrentValue = $this->inv_tgl->CurrentValue;
+			$ViewValue = &$this->inv_tgl->ViewValue;
+			$ViewAttrs = &$this->inv_tgl->ViewAttrs;
+			$CellAttrs = &$this->inv_tgl->CellAttrs;
+			$HrefValue = &$this->inv_tgl->HrefValue;
+			$LinkAttrs = &$this->inv_tgl->LinkAttrs;
+			$this->Cell_Rendered($this->inv_tgl, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		}
 
 		// Call Row_Rendered event
@@ -1502,6 +1553,8 @@ class crr_jual_summary extends crr_jual {
 		if ($this->harga->Visible) $this->DtlColumnCount += 1;
 		if ($this->sub_total->Visible) $this->DtlColumnCount += 1;
 		if ($this->jual_id->Visible) $this->DtlColumnCount += 1;
+		if ($this->inv_no->Visible) $this->DtlColumnCount += 1;
+		if ($this->inv_tgl->Visible) $this->DtlColumnCount += 1;
 	}
 
 	// Set up Breadcrumb
@@ -2157,6 +2210,8 @@ class crr_jual_summary extends crr_jual {
 			$this->harga->setSort("");
 			$this->sub_total->setSort("");
 			$this->jual_id->setSort("");
+			$this->inv_no->setSort("");
+			$this->inv_tgl->setSort("");
 
 		// Check for an Order parameter
 		} elseif ($orderBy <> "") {
@@ -2173,6 +2228,8 @@ class crr_jual_summary extends crr_jual {
 			$this->UpdateSort($this->harga, $bCtrl); // harga
 			$this->UpdateSort($this->sub_total, $bCtrl); // sub_total
 			$this->UpdateSort($this->jual_id, $bCtrl); // jual_id
+			$this->UpdateSort($this->inv_no, $bCtrl); // inv_no
+			$this->UpdateSort($this->inv_tgl, $bCtrl); // inv_tgl
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
 			$this->setStartGroup(1);
@@ -2979,6 +3036,42 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	</td>
 <?php } ?>
 <?php } ?>
+<?php if ($Page->inv_no->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="inv_no"><div class="r_jual_inv_no"><span class="ewTableHeaderCaption"><?php echo $Page->inv_no->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="inv_no">
+<?php if ($Page->SortUrl($Page->inv_no) == "") { ?>
+		<div class="ewTableHeaderBtn r_jual_inv_no">
+			<span class="ewTableHeaderCaption"><?php echo $Page->inv_no->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r_jual_inv_no" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->inv_no) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->inv_no->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->inv_no->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->inv_no->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->inv_tgl->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="inv_tgl"><div class="r_jual_inv_tgl"><span class="ewTableHeaderCaption"><?php echo $Page->inv_tgl->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="inv_tgl">
+<?php if ($Page->SortUrl($Page->inv_tgl) == "") { ?>
+		<div class="ewTableHeaderBtn r_jual_inv_tgl">
+			<span class="ewTableHeaderCaption"><?php echo $Page->inv_tgl->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r_jual_inv_tgl" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->inv_tgl) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->inv_tgl->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->inv_tgl->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->inv_tgl->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 	</tr>
 </thead>
 <tbody>
@@ -3239,6 +3332,14 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="jual_id"<?php echo $Page->jual_id->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->GrpCounter[2] ?>_<?php echo $Page->RecCount ?>_r_jual_jual_id"<?php echo $Page->jual_id->ViewAttributes() ?>><?php echo $Page->jual_id->ListViewValue() ?></span></td>
 <?php } ?>
+<?php if ($Page->inv_no->Visible) { ?>
+		<td data-field="inv_no"<?php echo $Page->inv_no->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->GrpCounter[2] ?>_<?php echo $Page->RecCount ?>_r_jual_inv_no"<?php echo $Page->inv_no->ViewAttributes() ?>><?php echo $Page->inv_no->ListViewValue() ?></span></td>
+<?php } ?>
+<?php if ($Page->inv_tgl->Visible) { ?>
+		<td data-field="inv_tgl"<?php echo $Page->inv_tgl->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->GrpCounter[2] ?>_<?php echo $Page->RecCount ?>_r_jual_inv_tgl"<?php echo $Page->inv_tgl->ViewAttributes() ?>><?php echo $Page->inv_tgl->ListViewValue() ?></span></td>
+<?php } ?>
 	</tr>
 <?php
 
@@ -3337,11 +3438,17 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->jual_id->Visible) { ?>
 		<td data-field="jual_id"<?php echo $Page->no_po->CellAttributes() ?>></td>
 <?php } ?>
+<?php if ($Page->inv_no->Visible) { ?>
+		<td data-field="inv_no"<?php echo $Page->no_po->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->inv_tgl->Visible) { ?>
+		<td data-field="inv_tgl"<?php echo $Page->no_po->CellAttributes() ?>></td>
+<?php } ?>
 	</tr>
 <?php } else { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->GrpColumnCount + $Page->DtlColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->jual_id->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->no_po->GroupViewValue, $Page->no_po->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->inv_tgl->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->no_po->GroupViewValue, $Page->no_po->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
 <?php } ?>
 	</tr>
 	<tr<?php echo $Page->RowAttributes(); ?>>
@@ -3364,11 +3471,17 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="harga"<?php echo $Page->no_po->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->sub_total->Visible) { ?>
-		<td data-field="sub_total"<?php echo $Page->jual_id->CellAttributes() ?>>
+		<td data-field="sub_total"<?php echo $Page->inv_tgl->CellAttributes() ?>>
 <span data-class="tpgs<?php echo $Page->GrpCount ?>_r_jual_sub_total"<?php echo $Page->sub_total->ViewAttributes() ?>><?php echo $Page->sub_total->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->jual_id->Visible) { ?>
 		<td data-field="jual_id"<?php echo $Page->no_po->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->inv_no->Visible) { ?>
+		<td data-field="inv_no"<?php echo $Page->no_po->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->inv_tgl->Visible) { ?>
+		<td data-field="inv_tgl"<?php echo $Page->no_po->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 	</tr>
 <?php } ?>
@@ -3440,6 +3553,12 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->jual_id->Visible) { ?>
 		<td data-field="jual_id"<?php echo $Page->jual_id->CellAttributes() ?>></td>
 <?php } ?>
+<?php if ($Page->inv_no->Visible) { ?>
+		<td data-field="inv_no"<?php echo $Page->inv_no->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->inv_tgl->Visible) { ?>
+		<td data-field="inv_tgl"<?php echo $Page->inv_tgl->CellAttributes() ?>></td>
+<?php } ?>
 	</tr>
 <?php } else { ?>
 	<tr<?php echo $Page->RowAttributes() ?>><td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"><?php echo $ReportLanguage->Phrase("RptGrandSummary") ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->TotCount,0,-2,-2,-2); ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td></tr>
@@ -3468,6 +3587,12 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php if ($Page->jual_id->Visible) { ?>
 		<td data-field="jual_id"<?php echo $Page->jual_id->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->inv_no->Visible) { ?>
+		<td data-field="inv_no"<?php echo $Page->inv_no->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->inv_tgl->Visible) { ?>
+		<td data-field="inv_tgl"<?php echo $Page->inv_tgl->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 	</tr>
 <?php } ?>

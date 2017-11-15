@@ -20,6 +20,8 @@ class crr_jual extends crTableBase {
 	var $harga;
 	var $sub_total;
 	var $jual_id;
+	var $inv_no;
+	var $inv_tgl;
 
 	//
 	// Table class constructor
@@ -151,6 +153,23 @@ class crr_jual extends crTableBase {
 		$this->jual_id->DateFilter = "";
 		$this->jual_id->SqlSelect = "";
 		$this->jual_id->SqlOrderBy = "";
+
+		// inv_no
+		$this->inv_no = new crField('r_jual', 'r_jual', 'x_inv_no', 'inv_no', '`inv_no`', 200, EWR_DATATYPE_STRING, -1);
+		$this->inv_no->Sortable = TRUE; // Allow sort
+		$this->fields['inv_no'] = &$this->inv_no;
+		$this->inv_no->DateFilter = "";
+		$this->inv_no->SqlSelect = "";
+		$this->inv_no->SqlOrderBy = "";
+
+		// inv_tgl
+		$this->inv_tgl = new crField('r_jual', 'r_jual', 'x_inv_tgl', 'inv_tgl', '`inv_tgl`', 133, EWR_DATATYPE_DATE, 0);
+		$this->inv_tgl->Sortable = TRUE; // Allow sort
+		$this->inv_tgl->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_FORMAT"], $ReportLanguage->Phrase("IncorrectDate"));
+		$this->fields['inv_tgl'] = &$this->inv_tgl;
+		$this->inv_tgl->DateFilter = "";
+		$this->inv_tgl->SqlSelect = "";
+		$this->inv_tgl->SqlOrderBy = "";
 	}
 
 	// Set Field Visibility
