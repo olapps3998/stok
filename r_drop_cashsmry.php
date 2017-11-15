@@ -1217,8 +1217,9 @@ class crr_drop_cash_summary extends crr_drop_cash {
 
 			// sisa
 			$this->sisa->GroupViewValue = $this->sisa->GroupOldValue();
-			$this->sisa->GroupViewValue = ewr_FormatNumber($this->sisa->GroupViewValue, $this->sisa->DefaultDecimalPrecision, -1, 0, 0);
+			$this->sisa->GroupViewValue = ewr_FormatNumber($this->sisa->GroupViewValue, 0, -2, -2, -2);
 			$this->sisa->CellAttrs["class"] = ($this->RowGroupLevel == 4) ? "ewRptGrpSummary4" : "ewRptGrpField4";
+			$this->sisa->CellAttrs["style"] = "text-align:right;";
 			$this->sisa->GroupViewValue = ewr_DisplayGroupValue($this->sisa, $this->sisa->GroupViewValue);
 			$this->sisa->GroupSummaryOldValue = $this->sisa->GroupSummaryValue;
 			$this->sisa->GroupSummaryValue = $this->sisa->GroupViewValue;
@@ -1316,8 +1317,9 @@ class crr_drop_cash_summary extends crr_drop_cash {
 
 			// sisa
 			$this->sisa->GroupViewValue = $this->sisa->GroupValue();
-			$this->sisa->GroupViewValue = ewr_FormatNumber($this->sisa->GroupViewValue, $this->sisa->DefaultDecimalPrecision, -1, 0, 0);
+			$this->sisa->GroupViewValue = ewr_FormatNumber($this->sisa->GroupViewValue, 0, -2, -2, -2);
 			$this->sisa->CellAttrs["class"] = "ewRptGrpField4";
+			$this->sisa->CellAttrs["style"] = "text-align:right;";
 			$this->sisa->GroupViewValue = ewr_DisplayGroupValue($this->sisa, $this->sisa->GroupViewValue);
 			if ($this->sisa->GroupValue() == $this->sisa->GroupOldValue() && !$this->ChkLvlBreak(4))
 				$this->sisa->GroupViewValue = "&nbsp;";
@@ -2807,15 +2809,15 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<td data-field="sisa">&nbsp;</td>
 	<?php } else { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="sisa"><div class="r_drop_cash_sisa"><span class="ewTableHeaderCaption"><?php echo $Page->sisa->FldCaption() ?></span></div></td>
+	<td data-field="sisa"><div class="r_drop_cash_sisa" style="text-align: right;"><span class="ewTableHeaderCaption"><?php echo $Page->sisa->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="sisa">
 <?php if ($Page->SortUrl($Page->sisa) == "") { ?>
-		<div class="ewTableHeaderBtn r_drop_cash_sisa">
+		<div class="ewTableHeaderBtn r_drop_cash_sisa" style="text-align: right;">
 			<span class="ewTableHeaderCaption"><?php echo $Page->sisa->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer r_drop_cash_sisa" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->sisa) ?>',2);">
+		<div class="ewTableHeaderBtn ewPointer r_drop_cash_sisa" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->sisa) ?>',2);" style="text-align: right;">
 			<span class="ewTableHeaderCaption"><?php echo $Page->sisa->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->sisa->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->sisa->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
