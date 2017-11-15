@@ -237,7 +237,6 @@ $html .= '<tr><td>Hormat kami,</td></tr>';
 $html .= '<tr><td>&nbsp;</td></tr>';
 $html .= '<tr><td>&nbsp;</td></tr>';
 $html .= '<tr><td>&nbsp;</td></tr>';
-$html .= '<tr><td>&nbsp;</td></tr>';
 $html .= '<tr><td align="left">HARIS</td></tr>';
 $html .= '</table>';
 
