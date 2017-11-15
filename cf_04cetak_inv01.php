@@ -312,15 +312,15 @@ Page_Rendering();
 </div>
 <?php } ?>
 <form method="post" action="cf_05cetak_inv02.php">
-	Pilih No. PO :
+	Pilih No. Invoice :
 	<select name="jual_id">
-		<option value="0">No. PO</option>
+		<option value="0">No. Invoice</option>
 		<?php
-		$q = "select * from t_06jual order by no_po";
+		$q = "select * from t_06jual where inv_no <> '' order by inv_no desc";
 		$r = Conn()->Execute($q);
 		while (!$r->EOF) {
 			?>
-			<option value="<?php echo $r->fields['jual_id']?>"><?php echo $r->fields["no_po"]?></option>
+			<option value="<?php echo $r->fields['jual_id']?>"><?php echo $r->fields["inv_no"]?></option>
 			<?php
 			$r->MoveNext();
 		}

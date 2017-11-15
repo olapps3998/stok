@@ -165,9 +165,9 @@ $html .= '<tr><td>&nbsp;</td></tr>';
 $html .= '</table>';
 
 $html .= '<table border="0" width="100%">';
-$html .= '<tr><td width="100">No. Invoice</td><td>: </td></tr>';
-$tgl_po = strtotime($r->fields["tgl"]);
-$html .= '<tr><td>Tanggal</td><td>: '.date("d", $tgl_po).' '.$anamabln_[intval(date("m", $tgl_po))].' '.date("Y", $tgl_po).'</td></tr>';
+$html .= '<tr><td width="100">No.</td><td>: '.$r->fields["inv_no"].'</td></tr>';
+$inv_tgl = strtotime($r->fields["inv_tgl"]);
+$html .= '<tr><td>Tanggal</td><td>: '.date("d", $inv_tgl).' '.$anamabln_[intval(date("m", $inv_tgl))].' '.date("Y", $inv_tgl).'</td></tr>';
 $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 $html .= '<tr><td>Customer</td><td>: '.$r->fields["customer_nama"].'</td></tr>';
 $html .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';

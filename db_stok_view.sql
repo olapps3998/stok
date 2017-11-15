@@ -19,22 +19,24 @@ From ((t_04beli
   Join t_03satuan On t_04beli.satuan_id = t_03satuan.satuan_id;
 
 create view v_02jual_laporan as  
-Select t_06jual.jual_id As jual_id,
-  t_06jual.no_po As no_po,
-  t_06jual.tgl As tgl,
-  t_05customer.customer_nama As customer_nama,
-  t_06jual.total As total,
-  t_07jual_detail.tgl_kirim As tgl_kirim,
-  t_02item.item_nama As item_nama,
-  t_07jual_detail.qty As qty,
-  t_03satuan.satuan_nama As satuan_nama,
-  t_07jual_detail.harga As harga,
-  t_07jual_detail.sub_total As sub_total
-From (((t_06jual
-  Join t_07jual_detail On t_06jual.jual_id = t_07jual_detail.jual_id)
-  Join t_05customer On t_06jual.customer_id = t_05customer.customer_id)
-  Join t_02item On t_07jual_detail.item_id = t_02item.item_id)
-  Join t_03satuan On t_07jual_detail.satuan_id = t_03satuan.satuan_id;
+SELECT t_06jual.jual_id AS jual_id,
+  t_06jual.no_po AS no_po,
+  t_06jual.tgl AS tgl,
+  t_05customer.customer_nama AS customer_nama,
+  t_06jual.total AS total,
+  t_07jual_detail.tgl_kirim AS tgl_kirim,
+  t_02item.item_nama AS item_nama,
+  t_07jual_detail.qty AS qty,
+  t_03satuan.satuan_nama AS satuan_nama,
+  t_07jual_detail.harga AS harga,
+  t_07jual_detail.sub_total AS sub_total,
+  t_06jual.inv_no AS inv_no,
+  t_06jual.inv_tgl AS inv_tgl
+FROM (((t_06jual
+  JOIN t_07jual_detail ON t_06jual.jual_id = t_07jual_detail.jual_id)
+  JOIN t_05customer ON t_06jual.customer_id = t_05customer.customer_id)
+  JOIN t_02item ON t_07jual_detail.item_id = t_02item.item_id)
+  JOIN t_03satuan ON t_07jual_detail.satuan_id = t_03satuan.satuan_id;
   
 create view v_03masuk as
 Select t_04beli.item_id As item_id,
