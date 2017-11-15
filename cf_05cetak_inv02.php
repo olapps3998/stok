@@ -148,6 +148,9 @@ $q = "select * from v_02jual_laporan where jual_id = '".$_POST["jual_id"]."'"; /
 $r = Conn()->Execute($q); 
 $terbilang = Terbilang(number_format($r->fields["total"], 0, "", "")); //echo number_format($r->fields["total"], 0, "", ""); exit;
 $total = $r->fields["total"];
+$no_po = $r->fields["no_po"];
+$tgl_po_raw = strtotime($r->fields["tgl"]);
+$tgl_po = date("d", $tgl_po_raw).' '.$anamabln_[intval(date("m", $tgl_po_raw))].' '.date("Y", $tgl_po_raw);
 
 $html = '';
 
@@ -213,6 +216,16 @@ $html .= '
 	</tr>
 	</table>';
 
+$html .= '<table border="0">';
+$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
+$html .= '<tr><td colspan="2">Keterangan :</td></tr>';
+$html .= '<tr><td width="5">-</td><td>&nbsp;Non PPN dan Non NPWP</td></tr>';
+$html .= '<tr><td>-</td><td>&nbsp;Rekening transfer :</td></tr>';
+$html .= '<tr><td>&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bank [bank] - no. rekening [no_rek] - atas nama [nama]</td></tr>';
+$html .= '<tr><td>-</td><td>&nbsp;Invoice ini berdasar pada PO No. '.$no_po.' Tgl. '.$tgl_po.'</td></tr>';
+$html .= '</table>';
+	
 $html .= '<table border="0">';
 $html .= '<tr><td>&nbsp;</td></tr>';
 $html .= '<tr><td>&nbsp;</td></tr>';
