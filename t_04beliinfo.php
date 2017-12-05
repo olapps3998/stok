@@ -1521,9 +1521,20 @@ class ct_04beli extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
-		$tot_det = ew_ExecuteScalar("select sum(sub_total) from t_04beli where dc_id = ".$rsnew["dc_id"]."");
-		$jml_dc = ew_ExecuteScalar("select jumlah from t_14drop_cash where dc_id = ".$rsnew["dc_id"]."");
-		ew_Execute("update t_14drop_cash set pemakaian_total = ".$tot_det.", sisa = ".$jml_dc - $tot_det." where dc_id = ".$rsnew["dc_id"]."");
+		$dc_id = ew_ExecuteScalar("select dc_id from t_04beli where beli_id = ".$rsnew["beli_id"]."");
+
+		//echo $dc_id; exit;
+		$tot_det = ew_ExecuteScalar("select sum(sub_total) from t_04beli where dc_id = ".$dc_id."");
+		$jml_dc = ew_ExecuteScalar("select jumlah from t_14drop_cash where dc_id = ".$dc_id."");
+
+		//echo $jml_dc." - ".(is_null($jml_dc) ? "ini null" : "tidak null"); exit;
+		//echo $jml_dc." - ".(empty($jml_dc) ? "ini empty" : "tidak empty"); exit;
+
+		if (!empty($jml_dc)) {
+			ew_Execute("update t_14drop_cash set pemakaian_total = ".$tot_det.", sisa = ".$jml_dc - $tot_det." where dc_id = ".$dc_id."");
+		}
+
+		//ew_Execute("update t_14drop_cash set pemakaian_total = ".$tot_det.", sisa = ".$jml_dc - $tot_det." where dc_id = ".$dc_id."");
 	}
 
 	// Row Updating event
@@ -1548,7 +1559,7 @@ class ct_04beli extends cTable {
 			$sisa = $jml_dc - $tot_det;
 			ew_Execute("update t_14drop_cash set pemakaian_total = ".$tot_det.", sisa = ".$sisa." where dc_id = ".$rsnew["dc_id"]."");
 		}
-		else {
+		else { //echo "lewat"; exit;
 			$tot_det = ew_ExecuteScalar("select sum(sub_total) from t_04beli where dc_id = ".$rsold["dc_id"]."");
 			$tot_det = (is_null($tot_det) ? 0 : $tot_det);
 			$jml_dc = ew_ExecuteScalar("select jumlah from t_14drop_cash where dc_id = ".$rsold["dc_id"]."");
